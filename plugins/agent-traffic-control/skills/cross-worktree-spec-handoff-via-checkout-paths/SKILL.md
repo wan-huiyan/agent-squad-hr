@@ -1,22 +1,23 @@
 ---
 name: cross-worktree-spec-handoff-via-checkout-paths
 description: |
-  Pass design specs, handoff prompts, or any shared artefact between two parallel Claude Code
-  sessions in different git worktrees on different branches, without merging the producing branch
-  to main first. Use when: (1) session A produced design docs / a handoff prompt / a mockup file
-  on branch X, (2) session B (different cwd / worktree, branch Y off main) reports "the file
-  doesn't exist" or "I can't find the design spec you mentioned", (3) you want B unblocked NOW
-  without a PR review cycle, (4) both worktrees share one `.git`. The unblock: `git checkout
-  <producing-branch> -- <paths>` in B's worktree pulls the files in as staged additions. Covers
-  the gitignore-exception trick for blanket-ignored files (`*.html` mockups). Diagnostic-search
-  variant: user says "execute <path/to/file>" but it isn't in your worktree — `git log --all
-  --diff-filter=A -- <path>` + `git branch --contains <sha>` find which branch holds it; `git show
-  <branch>:<path>` reads it without modifying your tree. Clean-PR-extraction variant: land a
-  mergeable SUBSET on main from a branch SHARED with a live parallel session or holding
-  DO-NOT-MERGE content — cut a THROWAWAY worktree off origin/main, check the safe paths into it,
-  never branch-switch that worktree (it yanks the other session's files). cwd-relative-pathspec
-  trap: `git log -- <root-relative-path>` returns EMPTY from a subdir, masking a file that IS
-  committed; use `git log --all --name-only | grep`, `git -C <root>`, or an absolute-path Read.
+  Pass design specs or any shared artefact between two parallel Claude Code sessions in
+  different worktrees on different branches, without merging the producing branch to main first.
+  Use when: (1) session A produced design docs / a handoff prompt / a mockup file on branch X,
+  (2) session B (different cwd/worktree, branch Y off main) reports "the file doesn't exist" or
+  "I can't find the design spec you mentioned", (3) you want B unblocked NOW, no PR review
+  cycle, (4) both worktrees share one `.git`. Unblock: `git checkout <producing-branch> --
+  <paths>` in B's worktree pulls them in as staged additions. Covers the gitignore-exception
+  trick for blanket-ignored files (`*.html` mockups). Diagnostic-search variant: user says
+  "execute <path/to/file>" but it isn't in your worktree — `git log --all --diff-filter=A --
+  <path>` + `git branch --contains <sha>` find which branch holds it; `git show <branch>:<path>`
+  reads it without modifying your tree. Clean-PR-extraction variant: land a mergeable SUBSET on
+  main from a branch SHARED with a live parallel session or DO-NOT-MERGE content — cut a
+  THROWAWAY worktree off origin/main, check safe paths in, never branch-switch the SHARED
+  worktree (it yanks the parallel session's files). Cleanup: `gh pr merge --delete-branch` fails
+  when main is checked out elsewhere. cwd-relative-pathspec trap: `git log --
+  <root-relative-path>` returns EMPTY from a subdir, masking a committed file; use `git log
+  --all --name-only | grep`, `git -C <root>`, or absolute-path Read.
 author: Claude Code
 version: 1.3.1
 date: 2026-08-04
