@@ -11,10 +11,11 @@ description: |
   you're tempted to trust a scope doc that "looks authoritative" (prior-PR approvals,
   multi-session review history), (4) dispatch cost is $50+ or wallclock is in hours. Catches
   predecessor docs that assert dataset/column names confidently but wrongly — fabricated from
-  memory or stale from an older schema. Typical catches: a dataset path that doesn't exist
-  (`project.dataset_a` vs `project.dataset_b.dataset_a`), a label column that is plausible but
-  wrong (`enrolled_2025` vs `enrolled_segment_a`), an assumed-but-absent column-name prefix
-  (`evt_page_visit_30d` vs `page_visit_8_30d`). Related but distinct from
+  memory or stale from a prior schema. Typical catches: a dataset path that doesn't exist
+  (`project.dataset_a` instead of `project.dataset_b.dataset_a`), a label column that is
+  plausible but wrong (`enrolled_2025` instead of `enrolled_segment_a`), a column-name prefix
+  convention that is assumed but absent (`evt_page_visit_30d` instead of
+  `page_visit_8_30d`). Related but distinct from
   `verify-plan-constants-against-data`, which covers enum/category VALUES inside columns; this
   skill covers the STRUCTURE (dataset paths, table names, column names).
 author: Claude Code

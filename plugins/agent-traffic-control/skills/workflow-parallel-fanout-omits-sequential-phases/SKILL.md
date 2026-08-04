@@ -6,18 +6,20 @@ description: |
   VANISHES when the task is run under "ultracode" or authored as a Workflow — the run
   collapses to a parallel find→verify→judge with no reviewer-to-reviewer cross-talk.
   Use when: (1) you ran "review / red-team / debate X in ultracode mode" and the
-  workflow shows only ~3 stages (review → verify → judge), no debate/reflection/blind-
-  final; (2) you invoked a multi-phase SKILL (e.g. roundtable:agent-review-panel) but
+  workflow shows only ~3 stages (review → verify → judge), no
+  debate/reflection/blind-final; (2) you invoked a multi-phase SKILL (e.g.
+  roundtable:agent-review-panel) but
   the execution was a parallel fan-out with no agents reading each other; (3) a skill
   whose spec MANDATES sequential phases produced a result with those phases absent and
-  it is NOT context-compression (that's the sister skill multi-agent-skill-silent-phase-
-  compression). Counter-intuitive root cause: the Workflow/ultracode engine is a PARALLEL
+  it is NOT context-compression (that's the sister skill
+  multi-agent-skill-silent-phase-compression). Counter-intuitive root cause: the
+  Workflow/ultracode engine is a PARALLEL
   fan-out engine (parallel()/pipeline(), agents never see each other) with no primitive
   for sequential cross-talk — so "run it as a workflow" structurally omits debate, and
   invoking a skill under ultracode-bias ≠ running the skill's protocol.
 author: Claude Code
-version: 1.0.0
-date: 2026-06-06
+version: 1.0.1
+date: 2026-08-04
 disable-model-invocation: true
 ---
 

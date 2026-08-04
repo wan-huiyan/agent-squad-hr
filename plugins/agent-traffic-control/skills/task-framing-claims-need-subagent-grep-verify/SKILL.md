@@ -1,8 +1,8 @@
 ---
 name: task-framing-claims-need-subagent-grep-verify
 description: |
-  When dispatching a sub-agent (Agent / Task) to WRITE content that cross-
-  references existing code paths, explicitly grant + expect grep-driven
+  When dispatching a sub-agent (Agent / Task) to WRITE content that
+  cross-references existing code paths, explicitly grant + expect grep-driven
   correction of the dispatcher's task-framing claims. Use when:
   (1) your prompt to a sub-agent asserts facts about what an existing
   codebase contains ("X is NOT in v6.1", "Y is already implemented at
@@ -20,8 +20,8 @@ description: |
   covers the INVERSION: telling write-content agents they can correct
   YOU.
 author: Claude Code
-version: 1.0.0
-date: 2026-05-27
+version: 1.0.1
+date: 2026-08-04
 disable-model-invocation: true
 ---
 

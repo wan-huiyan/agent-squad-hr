@@ -12,6 +12,12 @@ Checks (stdlib only, no external deps):
   6. Every SKILL.md frontmatter `name:` equals its containing directory name.
   7. If a VERSION file exists: it is non-empty; and for a single-plugin repo it must
      equal that plugin's plugin.json version (drift guard).
+  8. Every marketplace entry's `version` equals that plugin's plugin.json version.
+     Without this, a release can bump VERSION + plugin.json and leave the marketplace
+     entry consumers actually read on the previous version, and CI passes anyway.
+     81ebb0f (v1.5.0) shipped exactly that way -- VERSION and plugin.json at 1.5.0,
+     marketplace.json still 1.4.0 -- and was silently corrected by f1254dd (v1.6.0).
+     The same drift recurred in afbee80 and was caught in review, not by CI.
 
 Exit 0 = all good; exit 1 = one or more failures (printed).
 """
@@ -71,6 +77,7 @@ def main():
             err(f"marketplace.json missing top-level `{key}`")
     plugins = mkt.get("plugins", [])
     registered = {}
+    mkt_versions = {}
     for p in plugins:
         name, source = p.get("name"), p.get("source", "")
         if not name or not source:
@@ -79,6 +86,7 @@ def main():
         if name in registered:
             err(f"plugin `{name}` registered more than once in marketplace.json")
         registered[name] = source.lstrip("./")
+        mkt_versions[name] = p.get("version")
 
     plugins_dir = os.path.join(ROOT, "plugins")
     on_disk = set()
@@ -107,6 +115,14 @@ def main():
                     err(f"{pj}: name `{pjd.get('name')}` != marketplace entry `{name}`")
                 if not pjd.get("version"):
                     warn(f"{pj}: no version field")
+                # Marketplace <-> plugin.json version drift guard. The marketplace
+                # entry is what consumers read, so it must not lag plugin.json.
+                mv = mkt_versions.get(name)
+                if not mv:
+                    warn(f"marketplace.json entry `{name}`: no version field")
+                elif pjd.get("version") and mv != pjd["version"]:
+                    err(f"marketplace.json `{name}` version ({mv}) != "
+                        f"{rel}/.claude-plugin/plugin.json version ({pjd['version']})")
         # skill presence: flat SKILL.md or nested skills/*/SKILL.md
         flat = os.path.join(pdir, "SKILL.md")
         skills_dir = os.path.join(pdir, "skills")

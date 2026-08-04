@@ -31,8 +31,46 @@ python3 scripts/check_skill_descriptions.py . --no-color --triggers   # exit 0 =
 synonym runs and cut prose/implementation detail — never delete a distinct concept, and keep
 any "NOT for ..." negative list, which is what stops false firing. Land ~30–50 chars under the
 cap so the next edit does not re-break it. The script is vendored from
-[wan-huiyan/context-police](https://github.com/wan-huiyan/context-police); fix it there and
-re-vendor rather than forking it here.
+[wan-huiyan/context-police](https://github.com/wan-huiyan/context-police) (currently v2.2.0);
+fix it there and re-vendor rather than forking it here.
+
+The same script also fails on **line-wrap corruption**: `description: >` and `description: |`
+join their lines, so a line that ends in a hyphen silently becomes `token- efficient` in the
+text the harness injects. The usual cause is re-wrapping with `textwrap.wrap()`, which breaks
+on hyphens by default — pass `break_on_hyphens=False`. The character count is unchanged, so no
+length check can see it.
+
+### Before/after a trim, run both checks — they see different things
+
+```bash
+# 1. Trigger-surface diff: what a reviewer must read. Exit 1 on DROPPED or NARROWED.
+python3 scripts/check_skill_descriptions.py --no-color \
+    --compare main:plugins/agent-traffic-control/skills/<skill>/SKILL.md \
+              plugins/agent-traffic-control/skills/<skill>/SKILL.md
+
+# 2. Coverage against a committed eval suite of natural-language prompts.
+python3 scripts/score_trigger_coverage.py \
+    --old  main:plugins/agent-traffic-control/skills/<skill>/SKILL.md \
+    --new  plugins/agent-traffic-control/skills/<skill>/SKILL.md \
+    --eval scripts/eval/<skill>.eval-suite.json
+```
+
+`--compare` catches what coverage scoring structurally cannot: **NARROWED**, where a
+precondition is added to a trigger so it fires for fewer users. The word set is identical, so
+every bag-of-words metric scores it the same. Read the `NARROWED` and `REWORDED` rows yourself;
+do not clear them with a number.
+
+`score_trigger_coverage.py` baselines against `old_description[:1535]` — what the model
+actually saw — not the full oversized source. **If a PR quotes coverage figures, the eval suite
+must be committed under `scripts/eval/`.** An unreproducible table is worse than no table.
+
+### Getting under the cap is necessary, not sufficient
+
+A second limit, `skillListingBudgetFraction` (1% of the context window), sizes the whole
+listing. When the total is over budget the harness collapses descriptions to bare names, ranked
+by usage rather than by length — so a description can be fully under the cap and still reach
+the model as a name only. `check_skill_descriptions.py` prints the budget line for a given
+`--context`. Claim "no longer truncated"; never claim "guaranteed visible".
 
 ## One-time local setup (recommended)
 
@@ -56,5 +94,10 @@ genuine false positive — narrow the pattern or add an exclusion in `scripts/le
 
 ## If the description gate fires
 
-Trim the flagged description down to size. Do **not** raise `--max-chars`: the cap is read out
-of the Claude Code binary, so overriding it only hides the truncation, it does not prevent it.
+**OVER CAP** — trim the flagged description down to size. Do **not** raise `--max-chars`: the
+cap is read out of the Claude Code binary, so overriding it only hides the truncation, it does
+not prevent it.
+
+**BROKEN BY LINE-WRAP** — repair the split token and re-wrap the block without breaking on
+hyphens. Do not "fix" it by shortening the line; the corruption is the hyphen at the line end,
+not the length.
