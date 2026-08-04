@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-# Committed leak gate (pre-push). Enable once per clone:
+# Committed publishing gates (pre-push). Enable once per clone:
 #   git config core.hooksPath .githooks
-# Blocks a push carrying a candidate client/PII identifier. See CONTRIBUTING.md.
+# 1. Blocks a push carrying a candidate client/PII identifier.
+# 2. Blocks a push whose SKILL.md description would be truncated mid-sentence
+#    by Claude Code's skill-listing cap. See CONTRIBUTING.md.
 set -e
 ROOT="$(git rev-parse --show-toplevel)"
+python3 "$ROOT/scripts/check_skill_descriptions.py" "$ROOT" --no-color --triggers
 exec bash "$ROOT/scripts/leak_scan.sh" "$ROOT"
