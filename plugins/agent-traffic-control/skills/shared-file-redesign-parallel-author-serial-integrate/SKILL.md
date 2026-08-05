@@ -197,25 +197,9 @@ what kept a 12-component fan-out collision-free.
   that collide with a redesign's files; complementary (run both).
 - `parallel-pr-scope-overlap-tiebreaker-delta-check` — two simultaneous PRs vs one
   redesign + WIP elsewhere.
-- `batch-authored-stacked-pr-plans-stale-edit-anchors` — why line-number anchors in
-  parallel prompts rot; anchor on grep instead.
-- `template-inlined-css-is-one-surface-not-two`,
-  `parallel-pr-template-fork-duplicates-moved-section` — the shared-CSS / moved-
-  section collision specifics.
-- `pre-dispatch-schema-probe`, `deploy-gate-success-report-doesnt-prove-the-gated-path`
-  — why the backend gating-spike goes first and must bake.
+- `parallel-pr-template-fork-duplicates-moved-section` — the shared-CSS /
+  moved-section collision specifics.
+- `pre-dispatch-schema-probe` — why the backend gating-spike goes first and
+  must bake.
 - `session-handoff` (Phase 3 step 18) — the disjoint-files default this skill
   extends.
-- `vite-hmr-transient-console-errors-verify-on-fresh-reload` — the in-session
-  Variant browser-smokes a live dev server while agents write files; verify on a
-  FRESH server, not the dirty HMR console.
-- `claude-design-handoff-bundle` — the prototype-port reconciliation (visuals
-  authoritative; bind real data; never port the prototype's fabricated panels) the
-  Variant's "mine BOTH sources" step rests on.
-
-## See also
-
-- `fanout-section-redesign-behind-build-failing-rendered-contract` — the SAME-session sibling:
-  when the slices are DISJOINT section files and the risk is spec-interpretation drift rather
-  than file collision, fan out agents behind an executable (build-failing, rendered-DOM)
-  contract instead of splitting across sessions.

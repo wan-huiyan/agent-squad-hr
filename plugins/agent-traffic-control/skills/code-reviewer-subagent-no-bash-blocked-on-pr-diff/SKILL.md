@@ -115,6 +115,5 @@ correct first dispatch would have avoided.
   of this skill (published in `wan-huiyan/overnight-workflows`): in an unattended run a BLOCKED
   reviewer reads as CLEAN with no human to notice, so the bug ships by morning. This skill is the
   general tool-gap mechanism; that one adds the autonomy consequence + morning-synthesis rule.
-- `voltagent-reviewer-no-write-tool` — sibling tool-gap (Write missing → inline output)
 - `stacked-pr-review-per-base-diff-and-attach` — scoping stacked-PR diffs per base
 - `subagent-bash-cd-wrong-worktree` — Bash-capable agents landing in the wrong worktree

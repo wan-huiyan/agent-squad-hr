@@ -161,4 +161,3 @@ findings (which ran real Python) were genuine.
 ## References / See also
 - `concurrent-session-checkout-clobbers-shared-worktree` — branch-switch variant by an unknown session.
 - `subagent-read-stale-worktree-needs-head-pin` — read-only stale-worktree variant (no mutation).
-- `git-add-all-sweeps-untracked-artifacts-into-commit` — the staging discipline for the commit step.

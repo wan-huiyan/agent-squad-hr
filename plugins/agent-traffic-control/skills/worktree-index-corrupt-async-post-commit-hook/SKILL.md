@@ -223,5 +223,3 @@ eliminated the race for the rest of the merge sequence.
 - `gh-pr-merge-worktree-checkout-trap` — *different* problem: gh refuses
   to delete a remote branch that's checked out in a sibling worktree.
 - `using-git-worktrees` / `git-worktree` — general worktree workflow.
-- `claude-code-hook-json-schema` — Claude Code's hook system, unrelated
-  to git hooks but in the same hook-design family.
