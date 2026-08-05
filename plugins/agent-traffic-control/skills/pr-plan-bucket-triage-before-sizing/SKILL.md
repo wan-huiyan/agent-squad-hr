@@ -285,8 +285,6 @@ emerged from the same evidence-first pattern.
   loop. This skill is its read-only sibling for investigation.
 - `superpowers:brainstorming` — what produced the speculative design
   this skill audits.
-- `cdc-field-history-coverage-audit-before-scoping-temporal-fix` — a
-  domain-specific instance of the same "audit before scoping" pattern.
 - `successor-handoff` — when the synthesis output becomes the next
   session's kickoff context.
 

@@ -425,12 +425,6 @@ good revision), then proper rebuild instructions handed back to user
   That skill covers the LOUD case (`fatal: unable to read <sha>`
   errors); this skill's v1.2 variant covers the SILENT case (no
   error, pull's "Updating X..Y" line lies, deploy ships old code).
-- `baked-payload-stale-after-merge` — same symptom (fix not visible
-  after redeploy), different cause (baker / pre-aggregation job not
-  redeployed; serving image is fine). Check that one FIRST if your
-  architecture has a separate baker. Check THIS one if there is no
-  baker, or if the file in question is a static template / Python
-  module (not data).
 - `gh-pr-merge-worktree-checkout-trap` — different worktree pitfall
   (gh CLI refusing to delete branch checked out in another worktree).
 - `subagent-bash-cd-wrong-worktree` — subagent context, not deploy.

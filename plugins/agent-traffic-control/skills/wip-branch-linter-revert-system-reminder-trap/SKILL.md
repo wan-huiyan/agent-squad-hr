@@ -206,8 +206,4 @@ to `("Low",)` and re-baked. Your H+D vs Low framing is intact."*
 
 ## See also
 
-- `flask-debug-ttl-cache-stale-after-rebake` — sister fix for the
-  downstream "I re-baked but the page still shows old data" case
-- `dashboard-worktree-main-gap` — primary worktree switching branches mid-session
-- `baked-payload-stale-after-merge` — baked payload vs. deployed code mismatch
 - `deploy-from-stale-worktree-silent-rollback` — deploy from a stale checkout

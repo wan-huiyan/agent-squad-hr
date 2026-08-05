@@ -257,8 +257,6 @@ S156 4-track orchestration on the project repo (2026-05-08):
 - Sister skill: `anthropic-credit-balance-error-vs-app-bug` (diagnose fake-vs-real
   credit errors at write-time; this skill picks up after the credit issue is real
   and resolved)
-- Related skill: `pr-conflict-site-regen` (rebase conflict resolution after
-  parallel-track collisions on `docs/site/` + `generate_roadmap_backlog.py`)
 - Related skill: `using-git-worktrees` (the substrate that makes parallel tracks
   isolatable in the first place)
 - Related skill: `dispatching-parallel-agents` (when to choose parallel dispatch in

@@ -205,6 +205,3 @@ uncommitted; one labeled follow-up issue; an existing memory file updated in pla
   conflicts in git.
 - `session-handoff` — the Variant above inverts its Phase 4 (commit-all + PR +
   auto-merge) for a shared, live-co-edited, gated branch.
-- `shipped-change-not-visible-deploy-vs-gate-vs-cache` (Step 0) — the general
-  "don't conclude from a shallow grep of a built artifact; read the source" rule
-  the coverage-check bullet specializes for section-assembled deliverables.

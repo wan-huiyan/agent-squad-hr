@@ -219,7 +219,6 @@ Total recovery cost: ~5 minutes of file/branch renames + cross-ref find-replace.
 
 ## References
 
-- Sister skill: `pr-conflict-site-regen` v1.4.0 Step 2c (silent ID collision for tracker IDs).
 - Sister skill: `numbered-append-log-next-id-grep-max-not-tail` (the WITHIN-FILE non-monotonic case — next lesson/changelog/ADR number is the grep-MAX, not the file-order last; no branches involved).
 - Sister feedback files (proactive coordination):
   - `feedback_coordination_framing_for_parallel_artifact_collisions.md` — supersession vs coordination framing.

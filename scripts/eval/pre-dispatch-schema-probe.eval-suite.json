@@ -26,7 +26,7 @@
     {"id": "pos-19", "prompt": "Catch schema mismatches before the scheduled pipeline burns a night of wallclock", "should_trigger": true, "category": "positive"},
     {"id": "pos-20", "prompt": "The plan doc mentions specific column names, verify they exist in the warehouse before dispatch", "should_trigger": true, "category": "positive"},
 
-    {"id": "neg-1", "prompt": "Check the enum values inside the status column match the ones the plan assumes", "should_trigger": false, "category": "negative", "notes": "verify-plan-constants-against-data -- the explicit NOT-for sibling"},
+    {"id": "neg-1", "prompt": "Check the enum values inside the status column match the ones the plan assumes", "should_trigger": false, "category": "negative", "notes": "column VALUES, not column STRUCTURE -- the explicit NOT-for boundary in the description"},
     {"id": "neg-2", "prompt": "The other session's design spec is not in my worktree, how do I get it over", "should_trigger": false, "category": "negative", "notes": "cross-worktree-spec-handoff-via-checkout-paths"},
     {"id": "neg-3", "prompt": "A standalone schema agent crashed the whole run and args came through as a JSON string", "should_trigger": false, "category": "negative", "notes": "workflow-standalone-schema-agent-crash-and-args-string"},
     {"id": "neg-4", "prompt": "The schema agent retried until it hit the cap because the payload was oversized", "should_trigger": false, "category": "negative", "notes": "workflow-schema-agent-retry-cap-oversized-payload"},

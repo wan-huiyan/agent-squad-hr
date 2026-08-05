@@ -275,18 +275,9 @@ count = 1.
 
 ## Sister skills
 
-- `route-orphan-fetch-after-template-carveout` — within-PR drift: a section
-  was deleted from a template but the handler still fetches its data. This
-  skill covers the across-PR equivalent where the section was *duplicated*
-  rather than orphaned.
-- `jinja-tojson-undefined-after-refactor` — the opposite within-PR direction:
-  template ref survives, kwarg removed → render fails.
 - `pr-conflict-from-mid-flight-merges` — the textual sibling: two PRs touch
   the same lines and git flags `mergeStateStatus: DIRTY`. This skill
   documents the silent (non-textual) failure mode of the same scenario.
-- `pr-conflict-site-regen` — project-specific playbook for resolving
-  TEXTUAL parallel-PR conflicts on auto-generated docs. Doesn't catch
-  semantic duplication.
 
 ## References
 
