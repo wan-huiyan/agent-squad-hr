@@ -1,29 +1,26 @@
 ---
 name: pre-dispatch-schema-probe
 description: |
-  Before firing a multi-hour or multi-agent data dispatch (overnight insight runs,
-  parallel subagent fleets, Cloud Run batch jobs, scheduled pipelines), run a fast
-  5-minute schema probe to verify that every dataset path, table name, and column
-  name referenced in the plan/scope doc actually exists in the warehouse. Use when:
-  (1) you inherited a scope doc authored by a predecessor session and are about to
-  dispatch 2+ long-running agents or jobs based on its table references, (2) the
-  plan doc mentions specific BQ paths like `project.dataset.table` / column names
-  like `enrolled_2025` and you're copying them verbatim into agent prompts or
-  SQL, (3) you're tempted to trust a scope doc that "looks authoritative" (has
-  prior-PR approvals, multi-session review history), (4) dispatch cost is measured
-  in $50+ or wallclock in hours. Catches the failure mode where predecessor docs
-  carry confidently-asserted dataset/column names that are factually wrong —
-  fabricated from memory or stale from a prior schema. Typical catches: dataset
-  path references a project-level dataset that doesn't exist (`project.dataset_a`
-  instead of `project.dataset_b.dataset_a`), label column name is plausible but
-  wrong (`enrolled_2025` instead of `enrolled_segment_a`), column-name
-  prefix convention is assumed but absent (`evt_page_visit_30d` instead of
-  `page_visit_8_30d`). Related but distinct from `verify-plan-constants-against-data`
-  which covers enum/category VALUES inside columns; this skill covers the
-  STRUCTURE (dataset paths, table names, column names).
+  Before firing a multi-hour or multi-agent data dispatch (overnight insight runs, parallel
+  subagent fleets, Cloud Run batch jobs, scheduled pipelines), run a fast 5-minute schema probe to
+  verify that every dataset path, table name, and column name referenced in the plan/scope doc
+  actually exists in the warehouse. Use when: (1) you inherited a scope doc authored by a
+  predecessor session and are about to dispatch 2+ long-running agents or jobs based on its table
+  references, (2) the plan doc mentions specific BQ paths like `project.dataset.table` or column
+  names like `enrolled_2025` and you're copying them verbatim into agent prompts or SQL, (3)
+  you're tempted to trust a scope doc that "looks authoritative" (prior-PR approvals,
+  multi-session review history), (4) dispatch cost is $50+ or wallclock is in hours. Catches
+  predecessor docs that assert dataset/column names confidently but wrongly — fabricated from
+  memory or stale from a prior schema. Typical catches: a dataset path that doesn't exist
+  (`project.dataset_a` instead of `project.dataset_b.dataset_a`), a label column that is
+  plausible but wrong (`enrolled_2025` instead of `enrolled_segment_a`), a column-name prefix
+  convention that is assumed but absent (`evt_page_visit_30d` instead of
+  `page_visit_8_30d`). Related but distinct from
+  `verify-plan-constants-against-data`, which covers enum/category VALUES inside columns; this
+  skill covers the STRUCTURE (dataset paths, table names, column names).
 author: Claude Code
-version: 1.1.0
-date: 2026-04-28
+version: 1.1.1
+date: 2026-08-04
 ---
 
 # Pre-Dispatch Schema Probe

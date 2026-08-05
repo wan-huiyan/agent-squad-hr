@@ -2,8 +2,8 @@
 name: subagent-driven-branch-ref-froze-stranded-commits
 description: |
   Diagnose and recover from "PR merged, but half my work is missing from main"
-  cases in `superpowers:subagent-driven-development` (or similar one-fresh-
-  subagent-per-task) sessions, where committed work survives in the worktree's
+  cases in `superpowers:subagent-driven-development` (or similar
+  one-fresh-subagent-per-task) sessions, where committed work survives in the worktree's
   `HEAD` chain but never makes it into the pushed branch ref. Use when ANY of
   these appears:
   (1) `gh pr view <N>` body claims "M files changed, N insertions" but
@@ -34,8 +34,8 @@ description: |
   different timing). Distinct from `pr-hijack-via-stale-worktree-branch-ref`
   (which is about overwriting a different branch upstream).
 author: Claude Code
-version: 1.0.0
-date: 2026-05-18
+version: 1.0.1
+date: 2026-08-04
 disable-model-invocation: true
 ---
 
