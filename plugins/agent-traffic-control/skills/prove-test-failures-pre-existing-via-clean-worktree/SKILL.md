@@ -75,4 +75,10 @@ zero regression risk.
 - Reviewer-side analog: `agent-review-panel`'s "Codebase State Check" (a review panel must not flag code
   as "missing" when it exists on main but not the reviewed branch). This skill is the author-side twin:
   don't attribute a *failure* to your change without checking the baseline.
+- **The baseline worktree is not automatically clean.** A worktree isolates the SOURCE TREE only;
+  a shared venv, an installed app keyed by bundle id, or a build cache keyed by project path is shared
+  by every worktree on the machine, so the baseline run can silently exercise ANOTHER worktree's
+  artefact and hand you a fictional failure set. Check provenance before comparing sets — the source
+  paths a test binary compiles in are the cheapest tell. See
+  `worktree-does-not-isolate-shared-installed-artefacts`.
 - See also: `using-git-worktrees` (worktree mechanics), `concurrent-session-checkout-clobbers-shared-worktree`.
