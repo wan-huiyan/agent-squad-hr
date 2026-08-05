@@ -251,8 +251,6 @@ up), captured the lesson in `cat7-7fc` tracker entry + MEMORY.md.
 - `parallel-pr-template-fork-duplicates-moved-section` — semantic
   duplication after parallel PRs ship (different mechanism: structural
   duplication via mover/forker, not scope overlap)
-- `pr-conflict-site-regen` — playbook for resolving the actual
-  rebase conflicts after the delta-check picks a winner (project-specific)
 
 ## Variant — the collision is discovered AFTER one fix is already DEPLOYED LIVE (v1.1)
 The base skill assumes two OPEN PRs you pick between. Higher-stakes variant: one fix is already

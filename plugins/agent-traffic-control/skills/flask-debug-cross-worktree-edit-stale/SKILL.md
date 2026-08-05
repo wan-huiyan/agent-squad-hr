@@ -208,10 +208,6 @@ debug-reload caught the file change).
 
 ## See also
 
-- `flask-debug-ttl-cache-stale-after-rebake` — genuine TTL-cache trap
-  in Flask, distinct mechanism (in-process cache, not filesystem
-  divergence). Use that skill when worktrees agree on disk but Flask
-  still serves old responses.
 - `gh-pr-merge-worktree-checkout-trap` — git-side error that prevents
   you from `git checkout`-ing the same branch in two worktrees.
   Forces you into the cross-worktree edit pattern this skill diagnoses.

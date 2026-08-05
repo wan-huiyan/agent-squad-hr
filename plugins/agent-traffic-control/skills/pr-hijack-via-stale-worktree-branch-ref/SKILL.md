@@ -252,9 +252,5 @@ Real session (2026-05-12, the-project-repo repo, Opus 4.7):
 
 - `git push --force-with-lease`:
   https://git-scm.com/docs/git-push#Documentation/git-push.txt---force-with-leaseltrefnamegt
-- `git-recover-lost-branch` (sister skill, recovery mechanics via reflog
-  when no remote branch is involved)
 - `gh-pr-merge-worktree-checkout-trap` (sister skill, different
   worktree-vs-gh failure mode)
-- `pr-conflict-site-regen` Step 2a (prevention pattern: session-
-  scoped tracker IDs avoid generic-name collisions)

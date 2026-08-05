@@ -343,9 +343,6 @@ retry recovered, all commits intact.)
   different symptom: `git add -u` + `--amend` stages thousands of
   tracked-file deletions because the post-commit hook mutated tracked
   files between commit and amend.
-- `bash-background-pipe-to-tail-buffers-output` — different root cause,
-  same general "subprocess management in shell scripts" family. Useful
-  if your post-commit hook itself uses pipes to tail.
 
 ## References
 

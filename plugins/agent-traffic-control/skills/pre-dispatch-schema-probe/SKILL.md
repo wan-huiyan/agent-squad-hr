@@ -284,12 +284,6 @@ the scope-doc paths, all 7 would have tapped out on first bq query.
 - **Archive the probe as a reproducible artefact.** Future sessions re-running the same
   dispatch can re-run the probe in 30 seconds to re-verify; don't re-invent it.
 
-## See also
-
-- `verify-plan-constants-against-data` — for wrong enum VALUES inside columns (complementary)
-- `bq-identity-resolution-debug` — for identity-join drift across datasets
-- `sf-bq-upsert-verify-before-createddate-gate` — for import-mode drift in CRM→BQ pipelines
-
 ## References
 
 - BigQuery `INFORMATION_SCHEMA` reference: https://cloud.google.com/bigquery/docs/information-schema-intro
