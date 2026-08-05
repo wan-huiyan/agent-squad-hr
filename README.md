@@ -1,6 +1,6 @@
 # Agent Traffic Control
 
-A coordination toolkit of 96 [Claude Code](https://claude.com/claude-code) skills for **running multiple parallel sessions against the same repo without collisions, stranded work, or rebase loops** — issue-pickup claim protocol, worktree & session-isolation pitfalls, parallel-PR conflict recovery, subagent-integrity edge cases, and the squash/merge mechanics that bite when multiple PRs converge on the same branch.
+A coordination toolkit of 97 [Claude Code](https://claude.com/claude-code) skills for **running multiple parallel sessions against the same repo without collisions, stranded work, or rebase loops** — issue-pickup claim protocol, worktree & session-isolation pitfalls, parallel-PR conflict recovery, subagent-integrity edge cases, and the squash/merge mechanics that bite when multiple PRs converge on the same branch.
 
 [![license](https://img.shields.io/github/license/wan-huiyan/agent-traffic-control)](LICENSE)
 [![last commit](https://img.shields.io/github/last-commit/wan-huiyan/agent-traffic-control)](https://github.com/wan-huiyan/agent-traffic-control/commits)
@@ -18,7 +18,7 @@ A coordination toolkit of 96 [Claude Code](https://claude.com/claude-code) skill
 # Add the marketplace
 /plugin marketplace add wan-huiyan/agent-traffic-control
 
-# Install the plugin — one shot, gets all 96 skills
+# Install the plugin — one shot, gets all 97 skills
 /plugin install agent-traffic-control@wan-huiyan-agent-traffic-control
 ```
 
@@ -26,7 +26,7 @@ This is a single multi-skill plugin (modeled on `superpowers`), not a marketplac
 
 ## The six buckets
 
-The 96 skills split into a **before / during / after / orchestrator-aware / merge-mechanics / workflow-orchestration** arc:
+The 97 skills split into a **before / during / after / orchestrator-aware / merge-mechanics / workflow-orchestration** arc:
 
 ### A. Pickup / claim coordination — *prevention*
 
@@ -125,6 +125,7 @@ Subagents introduce their own coordination failure modes. These cover misattribu
 | [**code-review-subagent-fabricates-specifics-to-inflate-severity**](plugins/agent-traffic-control/skills/code-review-subagent-fabricates-specifics-to-inflate-severity/) | A review subagent reports a HIGH/BLOCKING finding citing specific evidence (line numbers, call counts) that doesn't exist — verify the cited specifics before gating a merge; demote on fabrication. |
 | [**db-access-review-subagent-needs-explicit-probe-budget**](plugins/agent-traffic-control/skills/db-access-review-subagent-needs-explicit-probe-budget/) | A review/verification subagent with live DB/cloud access needs an explicit tool-call + wall-time budget and a return-partial-on-exhaustion instruction, or it runs 20–40min and can lose its whole output. |
 | [**dispatched-bash-agent-git-checkout-clobbers-uncommitted-edit**](plugins/agent-traffic-control/skills/dispatched-bash-agent-git-checkout-clobbers-uncommitted-edit/) | A verification/review subagent you dispatched runs `git checkout/restore/stash` and wipes your uncommitted edits — forbid or sandbox destructive git in dispatched agents. |
+| [**verifying-subagent-in-your-live-worktree-measures-your-uncommitted-work**](plugins/agent-traffic-control/skills/verifying-subagent-in-your-live-worktree-measures-your-uncommitted-work/) | A gate-running agent dispatched into the worktree you are STILL editing measures the branch plus your uncommitted changes and reports the mixture as the branch's result — no clobber, no error, just numbers for a tree nobody will merge. Give it its own detached worktree at a pinned SHA. |
 | [**subagent-read-stale-worktree-needs-head-pin**](plugins/agent-traffic-control/skills/subagent-read-stale-worktree-needs-head-pin/) | Read-only audit subagents silently return line numbers / "what exists" claims from the WRONG worktree in a many-worktree repo — pin them to the intended HEAD. |
 | [**parallel-impl-agent-dies-mid-stream-verify-working-tree**](plugins/agent-traffic-control/skills/parallel-impl-agent-dies-mid-stream-verify-working-tree/) | A dispatched parallel impl subagent can die leaving ZERO output while the harness still reports "completed" — verify the working tree, don't trust the status. |
 | [**parallel-subagent-fanout-rate-limit-recover-from-disk**](plugins/agent-traffic-control/skills/parallel-subagent-fanout-rate-limit-recover-from-disk/) | Large parallel subagent fan-outs hit a server-side rate limit AND the return status lies about what got written — recover the produced files from disk. |
