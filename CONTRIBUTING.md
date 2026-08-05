@@ -31,14 +31,27 @@ python3 scripts/check_skill_descriptions.py . --no-color --triggers   # exit 0 =
 synonym runs and cut prose/implementation detail — never delete a distinct concept, and keep
 any "NOT for ..." negative list, which is what stops false firing. Land ~30–50 chars under the
 cap so the next edit does not re-break it. The script is vendored from
-[wan-huiyan/context-police](https://github.com/wan-huiyan/context-police) (currently v2.2.0);
-fix it there and re-vendor rather than forking it here.
+[wan-huiyan/context-police](https://github.com/wan-huiyan/context-police) (currently v2.2.1 —
+a plugin version, not a git tag); fix it there and re-vendor rather than forking it here.
 
 The same script also fails on **line-wrap corruption**: `description: >` and `description: |`
 join their lines, so a line that ends in a hyphen silently becomes `token- efficient` in the
 text the harness injects. The usual cause is re-wrapping with `textwrap.wrap()`, which breaks
 on hyphens by default — pass `break_on_hyphens=False`. The character count is unchanged, so no
 length check can see it.
+
+> **The exit code only covers MODEL-INVOCABLE skills — and 74 of this repo's 94 are not.**
+> The text report's exit code is `1 if (over or corrupt) else 0`, where both lists are built
+> from `live = [s for s in skills if not s.disabled]`. A hyphen break inside a
+> `model-invocation: false` skill is **printed by neither and fails nothing**. Verified by
+> injecting one into a disabled skill: text report exit 0 and no `BROKEN BY LINE-WRAP` line,
+> while `--json` exits 1 and names it. That is exactly why the four real corruptions fixed in
+> v1.8.1 had to be found through `--json` rather than CI — all four were in manual-only skills.
+> **So run the `--json` form too** whenever you touch a description, disabled or not:
+>
+> ```bash
+> python3 scripts/check_skill_descriptions.py . --json > /dev/null; echo "exit=$?"
+> ```
 
 ### Before/after a trim, run both checks — they see different things
 

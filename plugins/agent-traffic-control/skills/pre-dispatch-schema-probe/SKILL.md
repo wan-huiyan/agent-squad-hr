@@ -15,12 +15,11 @@ description: |
   (`project.dataset_a` instead of `project.dataset_b.dataset_a`), a label column that is
   plausible but wrong (`enrolled_2025` instead of `enrolled_segment_a`), a column-name prefix
   convention that is assumed but absent (`evt_page_visit_30d` instead of
-  `page_visit_8_30d`). Related but distinct from
-  `verify-plan-constants-against-data`, which covers enum/category VALUES inside columns; this
-  skill covers the STRUCTURE (dataset paths, table names, column names).
+  `page_visit_8_30d`). Related but distinct from checking enum/category VALUES inside
+  columns; this skill covers the STRUCTURE (dataset paths, table names, column names).
 author: Claude Code
-version: 1.1.1
-date: 2026-08-04
+version: 1.1.2
+date: 2026-08-05
 ---
 
 # Pre-Dispatch Schema Probe
@@ -262,9 +261,14 @@ the scope-doc paths, all 7 would have tapped out on first bq query.
 
 ## Notes
 
-- **This skill is about STRUCTURE; `verify-plan-constants-against-data` is about CONTENT.**
-  That skill catches wrong enum VALUES inside a correctly-named column. This one catches
-  wrong dataset/table/column NAMES. Run both before dispatch if both layers apply.
+- **This skill is about STRUCTURE, not CONTENT.** It catches wrong dataset/table/column
+  NAMES. It does NOT check whether the VALUES inside a correctly-named column match what the
+  plan assumes -- a `status` column that exists but whose enum is `{new,won,lost}` where the
+  plan assumed `{open,closed}` passes this probe cleanly. Verify values separately.
+  (Earlier revisions named a sibling skill `verify-plan-constants-against-data` here and in
+  the frontmatter description. No such skill exists in this repo or any installed bundle, so
+  the redirect gave the model nothing to route to; the distinction is kept, the dead name is
+  not.)
 - **Cost scales with dispatch size, not probe size.** The probe is the same 5 minutes
   whether you're firing 2 agents or 20. For small 1-agent sessions, the probe is
   often overkill; for 5+ agent sessions, it's essential.
@@ -279,7 +283,6 @@ the scope-doc paths, all 7 would have tapped out on first bq query.
 
 ## See also
 
-- `verify-plan-constants-against-data` — for wrong enum VALUES inside columns (complementary)
 - `bq-identity-resolution-debug` — for identity-join drift across datasets
 - `sf-bq-upsert-verify-before-createddate-gate` — for import-mode drift in CRM→BQ pipelines
 
