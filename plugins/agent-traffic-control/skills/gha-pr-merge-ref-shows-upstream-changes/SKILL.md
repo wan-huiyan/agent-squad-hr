@@ -218,9 +218,5 @@ is doing its job, just on a sliding target.
 - [GitHub Docs: pull_request event](https://docs.github.com/en/actions/writing-workflows/choosing-when-workflows-run/events-that-trigger-workflows#pull_request)
 - [GitHub Docs: actions/checkout default refs](https://github.com/actions/checkout#checkout-pull-request-head-commit-instead-of-merge-commit)
 - Sister skills:
-  - `pr-conflict-site-regen` v1.4.0 Step 2b (recurring rebase loop
-    pattern this trap triggers)
-  - `gha-billing-failure-fast-fail-pattern` (different GHA gotcha:
-    1-second runner_id=0 fast-fails)
   - `gh-pr-merge-worktree-checkout-trap` (different gh subcommand
     failure mode)

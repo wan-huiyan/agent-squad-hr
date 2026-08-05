@@ -190,5 +190,3 @@ When Branch A merges main:
   branches claiming the same synthetic ID (tracker IDs, ADR numbers, migration filenames)
 - `pr-conflict-from-mid-flight-merges` — broader recipe for identifying and clearing all
   mid-flight conflicts across a stale PR
-- `pr-conflict-site-regen` — project-specific specialization of this skill for the
-  the-project-repo repo
