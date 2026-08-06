@@ -10,7 +10,7 @@
       "name": "agent-traffic-control",
       "source": "./plugins/agent-traffic-control",
       "description": "Coordination toolkit for parallel Claude Code sessions sharing one repo — issue-pickup claim protocol (assignee + wip label), worktree & session-isolation pitfalls, parallel-PR conflict recovery, subagent-integrity edge cases, and squash/merge mechanics for parallel-PR workflows.",
-      "version": "1.11.1"
+      "version": "1.12.0"
     }
   ]
 }

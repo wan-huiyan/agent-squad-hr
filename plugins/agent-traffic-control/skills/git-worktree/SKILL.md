@@ -18,6 +18,39 @@ This skill provides a unified interface for managing Git worktrees across your d
 - **Automatic .env file copying** from main repo to new worktrees
 - **Automatic dev tool trusting** for mise and direnv configs with review-safe guardrails
 
+## Resolve the manager script first (once per shell)
+
+Every command below runs `"$WTM"`. Resolve it once:
+
+```bash
+# Three roots, in order. A plugin install creates NEITHER of the first two:
+# CLAUDE_PLUGIN_ROOT is frequently unset in the shell a step actually runs in, and
+# ~/.claude/skills/agent-traffic-control/ does not exist — the plugin lives under
+# ~/.claude/plugins/cache/<marketplace>/agent-traffic-control/<version>/.
+REL="skills/git-worktree/scripts/worktree-manager.sh"
+WTM="${CLAUDE_PLUGIN_ROOT:+${CLAUDE_PLUGIN_ROOT}/$REL}"
+[ -f "$WTM" ] || WTM="$HOME/.claude/skills/agent-traffic-control/$REL"
+# Rank on the VERSION segment, not the whole path: the marketplace name precedes the
+# version, so a plain `sort -V` over full paths would let aaa-mkt/2.5.0 lose to
+# zzz-mkt/1.0.0. Here the version sits at NF-4 because the script nests two levels
+# deeper than a flat plugin layout. Use `find`, not a glob — zsh fails a non-matching
+# glob at expansion time, before 2>/dev/null can apply.
+[ -f "$WTM" ] || WTM="$(find -L "$HOME/.claude/plugins/cache" -mindepth 7 -maxdepth 7 \
+    -path "*/agent-traffic-control/*/$REL" 2>/dev/null \
+  | awk -F/ '{print $(NF-4)"\t"$0}' | sort -V -k1,1 | tail -1 | cut -f2-)"
+
+if [ ! -f "$WTM" ]; then
+  echo "worktree-manager.sh: not found — tried \$CLAUDE_PLUGIN_ROOT/$REL," \
+       "\$HOME/.claude/skills/agent-traffic-control/$REL, and" \
+       "\$HOME/.claude/plugins/cache/*/agent-traffic-control/*/$REL"
+fi
+```
+
+Say **"not found — tried \<paths\>"**, never a bare "not installed": a failed lookup is
+not evidence about install state. Without this block the commands below expanded to
+`/skills/git-worktree/scripts/worktree-manager.sh` on any plugin-scope machine and died
+with a bare `exit 127` naming no root at all.
+
 ## CRITICAL: Always Use the Manager Script
 
 **NEVER call `git worktree add` directly.** Always use the `worktree-manager.sh` script.
@@ -32,7 +65,7 @@ The script handles critical setup that raw git commands don't:
 
 ```bash
 # ✅ CORRECT - Always use the script
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh create feature-name
+bash "$WTM" create feature-name
 
 # ❌ WRONG - Never do this directly
 git worktree add .worktrees/feature-name -b feature-name main
@@ -64,19 +97,19 @@ You can also invoke the skill directly from bash:
 
 ```bash
 # Create a new worktree (copies .env files automatically)
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh create feature-login
+bash "$WTM" create feature-login
 
 # List all worktrees
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh list
+bash "$WTM" list
 
 # Switch to a worktree
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh switch feature-login
+bash "$WTM" switch feature-login
 
 # Copy .env files to an existing worktree (if they weren't copied)
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh copy-env feature-login
+bash "$WTM" copy-env feature-login
 
 # Clean up completed worktrees
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh cleanup
+bash "$WTM" cleanup
 ```
 
 ## Commands
@@ -91,7 +124,7 @@ Creates a new worktree with the given branch name.
 
 **Example:**
 ```bash
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh create feature-login
+bash "$WTM" create feature-login
 ```
 
 **What happens:**
@@ -111,7 +144,7 @@ Lists all available worktrees with their branches and current status.
 
 **Example:**
 ```bash
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh list
+bash "$WTM" list
 ```
 
 **Output shows:**
@@ -126,7 +159,7 @@ Switches to an existing worktree and cd's into it.
 
 **Example:**
 ```bash
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh switch feature-login
+bash "$WTM" switch feature-login
 ```
 
 **Optional:**
@@ -138,7 +171,7 @@ Interactively cleans up inactive worktrees with confirmation.
 
 **Example:**
 ```bash
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh cleanup
+bash "$WTM" cleanup
 ```
 
 **What happens:**
@@ -157,34 +190,34 @@ bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh clean
 
 # You respond: yes
 # Script runs (copies .env files automatically):
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh create pr-123-feature-name
+bash "$WTM" create pr-123-feature-name
 
 # You're now in isolated worktree for review with all env vars
 cd .worktrees/pr-123-feature-name
 
 # After review, return to main:
 cd ../..
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh cleanup
+bash "$WTM" cleanup
 ```
 
 ### Parallel Feature Development
 
 ```bash
 # For first feature (copies .env files):
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh create feature-login
+bash "$WTM" create feature-login
 
 # Later, start second feature (also copies .env files):
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh create feature-notifications
+bash "$WTM" create feature-notifications
 
 # List what you have:
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh list
+bash "$WTM" list
 
 # Switch between them as needed:
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh switch feature-login
+bash "$WTM" switch feature-login
 
 # Return to main and cleanup when done:
 cd .
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh cleanup
+bash "$WTM" cleanup
 ```
 
 ## Key Design Principles
@@ -250,7 +283,7 @@ Switch out of the worktree first (to main repo), then cleanup:
 
 ```bash
 cd $(git rev-parse --show-toplevel)
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh cleanup
+bash "$WTM" cleanup
 ```
 
 ### Lost in a worktree?
@@ -258,7 +291,7 @@ bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh clean
 See where you are:
 
 ```bash
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh list
+bash "$WTM" list
 ```
 
 ### .env files missing in worktree?
@@ -266,7 +299,7 @@ bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh list
 If a worktree was created without .env files (e.g., via raw `git worktree add`), copy them:
 
 ```bash
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh copy-env feature-name
+bash "$WTM" copy-env feature-name
 ```
 
 Navigate back to main:
