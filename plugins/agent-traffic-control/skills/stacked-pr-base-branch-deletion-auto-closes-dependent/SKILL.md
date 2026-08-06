@@ -22,7 +22,7 @@ description: |
   `gh pr view <N> --json state` reports exactly `MERGED`. Sister skill to
   `gh-pr-merge-worktree-checkout-trap` (one upstream cause).
 author: Claude Code
-version: 1.2.0
+version: 1.2.1
 date: 2026-05-19
 disable-model-invocation: true
 ---
@@ -350,4 +350,5 @@ first; just rebase + new PR).
   https://docs.github.com/en/rest/git/refs#delete-a-reference
 - GitHub stacked-PR documentation (auto-retarget on UI delete):
   https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-base-branch-of-a-pull-request
-- Sister skill: `~/.claude/skills/gh-pr-merge-worktree-checkout-trap/SKILL.md`
+- Sister skill: `gh-pr-merge-worktree-checkout-trap` — in this same plugin
+  ([source](https://github.com/wan-huiyan/agent-traffic-control/blob/main/plugins/agent-traffic-control/skills/gh-pr-merge-worktree-checkout-trap/SKILL.md))
