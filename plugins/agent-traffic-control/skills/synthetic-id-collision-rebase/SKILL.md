@@ -17,7 +17,7 @@ description: |
   Python function call, leaving an orphaned partial call that causes a SyntaxError
   far from the conflict site — requires ast.parse() verification after resolution.
 author: Claude Code
-version: 1.1.0
+version: 1.1.1
 date: 2026-05-13
 disable-model-invocation: true
 ---
@@ -216,5 +216,5 @@ grep -n 'Item("cat7-7kr"' docs/generate_roadmap_backlog.py
 
 ## References
 
-- Companion skill: `~/.claude/skills/pr-conflict-from-mid-flight-merges/SKILL.md`
+- Companion skill: `pr-conflict-from-mid-flight-merges` — in this same plugin ([source](https://github.com/wan-huiyan/agent-traffic-control/blob/main/plugins/agent-traffic-control/skills/pr-conflict-from-mid-flight-merges/SKILL.md))
 - Parallel-session-isolation root-cause fix: Claude Code's built-in `claude --worktree <name>` flag (avoids shared-working-tree race conditions entirely)

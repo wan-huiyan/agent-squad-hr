@@ -20,7 +20,7 @@ description: |
   to disk, returns only path + 100-word summary) + run-verification gate +
   fail-loud headers.
 author: Claude Code
-version: 1.0.0
+version: 1.0.1
 date: 2026-04-27
 disable-model-invocation: true
 ---
@@ -303,7 +303,8 @@ Diagnostic steps:
   EXPLICIT skip conditions in well-designed skills. Phase 4/5/7 do NOT — they
   are MANDATORY. Adding explicit MANDATORY markers is part of the fix
   (anti-rationalization).
-- **Cross-skill insight:** every overnight-workflow skill in `~/.claude/skills/`
+- **Cross-skill insight:** every overnight-workflow skill
+  ([overnight-workflows](https://github.com/wan-huiyan/overnight-workflows))
   that handles 10+ subagent runs uses some form of file-based state passing.
   This skill is a generalization of that pattern, applied as a diagnostic and
   fix for the symmetric (output-direction) problem the sister skill

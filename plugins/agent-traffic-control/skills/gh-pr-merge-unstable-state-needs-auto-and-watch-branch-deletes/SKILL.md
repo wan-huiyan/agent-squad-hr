@@ -18,7 +18,7 @@ description: |
   will delete a draft/unmerged PR's branch and close it — always gate deletes on `mergedAt != null`.
   Sibling to `gh-pr-merge-worktree-checkout-trap` (different failure mode — worktree holding main).
 author: Claude Code
-version: 1.1.0
+version: 1.1.1
 date: 2026-06-08
 disable-model-invocation: true
 ---
@@ -231,4 +231,5 @@ Fix that prevented a repeat: gate the delete on `mergedAt != null`, not on branc
 
 - [gh pr merge — official docs](https://cli.github.com/manual/gh_pr_merge)
 - [GitHub mergeStateStatus enum reference](https://docs.github.com/en/graphql/reference/enums#mergestatestatus)
-- Sibling skill: `~/.claude/skills/gh-pr-merge-worktree-checkout-trap/SKILL.md`
+- Sibling skill: `gh-pr-merge-worktree-checkout-trap` — in this same plugin
+  ([source](https://github.com/wan-huiyan/agent-traffic-control/blob/main/plugins/agent-traffic-control/skills/gh-pr-merge-worktree-checkout-trap/SKILL.md))

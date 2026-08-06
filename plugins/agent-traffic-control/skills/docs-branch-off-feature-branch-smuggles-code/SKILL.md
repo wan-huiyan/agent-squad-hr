@@ -28,7 +28,7 @@ description: |
   squash-merge. Recovery: rebase `--onto origin/main feat/sN-feature
   docs/sN-handoff` to drop the smuggled commits, force-push.
 author: Claude Code
-version: 1.1.0
+version: 1.1.1
 date: 2026-06-23
 disable-model-invocation: true
 ---
@@ -369,6 +369,7 @@ on PR #90 where they belong, awaiting their own merge gate.
   ref drift; different mechanism.
 - Sister: `feedback_worktree_add_absolute_paths` — prevention via
   explicit worktree base.
-- `session-handoff` skill (`~/.claude/skills/session-handoff/SKILL.md`)
-  Phase 4 step 22 — the `code-reviewer` agent pass that catches
-  this trap if you skip the manual check.
+- `session-handoff` skill — a separate plugin, published at
+  https://github.com/wan-huiyan/session-handoff — Phase 4 step 22, the
+  `code-reviewer` agent pass that catches this trap if you skip the
+  manual check.

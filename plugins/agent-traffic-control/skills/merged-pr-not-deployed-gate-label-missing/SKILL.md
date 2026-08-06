@@ -23,7 +23,7 @@ description: |
   UNWANTED redeploy. Trigger: "why does my monitoring/docs PR have the auto-deploy
   label", "remove auto-deploy before merge", "config PR triggered a redeploy".
 author: Claude Code
-version: 1.2.0
+version: 1.2.1
 date: 2026-07-01
 disable-model-invocation: true
 ---
@@ -323,7 +323,7 @@ Durable fix (if config-only PRs under the deployable path are common): tighten t
 
 ## References
 
-- Sister skill: `~/.claude/skills/gha-auto-deploy-never-ran-skipped-mask/SKILL.md` — first-time gate fires + permission gap
-- Sister skill: `~/.claude/skills/deploy-from-stale-worktree-silent-rollback/SKILL.md` — manual deploy preflight
+- Sister skill: `gha-auto-deploy-never-ran-skipped-mask` — first-time gate fires + permission gap. Not part of this plugin and not published; refer to it by name.
+- Sister skill: `deploy-from-stale-worktree-silent-rollback` — manual deploy preflight; in this same plugin ([source](https://github.com/wan-huiyan/agent-traffic-control/blob/main/plugins/agent-traffic-control/skills/deploy-from-stale-worktree-silent-rollback/SKILL.md))
 - GHA docs: [Events that trigger workflows — pull_request](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request)
 - GHA docs: [Conditional execution — `if:`](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idif)
