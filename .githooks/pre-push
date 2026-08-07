@@ -2,24 +2,35 @@
 # Committed publishing gates (pre-push). Enable once per clone:
 #   git config core.hooksPath .githooks
 #
-# These are the same checks CI runs, in the same order, so a red CI is something you
-# already saw locally. Keep the two lists in step: a hook that runs fewer gates than
-# CI is a hook that tells you a push is clean when it is not.
+# These are the six checks CI runs, in CI's order, so a red CI is something you already
+# saw locally. That claim was FALSE until v1.19.1: the hook ran five of the six (it had
+# no `within_budget` assertion) and ran the leak gate last where CI runs it third. A hook
+# that runs fewer gates than CI is a hook that tells you a push is clean when it is not.
 #
-# 1. Blocks a push whose SKILL.md description would be truncated mid-sentence by
-#    Claude Code's skill-listing cap, or whose folded scalar has a hyphen split
-#    across lines.
-# 2. Blocks a push that leaves a reference-only skill unreachable, a relative
-#    cross-link dead, or a skill without exactly one README index row.
-# 3. Blocks a push that breaks the listing-budget tier policy.
-# 4. Blocks a push carrying a candidate client/PII identifier.
+# PARITY IS BY HAND. Nothing checks this list against `.github/workflows/ci.yml`; if you
+# add a CI step, add it here in the same position, and diff the two files when in doubt.
 #
-# `validate_plugins.py` is CI's first step and runs here too -- it is what caught a
-# version bump that truncated both manifests to zero bytes.
+# 1. Marketplace / plugin / SKILL.md structure. CI's first step and it runs here too --
+#    it is what caught a version bump that truncated both manifests to zero bytes.
+# 2. Blocks a push whose SKILL.md description would be truncated mid-sentence by Claude
+#    Code's skill-listing cap, or whose folded scalar has a hyphen split across lines.
+# 3. Blocks a push carrying a candidate client/PII identifier.
+# 4. Blocks a push that leaves a reference-only skill unreachable, a relative cross-link
+#    dead, or a skill without exactly one README index row.
+# 5. Blocks a push that breaks the listing-budget tier policy.
+# 6. Blocks a push whose listing is over budget by the vendored gate's OWN json verdict.
+#    Step 2's text report and this disagree on purpose: the text exit code covers only
+#    model-invocable skills, --json covers every skill.
 set -e
 ROOT="$(git rev-parse --show-toplevel)"
 python3 "$ROOT/.github/scripts/validate_plugins.py"
 python3 "$ROOT/scripts/check_skill_descriptions.py" "$ROOT" --no-color --triggers
+bash "$ROOT/scripts/leak_scan.sh" "$ROOT"
 python3 "$ROOT/scripts/check_skill_routes.py" "$ROOT"
 python3 "$ROOT/scripts/check_skill_tiers.py" "$ROOT" --context 200000 --bytes-per-token 4
-exec bash "$ROOT/scripts/leak_scan.sh" "$ROOT"
+DESC_JSON="$(mktemp)"
+trap 'rm -f "$DESC_JSON"' EXIT
+python3 "$ROOT/scripts/check_skill_descriptions.py" "$ROOT" --json > "$DESC_JSON"
+# NOT `exec` -- exec replaces the shell and the EXIT trap above never fires, leaking the
+# temp file on every push.
+python3 -c "import json,sys; d=json.load(open(sys.argv[1])); sys.exit(0 if d['within_budget'] else print('listing %d over budget %d' % (d['listing_chars'], d['budget_chars'])) or 1)" "$DESC_JSON"

@@ -255,9 +255,13 @@ Two ways this goes wrong, both seen:
 
 ## One-time local setup (recommended)
 
-Enable the committed pre-push hook so all five gates run **before** anything leaves your
-machine. It runs the same checks as CI, in the same order — a hook that runs fewer gates than
-CI is a hook that tells you a push is clean when it is not, so keep the two lists in step:
+Enable the committed pre-push hook so all six gates run **before** anything leaves your
+machine. It runs the same six checks as CI, in CI's order — a hook that runs fewer gates than
+CI is a hook that tells you a push is clean when it is not. **That claim was false when it was
+first written**: the hook ran five of the six (no `within_budget` assertion) and ran the leak
+gate last where CI runs it third, so it was fixed rather than reworded in v1.19.1. **Nothing
+enforces the parity** — if you add a CI step, add it to `.githooks/pre-push` in the same
+position, and diff the two files when in doubt:
 
 ```bash
 git config core.hooksPath .githooks
