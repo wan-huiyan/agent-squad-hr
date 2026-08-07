@@ -1,5 +1,6 @@
 ---
 name: gh-issue-claim-coordination
+listing_tier: short
 description: |
   Before writing code for a GitHub issue when another session might take the same one, claim it
   with BOTH an assignee and a `wip` label so a sibling sees it and skips. Trigger on "pick up

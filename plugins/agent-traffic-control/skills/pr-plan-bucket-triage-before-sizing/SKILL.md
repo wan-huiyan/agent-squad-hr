@@ -1,5 +1,6 @@
 ---
 name: pr-plan-bucket-triage-before-sizing
+listing_tier: name-led
 description: |
   Before writing detailed pull request plans against a codebase you have not audited, triage it by
   bucket so sizes rest on findings rather than assumptions.

@@ -1,5 +1,6 @@
 ---
 name: stacked-pr-review-per-base-diff-and-attach
+listing_tier: name-led
 description: |
   Reviewing a stack of dependent pull requests: diff each one against ITS OWN base rather than
   against main, and attach the reports to the bottom branch.

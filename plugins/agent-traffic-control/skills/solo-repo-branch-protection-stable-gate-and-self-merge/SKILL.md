@@ -1,5 +1,6 @@
 ---
 name: solo-repo-branch-protection-stable-gate-and-self-merge
+listing_tier: rich
 description: |
   Lock main on a solo repo so nothing red lands and you are not locked out — no second
   reviewer needed. Use when something broken reached main by direct push (CI runs too late to

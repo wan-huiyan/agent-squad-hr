@@ -1,5 +1,6 @@
 ---
 name: parallel-session-coedit-via-source-mtime-and-idempotent-rebuild
+listing_tier: rich
 description: |
   Edit a shared deliverable while another live session or a colleague's agent is editing the same
   file right now — "don't delete each other's work", "only write when the other one is finished".

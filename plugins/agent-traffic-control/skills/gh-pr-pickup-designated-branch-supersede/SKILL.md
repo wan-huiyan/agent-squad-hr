@@ -1,5 +1,6 @@
 ---
 name: gh-pr-pickup-designated-branch-supersede
+listing_tier: name-led
 description: |
   Finish somebody else's open draft pull request when your session must push to a different,
   designated branch name — base it on the PR head and supersede.

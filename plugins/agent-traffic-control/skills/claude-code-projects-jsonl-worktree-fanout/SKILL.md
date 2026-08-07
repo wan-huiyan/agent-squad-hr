@@ -1,5 +1,6 @@
 ---
 name: claude-code-projects-jsonl-worktree-fanout
+listing_tier: name-led
 description: |
   Find a prior session's transcript that `~/.claude/projects/<project>/` does not hold: each git
   worktree gets its own separately namespaced project directory.

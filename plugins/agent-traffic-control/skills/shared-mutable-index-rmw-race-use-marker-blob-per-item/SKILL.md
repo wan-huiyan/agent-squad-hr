@@ -1,5 +1,6 @@
 ---
 name: shared-mutable-index-rmw-race-use-marker-blob-per-item
+listing_tier: name-led
 description: |
   Designing a shared "who is active / recent items" index that concurrent producers write to: one
   mutable list silently loses entries. Write one marker per item.
