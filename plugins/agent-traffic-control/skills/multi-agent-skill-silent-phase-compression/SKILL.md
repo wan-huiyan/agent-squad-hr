@@ -128,10 +128,10 @@ and they each get a fresh ~200k window for that.
 
 This pattern is already used by overnight-workflow skills:
 
-- [`overnight-insight-discovery`](../overnight-insight-discovery/SKILL.md) — Phase 0 probe results, stitched_view, RESUME_MORNING all written to disk; orchestrator holds paths only
-- [`successor-handoff`](../successor-handoff/SKILL.md) — handoff content written to disk, not chat-history
-- [`cloud-run-results-bq-postsync`](../cloud-run-results-bq-postsync/SKILL.md) — Path B intermediate state files
-- [`dual-cloudrun-job-orchestration`](../dual-cloudrun-job-orchestration/SKILL.md) — multi-agent file-based coordination
+- `overnight-insight-discovery` (separate plugin) — Phase 0 probe results, stitched_view, RESUME_MORNING all written to disk; orchestrator holds paths only
+- `successor-handoff` — handoff content written to disk, not chat-history
+- `cloud-run-results-bq-postsync` — Path B intermediate state files
+- `dual-cloudrun-job-orchestration` — multi-agent file-based coordination
 
 These can chain 30+ subagent runs without compression because the orchestrator
 context never bloats.
@@ -318,7 +318,7 @@ Diagnostic steps:
 ## References
 
 - Sister skill: [multi-phase-skill-disk-reading-strategy](../multi-phase-skill-disk-reading-strategy/SKILL.md) — input-direction version
-- Cross-skill pattern reference: [overnight-insight-discovery](../overnight-insight-discovery/SKILL.md), [successor-handoff](../successor-handoff/SKILL.md), [cloud-run-results-bq-postsync](../cloud-run-results-bq-postsync/SKILL.md), [dual-cloudrun-job-orchestration](../dual-cloudrun-job-orchestration/SKILL.md)
+- Cross-skill pattern reference (all four ship in OTHER plugins, not in this one — install them separately): `overnight-insight-discovery`, `successor-handoff`, `cloud-run-results-bq-postsync`, `dual-cloudrun-job-orchestration`
 - Validated repro: [agent-review-panel#35](https://github.com/wan-huiyan/agent-review-panel/issues/35) — full failure-mode analysis with 6 net-new findings demonstration
 - Repro session artifacts: `wan-huiyan/the-project-repo` PRs [#116](https://github.com/wan-huiyan/the-project-repo/pull/116) (compressed Run 1) and [#117](https://github.com/wan-huiyan/the-project-repo/pull/117) (corrective Run 2)
 - Related Anthropic skill-design pattern: [using-superpowers](https://github.com/anthropic/superpowers) red-flags table approach

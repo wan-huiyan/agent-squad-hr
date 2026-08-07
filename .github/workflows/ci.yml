@@ -16,3 +16,5 @@ jobs:
         run: python3 scripts/check_skill_descriptions.py . --no-color --triggers
       - name: Leak gate (client/PII identifiers)
         run: bash scripts/leak_scan.sh .
+      - name: Skill-route gate (reachability, links, README index)
+        run: python3 scripts/check_skill_routes.py .

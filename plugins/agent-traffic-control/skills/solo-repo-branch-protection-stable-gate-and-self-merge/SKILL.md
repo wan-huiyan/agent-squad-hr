@@ -113,3 +113,12 @@ must be made through a pull request. ... Required status check "test-gate" is ex
   pass `--repo`/`--base`/`--head` explicitly (see `gh-pr-create-orchestration-cwd-wrong-head`).
 - To fan out across many solo repos, script the PUT per repo after confirming each has a
   `test-gate`-style stable check. See also `claude-plugin-repo-ci-release`.
+
+## Reference-only siblings in this toolkit
+
+These carry `disable-model-invocation: true`. They never appear in the skill
+listing and the Skill tool refuses them, so the only way in is to open the file
+with Read when one of these matches what you are looking at.
+
+- [`workflow-run-deploy-gate-fork-pr-ref-name-escalation`](../workflow-run-deploy-gate-fork-pr-ref-name-escalation/SKILL.md) — a deploy gated on `on: workflow_run` and a branch name can be escalated from a fork PR
+- [`merged-pr-not-deployed-gate-label-missing`](../merged-pr-not-deployed-gate-label-missing/SKILL.md) — the PR merged and CI is green but production never got it — a deploy gate label was missing

@@ -335,3 +335,13 @@ Session B's frontend-design pass now reads the files and proceeds.
   [[worktree-outer-ls-mistaken-for-main-state]],
   [[brainstorm-html-mockup-with-design-tokens]],
   [[claude-design-handoff-bundle]].
+
+## Reference-only siblings in this toolkit
+
+These carry `disable-model-invocation: true`. They never appear in the skill
+listing and the Skill tool refuses them, so the only way in is to open the file
+with Read when one of these matches what you are looking at.
+
+- [`harness-read-write-base-repo-path-in-worktree-stale-tree`](../harness-read-write-base-repo-path-in-worktree-stale-tree/SKILL.md) — your own Read/Write calls used a base-repo absolute path and silently hit the wrong checkout
+- [`worktree-write-abs-path-lands-in-parent-checkout`](../worktree-write-abs-path-lands-in-parent-checkout/SKILL.md) — a Write whose absolute path points at the main repo root creates the file in the parent checkout
+- [`git-stash-pop-pulls-unrelated-stash`](../git-stash-pop-pulls-unrelated-stash/SKILL.md) — `git stash pop` restored another branch's work because the paired `git stash` was a no-op

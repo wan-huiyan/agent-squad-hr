@@ -168,3 +168,14 @@ Adjacent, and about the destructive-git side rather than the isolation side:
 [`dispatched-bash-agent-git-checkout-clobbers-uncommitted-edit`](https://github.com/wan-huiyan/agent-traffic-control/blob/main/plugins/agent-traffic-control/skills/dispatched-bash-agent-git-checkout-clobbers-uncommitted-edit/SKILL.md)
 — it already names "give it its own worktree" as a remedy; this skill is the pre-flight that
 checks you actually did.
+
+## Reference-only siblings in this toolkit
+
+These carry `disable-model-invocation: true`. They never appear in the skill
+listing and the Skill tool refuses them, so the only way in is to open the file
+with Read when one of these matches what you are looking at.
+
+- [`subagent-driven-branch-ref-froze-stranded-commits`](../subagent-driven-branch-ref-froze-stranded-commits/SKILL.md) — "PR merged but half my work is missing" after one-subagent-per-task development
+- [`subagent-reports-complete-but-pr-unmerged`](../subagent-reports-complete-but-pr-unmerged/SKILL.md) — a subagent reported the task complete and the PR is still open
+- [`multi-agent-skill-silent-phase-compression`](../multi-agent-skill-silent-phase-compression/SKILL.md) — mandatory phases of a multi-agent skill silently vanished under context pressure
+- [`multi-phase-skill-disk-reading-strategy`](../multi-phase-skill-disk-reading-strategy/SKILL.md) — late phases of a multi-phase skill fail silently because payloads went through the prompt, not disk

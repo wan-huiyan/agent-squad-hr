@@ -152,3 +152,13 @@ gh issue edit "$ISSUE" --remove-label wip
 - **`feedback_coordination_framing_for_parallel_artifact_collisions.md`** — what to do AFTER two parallel artifacts have already collided. This skill prevents the collision; that one frames the recovery.
 - **`feedback_pr_partial_close_phrasing.md`** — keeps GitHub's closing-keyword parser from auto-closing on partial PRs. Pairs with the partial-scope guardrail above.
 - **`pr-conflict-site-regen`** — resolves rebase conflicts when parallel PRs collide on generated site files. Downstream of a missed claim; if this skill runs, that one fires less often.
+
+## Reference-only siblings in this toolkit
+
+These carry `disable-model-invocation: true`. They never appear in the skill
+listing and the Skill tool refuses them, so the only way in is to open the file
+with Read when one of these matches what you are looking at.
+
+- [`prep-pr-close-keyword-auto-closes-issue`](../prep-pr-close-keyword-auto-closes-issue/SKILL.md) — a prep/planning PR's `Closes #N` closed the issue before the work was done
+- [`executed-prompt-not-retired-sibling-redoes-it`](../executed-prompt-not-retired-sibling-redoes-it/SKILL.md) — an executed brief was not retired on both the file and its index, so a sibling session redid the work
+- [`wip-branch-linter-revert-system-reminder-trap`](../wip-branch-linter-revert-system-reminder-trap/SKILL.md) — a linter or automation quietly reverted a deliberate wip-branch framing

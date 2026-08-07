@@ -179,3 +179,14 @@ effect:
 - Git merge-base semantics — what makes pattern 2 work without manual rebases
 - [`roundtable:agent-review-panel`](https://github.com/wan-huiyan/agent-review-panel) — Phase 1 "Codebase State Check" already enumerates the worktree+branch state; this skill adds the stacked-PR attachment dimension
 - Empirically used 2026-05-28 in the GA/GTM audit project's s13-stack review panel run (3 reviewers + 4 stacked PRs)
+
+## Reference-only siblings in this toolkit
+
+These carry `disable-model-invocation: true`. They never appear in the skill
+listing and the Skill tool refuses them, so the only way in is to open the file
+with Read when one of these matches what you are looking at.
+
+- [`stacked-pr-base-branch-deletion-auto-closes-dependent`](../stacked-pr-base-branch-deletion-auto-closes-dependent/SKILL.md) — deleting a base PR's branch auto-closed the dependent stacked PR, which cannot be reopened
+- [`code-review-subagent-fabricates-specifics-to-inflate-severity`](../code-review-subagent-fabricates-specifics-to-inflate-severity/SKILL.md) — a reviewer agent's HIGH/BLOCKING finding cites specifics that do not exist in the diff
+- [`subagent-pre-existing-misattribution`](../subagent-pre-existing-misattribution/SKILL.md) — a reviewer put test failures on the wrong side of the pre-existing / PR-introduced line
+- [`prove-test-failures-pre-existing-via-clean-worktree`](../prove-test-failures-pre-existing-via-clean-worktree/SKILL.md) — proving failures predate your change by replaying the suite in a clean worktree
