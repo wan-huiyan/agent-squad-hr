@@ -156,7 +156,9 @@ did, all in one session, each after an earlier check had reported clean:
 
 The executable form is a needle per *claim*, not per file — one distinctive
 phrase for every paragraph you amended, every ledger field you edited, and every
-computed figure re-derived rather than matched:
+computed figure re-derived rather than matched. **Save it as a file** (called
+`needle-audit.sh` throughout this section), because you will run it more than
+once with different values of `REF`:
 
 ```sh
 REF=${REF:-origin/main}                       # override to check a BRANCH pre-merge
@@ -207,8 +209,8 @@ main reads that as proof you were never affected, which is exactly backwards whe
 the question is what a particular merge did.
 
 ```sh
-REF=<suspect-squash-sha> ./audit.sh   # "did THAT merge drop it?"  ← the real question
-REF=origin/main          ./audit.sh   # "is it there right now?"   ← a different one
+REF=<suspect-squash-sha> sh needle-audit.sh   # "did THAT merge drop it?"  ← the real question
+REF=origin/main          sh needle-audit.sh   # "is it there right now?"   ← a different one
 ```
 
 This is what the `REF` override above is for, and it is worth running both ways:

@@ -40,7 +40,9 @@ text the harness injects. The usual cause is re-wrapping with `textwrap.wrap()`,
 on hyphens by default — pass `break_on_hyphens=False`. The character count is unchanged, so no
 length check can see it.
 
-> **The exit code only covers MODEL-INVOCABLE skills — and 74 of this repo's 94 are not.**
+> **The exit code only covers MODEL-INVOCABLE skills — and 77 of this repo's 98 are not.**
+> (That is the gate's own header line, `98 SKILL.md (21 model-invocable, 77 disabled)`. Re-read
+> it from a run rather than from here — it moves with every skill added.)
 > The text report's exit code is `1 if (over or corrupt) else 0`, where both lists are built
 > from `live = [s for s in skills if not s.disabled]`. A hyphen break inside a
 > `model-invocation: false` skill is **printed by neither and fails nothing**. Verified by

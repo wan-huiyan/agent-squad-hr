@@ -8,10 +8,14 @@ description: |
   CONFLICTING, (3) the feature branch has accumulated commits whose content is
   already on main via a different PR (squash-merged with a different SHA), (4) you
   need to figure out WHICH PRs landed and which of YOUR commits are now redundant
-  before rebasing. Prescribes a 6-step recipe: gh status → list landed commits →
-  detect redundant cherry-picks → reset to origin tip → rebase → reconcile.
+  before rebasing. Prescribes a 7-step recipe: gh status → list landed commits →
+  detect redundant cherry-picks → reset to origin tip → rebase → reconcile →
+  force-push with lease and refresh the PR body.
+  Reconciling a stated COUNT (a "N tests" / "N skills" claim in a README) is the one
+  step where taking either side of the conflict is wrong — in a stack where both sides
+  added tests, the merged tree's number is on NEITHER side. Re-measure the merged tree.
 author: Claude Code
-version: 1.0.0
+version: 1.1.0
 date: 2026-04-27
 ---
 
@@ -35,7 +39,7 @@ Adjacent symptom that strengthens the diagnosis: `git log --oneline HEAD~5..HEAD
 
 ## Solution
 
-**Six-step recipe.** Run from the PR's local feature branch.
+**Seven-step recipe.** Run from the PR's local feature branch.
 
 ### Step 1 — Confirm the conflict and capture the merge state
 
@@ -110,6 +114,42 @@ git commit -m "docs: reconcile <topic> against <sibling-PR-#N> after rebase"
 
 Keep this commit small and tightly scoped. The PR description should be updated (next step) to call out that the rebase happened.
 
+#### If what you are reconciling is a COUNT, do not copy either side's number
+
+A stated count — `342 tests`, `97 skills`, a coverage percentage, a totals row — is the one
+kind of reconciliation where **both sides of the conflict can be wrong at once**:
+
+- *Your side* is your branch's base plus whatever your branch added.
+- *Their side* is main plus whatever the sibling PRs added.
+- *The merged tree* is the base plus both — a third number nobody has measured.
+
+Taking "the newer side" is the natural move and it is only correct when your own branch
+changed nothing that the number counts. In a stack where every PR adds tests, it is wrong
+every time. Measured across three PRs in one stack (2026-08-07): resolutions of `459`, `461`
+and `476` against merged trees that actually collected **461**, **476** and **480**. Three
+resolutions, three wrong, each a real count of a real tree — and each looked reasonable
+when it was made.
+
+**And "bigger is newer" is not a tiebreak, because a count can go DOWN.** A later PR in the
+same repo was rebased four times and its row went `530 → 559 → 516`, while the merged tree
+collected **517**. Tests get deleted, renamed and moved between suites.
+
+The remedy is to make the value un-shippable until it is measured: resolve the conflict to a
+literal placeholder, finish the rebase, then measure the final tree **once** and replace it.
+
+```bash
+#   | `pytest docs` | **PENDING-REMEASURE** collected |     ← during the rebase
+git add README.md && git rebase --continue
+pytest docs -q --co 2>&1 | tail -1        # AFTER the rebase completes, not between steps
+grep -rn "PENDING-REMEASURE" .            # must be empty before you push
+```
+
+A half-plausible number survives by inertia — nobody re-checks a value that already looks
+like a value. Full treatment, including why this fires in a skill about *generated* files
+when nothing here is generated, in
+[`merge-conflict-generated-files`](https://github.com/wan-huiyan/agent-traffic-control/blob/main/plugins/agent-traffic-control/skills/merge-conflict-generated-files/SKILL.md)
+§*Variant — the derived thing is a VALUE inside a hand-authored file*.
+
 ### Step 7 — Force-push and refresh PR description
 
 ```bash
@@ -154,6 +194,12 @@ Step 4: `git reset --hard origin/docs/readme-panel-p0-fixes` dropped 51bbaa0.
 Step 5: `git rebase origin/main` ran cleanly, with `warning: skipped previously applied commit 6e1d28a` confirming the dedup commit was correctly recognized as already on main.
 
 Step 6: A small follow-up commit added a `v3.1` row to the Version History table (since main now had v3.1.0 as the latest) and bumped a `342 tests` claim to `379` to match the v3.1.0 test count.
+
+> **Read that count bump as a special case, not as the recipe.** Copying main's `379` was
+> right *here* only because this branch was a README-only change that added no tests, so
+> main's number was also the merged tree's number. On a branch that adds tests, taking
+> either side of that line is the failure described in step 6 — resolve to a placeholder
+> and re-measure after the rebase.
 
 Step 7: `git push --force-with-lease` succeeded, `gh pr edit` refreshed the body, `mergeStateStatus` flipped to `CLEAN`, and the PR merged.
 

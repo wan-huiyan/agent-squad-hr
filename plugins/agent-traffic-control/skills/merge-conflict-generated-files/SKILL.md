@@ -12,7 +12,7 @@ description: |
   HTML/JSON conflicts in files that will be overwritten by the generator anyway.
   ALSO covers the variant where the derived thing is a single VALUE inside a HAND-AUTHORED
   file — a stated test count, a coverage figure, a totals row in a README — which has no
-  generator at all, so conditions (1) and (3) do not apply. Use when a stack of PRs each
+  generator at all, so only condition (4) holds and (1)–(3) do not. Use when a stack of PRs each
   adds tests and every rebase conflicts on the same counted line: the correct merged value
   is on NEITHER side, so resolve to a literal placeholder (PENDING-REMEASURE), finish the
   rebase, then measure the final tree once and replace it.
@@ -48,10 +48,13 @@ Apply this skill when ALL of these hold:
 4. Hand-merging the outputs would produce semantically wrong results (e.g., duplicate tracker
    entries, stale totals, mismatched sort order, broken JSON).
 
-**If condition 2 fails because the conflicting thing is one derived NUMBER inside a file a
-human wrote** — a stated test count, a coverage percentage, a totals row — the reasoning
-still holds but the remedy is different, because there is no generator to re-run. Skip to
-*Variant — the derived thing is a VALUE inside a hand-authored file*, below.
+**If only condition 4 holds — the conflicting thing is one derived NUMBER inside a file a
+human wrote** (a stated test count, a coverage percentage, a totals row) — conditions 1–3 all
+fail: the conflicting file is hand-authored rather than generated output; nobody generates it;
+and there is no generator source for either side to have modified. The reasoning still holds
+and the remedy is different, because there is no
+generator to re-run. Skip to *Variant — the derived thing is a VALUE inside a hand-authored
+file*, below.
 
 **Common generator → output patterns:**
 
