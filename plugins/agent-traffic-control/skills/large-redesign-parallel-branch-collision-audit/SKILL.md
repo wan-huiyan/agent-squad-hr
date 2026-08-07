@@ -1,5 +1,6 @@
 ---
 name: large-redesign-parallel-branch-collision-audit
+listing_tier: rich
 description: |
   Before a large redesign, restructure or migration that will rewrite shared files — templates,
   the base layout, central views, shared CSS — audit every unmerged branch for commits on those

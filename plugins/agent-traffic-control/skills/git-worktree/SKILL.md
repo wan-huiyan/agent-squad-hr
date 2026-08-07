@@ -1,5 +1,6 @@
 ---
 name: git-worktree
+listing_tier: rich
 description: |
   Create, list, switch and clean up git worktrees — a second isolated checkout for parallel work
   or a pull request review. Runs the bundled `skills/git-worktree/scripts/worktree-manager.sh`,
