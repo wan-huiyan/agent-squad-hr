@@ -1,23 +1,12 @@
 ---
 name: recover-killed-session-from-transcript-and-worktree
 description: |
-  Use to recover the work, plan, and failure-cause of a PRIOR Claude Code session that died /
-  crashed / was killed mid-task (e.g. a hung tool call, an API 529 storm, the user force-quit), so
-  the current session can continue it without redoing work or repeating the fatal mistake. Trigger
-  when: (1) the user says something like "we had a session yesterday on worktree X that got killed —
-  the transcript might help", "resume the crashed session", "continue what the last run was doing";
-  (2) you find an isolated git worktree with uncommitted WIP + a leftover plan file (tasks/session_N_todo.md)
-  but no corresponding merged PRs; (3) a feature branch has uncommitted changes and you need to know
-  the intent behind them. Covers: locating the dead session's worktree + leftover artifacts, finding
-  and identifying its transcript JSONL, and mining it for the plan, the cause of death (to avoid
-  repeating it), and any USER DECISIONS made in that session (so you don't re-ask). Also covers the
-  trap that the dead session's "verified" / "done" claims are often PARTIAL (it was killed
-  mid-verification), so re-verify completely before trusting them.
+  Recover a prior Claude Code session that crashed or was killed mid task — its plan, its work and
+  what killed it — from its transcript and its leftover worktree.
 author: Claude Code
 version: 1.0.0
 date: 2026-06-06
 ---
-
 # Recover a killed Claude Code session from its transcript + worktree
 
 ## Problem

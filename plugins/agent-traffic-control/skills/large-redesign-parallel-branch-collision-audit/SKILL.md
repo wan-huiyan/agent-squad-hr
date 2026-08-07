@@ -1,29 +1,17 @@
 ---
 name: large-redesign-parallel-branch-collision-audit
 description: |
-  Before starting a large-scale redesign (10+ PRs that rewrite shared files like
-  templates, base layouts, or central views), audit ALL unmerged feature branches
-  for commits that touch the same files. Use when: (1) the user asks for a
-  multi-PR redesign / restructure / migration, (2) the worktree is at the top
-  of main but other long-running branches exist with active work, (3) the
-  redesign will replace files wholesale (template rewrites, route extractions,
-  base.css migrations), (4) the project has a multi-branch flow (one main per
-  client/deployment, e.g. `main` + `release-uk` + `feature/whitelabel-X`).
-  Symptom of having skipped this audit: hours after the redesign ships,
-  cherry-picking the parallel branch's work into main produces a head-on
-  conflict on the rewritten file (often progress.html / report.html / a base
-  template), and the parallel branch's a11y / safety / hotfix commits are
-  stranded — they must be hand-merged into the new markup rather than cleanly
-  cherry-picked. Sister to `pre-merge-client-variant-regression-audit` (audits
-  a variant branch BEING merged into main; this skill audits BEFORE main
-  diverges from a variant). Different from `parallel-pr-scope-overlap-tiebreaker-delta-check`
-  (which is about two PRs targeting the same scope simultaneously — this is
-  about a redesign on main vs WIP on an unrelated long-running branch).
+  Before a large redesign, restructure or migration that will rewrite shared files — templates,
+  the base layout, central views, shared CSS — audit every unmerged branch for commits on those
+  same files. Use when the repo keeps long lived parallel branches (client variant, release,
+  staging, whitelabel) and the plan replaces files wholesale rather than restyling in place.
+  Symptom: the redesign merges cleanly, then cherry picking that branch's accessibility or hotfix
+  commits collides with the new markup. Run it before the plan is locked. Not for two pull
+  requests racing on one scope.
 author: Claude Code
 version: 1.0.0
 date: 2026-05-28
 ---
-
 # Large-Redesign Parallel-Branch Collision Audit
 
 ## Problem

@@ -35,7 +35,7 @@
     {"id": "neg-2", "prompt": "My uncommitted Edit changes were stranded when the PR got squash merged", "should_trigger": false, "category": "negative", "notes": "working-tree-edits-stranded-on-squash-merge"},
     {"id": "neg-3", "prompt": "Two agents want the same issue, how do we claim it so nobody duplicates the work", "should_trigger": false, "category": "negative", "notes": "gh-issue-claim-coordination"},
     {"id": "neg-4", "prompt": "The async post-commit hook keeps stalling my rebase", "should_trigger": false, "category": "negative", "notes": "git-rebase-stalls-async-post-commit-hook"},
-    {"id": "neg-5", "prompt": "Before dispatching overnight agents, check the warehouse actually has these table and column names", "should_trigger": false, "category": "negative", "notes": "pre-dispatch-schema-probe"},
+    {"id": "neg-5", "prompt": "Before dispatching overnight agents, check the warehouse actually has these table and column names", "should_trigger": false, "category": "negative", "notes": "inherited-scope-doc-names-may-not-exist"},
     {"id": "neg-6", "prompt": "A code review subagent invented specific line numbers to make a finding sound worse", "should_trigger": false, "category": "negative", "notes": "code-review-subagent-fabricates-specifics-to-inflate-severity"},
     {"id": "neg-7", "prompt": "The deploy went out from a stale checkout and silently rolled the service back", "should_trigger": false, "category": "negative", "notes": "deploy-from-stale-worktree-silent-rollback"},
     {"id": "neg-8", "prompt": "My workflow_run deploy gate trusts the ref name and a fork PR could abuse it", "should_trigger": false, "category": "negative", "notes": "workflow-run-deploy-gate-fork-pr-ref-name-escalation"},

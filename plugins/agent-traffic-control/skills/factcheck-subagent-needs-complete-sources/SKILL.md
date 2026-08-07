@@ -1,25 +1,13 @@
 ---
 name: factcheck-subagent-needs-complete-sources
 description: |
-  When dispatching a subagent to fact-check or verify a document/report/claims
-  against source material, hand it COMPLETE primary sources — never your own
-  abridged summary or partial dump. Use when: (1) you are about to launch an
-  Agent/Task subagent to "fact-check", "verify", "independently check",
-  "stress-test", or "review the claims in" a document against sources;
-  (2) you are assembling the source bundle or writing the prompt for that
-  agent; (3) a verification subagent returns a verdict like "claim X is
-  unsupported / appears in no source / looks fabricated" — before accepting it,
-  check whether the gap is in a source YOU abridged. An agent fed a partial
-  source reports confident FALSE-POSITIVE "unsupported" verdicts on exactly the
-  regions you trimmed out. (4) you are FANNING OUT several verifiers, each
-  scoped to a DIFFERENT SUBSET of sources matched to a doc section — a claim
-  anchored to a source outside one verifier's slice gets false-flagged by that
-  verifier even though every source is complete (see Variant).
+  Writing the prompt for a verifier that will "fact check" or "verify" a document or report
+  against sources: hand it complete originals, never your own partial dump. And a verdict back
+  that calls a claim "unsupported" or "fabricated" — check the gap is not in a source you trimmed.
 author: Claude Code
 version: 1.1.0
 date: 2026-06-25
 ---
-
 # Fact-check subagents need complete primary sources
 
 ## Problem

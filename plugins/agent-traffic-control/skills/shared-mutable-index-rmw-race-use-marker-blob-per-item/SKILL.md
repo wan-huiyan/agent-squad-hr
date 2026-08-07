@@ -1,25 +1,12 @@
 ---
 name: shared-mutable-index-rmw-race-use-marker-blob-per-item
 description: |
-  Use when DESIGNING a shared "see everyone's active/in-flight/recent items" index — a
-  dashboard sidebar, an activity feed, a "running now" list, a per-team/per-workspace/per-user
-  recent-items list — that CONCURRENT producers add to AND a reader prunes. If you back it with
-  ONE shared mutable container (a JSON list/array in a GCS/S3 blob, a DB array column, a shared
-  session-cookie list, a single file) that is read-modify-written, you get a read-modify-write
-  RACE that silently and PERMANENTLY drops entries: the reader reads the list, a producer appends
-  X, the reader writes back its pruned copy computed before X existed → X is gone forever and the
-  feature's whole promise ("see each other's items") is silently violated for that item. Trigger
-  symptoms: an item a colleague just created never appears in the shared list; "self-correcting"
-  was assumed but the add fires only once so it never re-appears; review flags a concurrency race
-  on a shared index. Fix: ONE marker blob/row PER ITEM (`<prefix>/<item_id>`), so create = write
-  your own key (no read → race-free), reader = list the prefix, prune = delete individual
-  confirmed-dead keys. Covers the marker-per-item layout, age-prune-by-id-timestamp without a
-  resolve, read-time dedupe by a stable sub-key, and a resolve/display cap to bound cost.
+  Designing a shared "who is active / recent items" index that concurrent producers write to: one
+  mutable list silently loses entries. Write one marker per item.
 author: Claude Code
 version: 1.1.0
 date: 2026-06-09
 ---
-
 # Shared mutable index → use a marker blob/row per item (not a read-modify-written list)
 
 ## Problem

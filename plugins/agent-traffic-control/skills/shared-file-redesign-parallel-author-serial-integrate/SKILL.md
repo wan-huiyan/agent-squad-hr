@@ -1,24 +1,17 @@
 ---
 name: shared-file-redesign-parallel-author-serial-integrate
 description: |
-  Structure a next-session handoff so a multi-slice redesign whose slices ALL
-  edit one hot file (a template, a central view, a shared CSS block) can still be
-  parallelized — even though the disjoint-files test says "don't split." Use when:
-  (1) you're writing parallel next-session prompts (session-handoff Phase 3) and
-  the remaining work is N slices that each touch the same file (e.g. report.html /
-  analysis.py), so the standard "split only if file sets are disjoint" rule would
-  force everything serial; (2) one slice is a longer-lead, schema/storage/back-compat
-  -risky or probe-gated BACKEND change that a UI slice depends on; (3) you want to
-  give the next session a concrete collision-mitigation plan, not just "these
-  conflict." Encodes the parallel-author / serial-integrate split, the
-  backend-first gating-spike ordering, ascending-risk merge order, narrow-collision
-  marking, and the partials-extraction prep-PR alternative that converts serial
-  integration into true parallelism.
+  Writing the next session's prompts for several remaining slices that ALL edit one hot file — a
+  template, a central view, one stylesheet block — so the usual "split only if the file sets are
+  disjoint" rule would force everything serial. Shared file work is parallel to author and serial
+  to integrate. Pulls the longest lead slice out first as a gating spike when a schema, storage or
+  probe gated backend change decides a later panel's scope, fans the rest out, then merges by
+  ascending risk — or extracts partials in a prep pull request. Not for a session editing that
+  file right now.
 author: Claude Code
 version: 1.1.0
 date: 2026-06-04
 ---
-
 # Shared-file redesign: parallel-author, serial-integrate
 
 ## Problem
@@ -62,7 +55,7 @@ UI wants?) — it goes FIRST, alone. Reasons:
    - It must land → deploy → **bake** (a real run writes the new schema) before
      the UI slice has real data to render against.
    - It's the critical path; starting it first de-risks the whole fan-out.
-   See `pre-dispatch-schema-probe`, `deploy-gate-success-report-doesnt-prove-the-gated-path`.
+   See `inherited-scope-doc-names-may-not-exist`, `deploy-gate-success-report-doesnt-prove-the-gated-path`.
 
 **2. Fan out the remaining slices (parallel AUTHORING).** They're independent to
 write; each on its own branch off `origin/main`.
@@ -199,7 +192,7 @@ what kept a 12-component fan-out collision-free.
   redesign + WIP elsewhere.
 - `parallel-pr-template-fork-duplicates-moved-section` — the shared-CSS /
   moved-section collision specifics.
-- `pre-dispatch-schema-probe` — why the backend gating-spike goes first and
+- `inherited-scope-doc-names-may-not-exist` — why the backend gating-spike goes first and
   must bake.
 - `session-handoff` (Phase 3 step 18) — the disjoint-files default this skill
   extends.

@@ -1,21 +1,17 @@
 ---
 name: solo-repo-branch-protection-stable-gate-and-self-merge
 description: |
-  Configure GitHub branch protection on a solo-maintained repo so red/broken changes
-  can't reach main, WITHOUT locking yourself out (no second reviewer needed). Use when:
-  (1) a bad commit reached main because CI only runs after a direct push, (2) you want a
-  server-side guarantee that direct pushes are blocked and the test check must be green,
-  (3) "require status checks" alone isn't blocking direct pushes. Covers three non-obvious
-  traps: matrix CI check-runs are named "test (20)"/"test (22)" not the workflow name, so
-  pin a STABLE aggregation gate job instead; required_status_checks alone only gates PR
-  MERGES (you also need require-PR to block direct pushes); and required_approving_review_count:0
-  lets a solo maintainer self-merge. See also: claude-plugin-repo-ci-release,
-  consistency-test-checks-one-file-leaves-sibling-unguarded, gh-pr-merge-unstable-state-needs-auto-and-watch-branch-deletes.
+  Lock main on a repo you maintain alone so nothing red lands and you are not deadlocked — no
+  second reviewer needed. Use when something broken reached main by direct push — CI runs after
+  the push, too late to block it — or status checks are required and direct pushes still land.
+  Three traps: a matrix names check runs `test (20)` and `test (22)`, never the workflow name, so
+  require a stable aggregation gate that fails, not skips; `required_status_checks` alone only
+  gates merges; and `required_approving_review_count: 0` with `enforce_admins` lets you self
+  merge. Not for an undeployed merge.
 author: wan-huiyan
 version: 1.0.0
 date: 2026-06-01
 ---
-
 # Solo-Repo Branch Protection: Stable Gate + Self-Merge
 
 ## Problem
@@ -122,3 +118,12 @@ with Read when one of these matches what you are looking at.
 
 - [`workflow-run-deploy-gate-fork-pr-ref-name-escalation`](../workflow-run-deploy-gate-fork-pr-ref-name-escalation/SKILL.md) — a deploy gated on `on: workflow_run` and a branch name can be escalated from a fork PR
 - [`merged-pr-not-deployed-gate-label-missing`](../merged-pr-not-deployed-gate-label-missing/SKILL.md) — the PR merged and CI is green but production never got it — a deploy gate label was missing
+
+## Neighbouring skills
+
+These were named in this skill's description until v1.18.0. The description is
+resident in context on every turn, so a cross-link there costs budget on every
+turn and buys nothing -- a user never types another skill's name. They belong
+here, where the model reads them once retrieval has already succeeded.
+
+- [`gh-pr-merge-unstable-state-needs-auto-and-watch-branch-deletes`](../gh-pr-merge-unstable-state-needs-auto-and-watch-branch-deletes/SKILL.md)
