@@ -127,6 +127,47 @@ can be gone while its files are fine, and vice versa — and a text field can be
 rolled back to its earlier wording while the record still exists, which no
 id-presence check catches. Diff the field, not just the key.
 
+### Checking as a victim: scope the check to what you TOUCHED, not what you MADE
+
+The natural check — and the one a broadcast asks for — enumerates *the things I
+created*. **The revert's scope is *the things I touched*, which is larger**, and
+the gap between them is where a clean-looking check goes wrong. Three ways it
+did, all in one session, each after an earlier check had reported clean:
+
+- **In-place edits to records you did not create.** Amending someone else's
+  standing ruling, appending a "DONE" paragraph to a pre-existing task, editing
+  a caveat block — none of those produce a new id, so an id/status/PR-number
+  sweep passes while the prose underneath has reverted. One standing ruling was
+  left publishing a superseded range with no marker on it, and the sweep that
+  was supposed to have verified it had looked only at `status` and `prs`.
+- **A PARTIAL rollback inside one record.** Half of an appended edit survived
+  and half reverted, so a single entry said the question was *settled* and, two
+  sentences later, quoted the range the settlement replaced. **A half-reverted
+  record reads self-consistent** — worse than a clean revert, which at least
+  looks obviously old.
+- **A moved number is indistinguishable from a reverted one by grep.** A README
+  count read 560 where the session had written 546; both a file-existence check
+  and a content-needle check flagged it lost, and it was not — sibling sessions
+  had added tests. **Re-derive the value; do not compare the string.** The
+  needle check is right for prose and wrong for anything computed.
+
+The executable form is a needle per *claim*, not per file — one distinctive
+phrase for every paragraph you amended, every ledger field you edited, and every
+computed figure re-derived rather than matched:
+
+```sh
+REF=${REF:-origin/main}                       # override to check a BRANCH pre-merge
+f() { git show "$REF:$2" | grep -qF -- "$3" && echo "OK   $1" || echo "LOST $1"; }
+f "ruling: the amendment"  path/to/ledger.js  "AMENDED 2026-08-07 BY"
+f "caveat: pinned, not open" path/to/ledger.js "PINNED 2026-08-07 at"
+# ...and for anything computed, re-measure instead of grepping:
+test "$(pytest docs -q --co 2>&1 | tail -1 | awk '{print $1}')" = "$(grep -oE '[0-9]+ collected' README.md | head -1 | cut -d' ' -f1)"
+```
+
+Keep the `REF` override: the same script is the pre-merge gate for *your* PR and
+the post-merge audit for someone else's, and only the second one is usually
+written.
+
 **Then tell the other sessions.** Losses are per-session and nobody else can see
 yours; a broadcast with a copy-pasteable `git cat-file -e origin/main:<path>`
 loop is the only thing that finds the ones whose owners have already wrapped.
