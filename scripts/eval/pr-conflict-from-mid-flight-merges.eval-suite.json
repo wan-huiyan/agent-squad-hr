@@ -1,0 +1,205 @@
+{
+  "skill_name": "pr-conflict-from-mid-flight-merges",
+  "version": "1.0.0",
+  "created_by": "wan-huiyan",
+  "updated": "2026-08-07",
+  "notes": "Trigger-coverage eval suite recorded BEFORE the v1.18.0 description rewrite, so the rewrite has a baseline to be measured against. Positives are natural-language prompts a user would really type; every one was written from the skill's BODY with the frontmatter unopened, and any positive sharing a four-word run with the current description was rejected -- a prompt written from the description measures whether the words survived, not whether the trigger did. Negatives are lifted from SIBLING skills a wrong pick would land on, so the score measures separation from close neighbours rather than recall. Word-overlap scoring is blind to trigger-condition NARROWING -- run check_skill_descriptions.py --compare for that.",
+  "triggers": [
+    {
+      "id": "pos-1",
+      "prompt": "My pull request was clean yesterday and today it says there are conflicts",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-2",
+      "prompt": "GitHub is showing a red banner about conflicts on my branch",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-3",
+      "prompt": "Why did my pull request go dirty while I was doing something else",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-4",
+      "prompt": "Other pull requests landed on main and now mine will not merge",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-5",
+      "prompt": "gh pr view says mergeable CONFLICTING and mergeStateStatus DIRTY",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-6",
+      "prompt": "Which pull requests merged since my branch point and caused this",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-7",
+      "prompt": "My branch has commits I do not recognise, like a changelog entry I never wrote",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-8",
+      "prompt": "Some of my commits are already on main under a different sha from a squash merge",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-9",
+      "prompt": "Should I rebase straight away or drop the redundant commits first",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-10",
+      "prompt": "The rebase wants to replay fourteen commits that are not really mine",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-11",
+      "prompt": "How do I find the merge base and list what landed on main after it",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-12",
+      "prompt": "A sibling branch's work got pulled into my feature branch somehow",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-13",
+      "prompt": "I need to reset to the origin tip before rebasing this branch",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-14",
+      "prompt": "After rebasing, how do I push safely and update the description",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-15",
+      "prompt": "The clash is on a line stating how many tests exist and each side added some",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-16",
+      "prompt": "Both sides of the conflict have a different number and neither looks right",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-17",
+      "prompt": "Some of what I have locally is already in the trunk, which parts",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-18",
+      "prompt": "Reconcile the incidental cross pull request additions in a follow up commit",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-19",
+      "prompt": "The pull request has been open for days and main moved a long way",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-20",
+      "prompt": "Diff the branch point against origin main to see the overlapping files",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-21",
+      "prompt": "Work out the actual delta before I start resolving anything",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "neg-1",
+      "prompt": "The conflicting files are all generated from one source script, regenerate them",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "merge-conflict-generated-files"
+    },
+    {
+      "id": "neg-2",
+      "prompt": "Give me an isolated worktree to work in",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "git-worktree"
+    },
+    {
+      "id": "neg-3",
+      "prompt": "Clean up the stale branches and worktrees without losing progress",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "safe-bulk-worktree-branch-cleanup"
+    },
+    {
+      "id": "neg-4",
+      "prompt": "Audit unmerged branches before starting the multi pull request redesign",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "large-redesign-parallel-branch-collision-audit"
+    },
+    {
+      "id": "neg-5",
+      "prompt": "Claim the issue before I write any code so a sibling session skips it",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "gh-issue-claim-coordination"
+    },
+    {
+      "id": "neg-6",
+      "prompt": "Review a stack of dependent pull requests against their own bases",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "stacked-pr-review-per-base-diff-and-attach"
+    },
+    {
+      "id": "neg-7",
+      "prompt": "Deleting the base branch auto closed the dependent stacked pull request",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "stacked-pr-base-branch-deletion-auto-closes-dependent"
+    },
+    {
+      "id": "neg-8",
+      "prompt": "My old branch point silently deleted files that landed on main afterwards",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "pr-from-stale-branch-silently-reverts-newer-main-files"
+    },
+    {
+      "id": "neg-9",
+      "prompt": "Configure branch protection on a solo repo with a stable gate job",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "solo-repo-branch-protection-stable-gate-and-self-merge"
+    },
+    {
+      "id": "neg-10",
+      "prompt": "Finish someone else's draft pull request from a designated branch name",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "gh-pr-pickup-designated-branch-supersede"
+    }
+  ]
+}

@@ -1,0 +1,205 @@
+{
+  "skill_name": "solo-repo-branch-protection-stable-gate-and-self-merge",
+  "version": "1.0.0",
+  "created_by": "wan-huiyan",
+  "updated": "2026-08-07",
+  "notes": "Trigger-coverage eval suite recorded BEFORE the v1.18.0 description rewrite, so the rewrite has a baseline to be measured against. Positives are natural-language prompts a user would really type; every one was written from the skill's BODY with the frontmatter unopened, and any positive sharing a four-word run with the current description was rejected -- a prompt written from the description measures whether the words survived, not whether the trigger did. Negatives are lifted from SIBLING skills a wrong pick would land on, so the score measures separation from close neighbours rather than recall. Word-overlap scoring is blind to trigger-condition NARROWING -- run check_skill_descriptions.py --compare for that.",
+  "triggers": [
+    {
+      "id": "pos-1",
+      "prompt": "Something broken got onto the trunk by a direct push",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-2",
+      "prompt": "I want main to be unbreakable but I am the only maintainer",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-3",
+      "prompt": "I turned on require status checks and direct pushes still go through",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-4",
+      "prompt": "Will branch protection stop me merging my own pull requests",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-5",
+      "prompt": "The required check never exists because the matrix names them test twenty and test twenty two",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-6",
+      "prompt": "My required status check is orphaned after I changed the node versions",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-7",
+      "prompt": "All merges are deadlocked because the required check is skipped",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-8",
+      "prompt": "Add an aggregation job that fails when any matrix leg fails",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-9",
+      "prompt": "How do I require a pull request without needing a second reviewer",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-10",
+      "prompt": "Configure it so a pull request is needed but zero sign offs, and I can land my own",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-11",
+      "prompt": "Does enforce admins mean even I cannot bypass the gate",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-12",
+      "prompt": "Configure protection on main through the GitHub api",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-13",
+      "prompt": "Which check run name should I pin so a matrix change does not break it",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-14",
+      "prompt": "Continuous integration runs after the push lands so it cannot block a bad commit",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-15",
+      "prompt": "Confirm the check run name exists before I require it",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-16",
+      "prompt": "I want GitHub itself to refuse anything failing, not just my own discipline",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-17",
+      "prompt": "Block direct pushes to main on a repo only I work on",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-18",
+      "prompt": "Pair the protection with a local pre push hook for fast failure",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-19",
+      "prompt": "What scope does my token need to set branch protection",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-20",
+      "prompt": "The gate job should fail not skip when the tests do not succeed",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-21",
+      "prompt": "Stop me pushing straight to main by accident",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "neg-1",
+      "prompt": "My pull request went conflicting after other pull requests merged",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "pr-conflict-from-mid-flight-merges"
+    },
+    {
+      "id": "neg-2",
+      "prompt": "Give me an isolated checkout for parallel feature work",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "git-worktree"
+    },
+    {
+      "id": "neg-3",
+      "prompt": "The merged pull request never reached production, the deploy gate label was missing",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "merged-pr-not-deployed-gate-label-missing"
+    },
+    {
+      "id": "neg-4",
+      "prompt": "Claim the issue with an assignee and a label before starting",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "gh-issue-claim-coordination"
+    },
+    {
+      "id": "neg-5",
+      "prompt": "Clean up dozens of stale branches without losing progress",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "safe-bulk-worktree-branch-cleanup"
+    },
+    {
+      "id": "neg-6",
+      "prompt": "Two sessions are editing the same deliverable at once",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "parallel-session-coedit-via-source-mtime-and-idempotent-rebuild"
+    },
+    {
+      "id": "neg-7",
+      "prompt": "Audit long running branches before I rewrite the templates",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "large-redesign-parallel-branch-collision-audit"
+    },
+    {
+      "id": "neg-8",
+      "prompt": "The conflicting files are all generated by a build script",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "merge-conflict-generated-files"
+    },
+    {
+      "id": "neg-9",
+      "prompt": "Recover the work of a session that crashed mid task",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "recover-killed-session-from-transcript-and-worktree"
+    },
+    {
+      "id": "neg-10",
+      "prompt": "Review each pull request in the stack against its own base",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "stacked-pr-review-per-base-diff-and-attach"
+    }
+  ]
+}

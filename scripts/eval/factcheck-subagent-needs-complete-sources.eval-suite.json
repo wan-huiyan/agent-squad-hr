@@ -1,0 +1,205 @@
+{
+  "skill_name": "factcheck-subagent-needs-complete-sources",
+  "version": "1.0.0",
+  "created_by": "wan-huiyan",
+  "updated": "2026-08-07",
+  "notes": "Trigger-coverage eval suite recorded BEFORE the v1.18.0 description rewrite, so the rewrite has a baseline to be measured against. Positives are natural-language prompts a user would really type; every one was written from the skill's BODY with the frontmatter unopened, and any positive sharing a four-word run with the current description was rejected -- a prompt written from the description measures whether the words survived, not whether the trigger did. Negatives are lifted from SIBLING skills a wrong pick would land on, so the score measures separation from close neighbours rather than recall. Word-overlap scoring is blind to trigger-condition NARROWING -- run check_skill_descriptions.py --compare for that.",
+  "triggers": [
+    {
+      "id": "pos-1",
+      "prompt": "I am about to send an agent to check this report against its sources",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-2",
+      "prompt": "What should I hand a verification agent so it does not guess",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-3",
+      "prompt": "Should I summarise the source or give the agent the whole file",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-4",
+      "prompt": "The checker says it cannot find that figure anywhere, is it right",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-5",
+      "prompt": "The agent called a figure fabricated but everything else verified cleanly",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-6",
+      "prompt": "It reported unsupported for exactly the part of the document I trimmed",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-7",
+      "prompt": "I abridged one source to save tokens, what could go wrong",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-8",
+      "prompt": "Assemble the source bundle for an independent verification pass",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-9",
+      "prompt": "The agent believes it has the complete source and says absence proves absence",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-10",
+      "prompt": "Before I correct the document, how do I test the verifier's verdict",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-11",
+      "prompt": "The agent's own report hedges that its dump was partial",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-12",
+      "prompt": "Point the checker at the repository itself rather than my transcription",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-13",
+      "prompt": "I split the sources between four checkers, one bundle each",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-14",
+      "prompt": "A statement backed by a document that checker never got was flagged anyway",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-15",
+      "prompt": "How do I mark a verdict unverifiable rather than inaccurate",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-16",
+      "prompt": "Write the prompt for a stress test of the claims in this write up",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-17",
+      "prompt": "Separate real errors from source gap false positives in the agent's findings",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-18",
+      "prompt": "Reject a flag that traces to a region the agent never received",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-19",
+      "prompt": "The reviewer is checking numbers against a summary I wrote myself",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-20",
+      "prompt": "Should the verifier get the full document dump or a digest",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-21",
+      "prompt": "It says the term appears nowhere, but I know I saw it in the original",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "neg-1",
+      "prompt": "Bound the reviewer with database access to eight tool calls",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "db-access-review-subagent-needs-explicit-probe-budget"
+    },
+    {
+      "id": "neg-2",
+      "prompt": "Set the worktree isolation parameter on every writing agent call",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "pre-dispatch-agent-isolation-parameter-not-prompt"
+    },
+    {
+      "id": "neg-3",
+      "prompt": "Check the table and column names in the scope doc before dispatching",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "pre-dispatch-schema-probe"
+    },
+    {
+      "id": "neg-4",
+      "prompt": "An agent asked only to decide went ahead and deployed live infrastructure",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "design-subagent-with-plan-schema-executes-and-deploys-live-infra"
+    },
+    {
+      "id": "neg-5",
+      "prompt": "A reviewer put the test failures on the wrong side of the pre existing line",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "subagent-pre-existing-misattribution"
+    },
+    {
+      "id": "neg-6",
+      "prompt": "Give me an isolated worktree for this work",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "git-worktree"
+    },
+    {
+      "id": "neg-7",
+      "prompt": "My pull request went conflicting overnight",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "pr-conflict-from-mid-flight-merges"
+    },
+    {
+      "id": "neg-8",
+      "prompt": "Clean up dozens of branches without losing progress",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "safe-bulk-worktree-branch-cleanup"
+    },
+    {
+      "id": "neg-9",
+      "prompt": "Claim this issue before writing any code",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "gh-issue-claim-coordination"
+    },
+    {
+      "id": "neg-10",
+      "prompt": "Review each pull request in the stack against its own base branch",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "stacked-pr-review-per-base-diff-and-attach"
+    }
+  ]
+}

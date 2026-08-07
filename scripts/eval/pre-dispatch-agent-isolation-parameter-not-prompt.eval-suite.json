@@ -1,0 +1,205 @@
+{
+  "skill_name": "pre-dispatch-agent-isolation-parameter-not-prompt",
+  "version": "1.0.0",
+  "created_by": "wan-huiyan",
+  "updated": "2026-08-07",
+  "notes": "Trigger-coverage eval suite recorded BEFORE the v1.18.0 description rewrite, so the rewrite has a baseline to be measured against. Positives are natural-language prompts a user would really type; every one was written from the skill's BODY with the frontmatter unopened, and any positive sharing a four-word run with the current description was rejected -- a prompt written from the description measures whether the words survived, not whether the trigger did. Negatives are lifted from SIBLING skills a wrong pick would land on, so the score measures separation from close neighbours rather than recall. Word-overlap scoring is blind to trigger-condition NARROWING -- run check_skill_descriptions.py --compare for that.",
+  "triggers": [
+    {
+      "id": "pos-1",
+      "prompt": "I am about to launch four agents that will each commit to their own branch",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-2",
+      "prompt": "I wrote in the prompt that they all get separate checkouts, does that do it",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-3",
+      "prompt": "Does writing you are isolated in the prompt actually create anything",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-4",
+      "prompt": "Check the dispatch parameters before I fan out these write capable agents",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-5",
+      "prompt": "One agent's commit landed on a different agent's branch",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-6",
+      "prompt": "My session's branch got switched out from under me while the agents ran",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-7",
+      "prompt": "The test total moved by one and no merge happened in between",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-8",
+      "prompt": "How do I make each agent prove which directory it is actually in",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-9",
+      "prompt": "Two agents reported the same repository root, is that a problem",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-10",
+      "prompt": "I am reusing a fan out prompt template from an older plan document",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-11",
+      "prompt": "Should read only review agents get the same treatment as writing ones",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-12",
+      "prompt": "Nothing errored but the results look like the agents shared a checkout",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-13",
+      "prompt": "What is the first bash call every dispatched agent should run",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-14",
+      "prompt": "Give me a thirty second check that the fan out is really isolated",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-15",
+      "prompt": "I am sending one agent into a directory another session is live in",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-16",
+      "prompt": "The dispatch tool has no isolation field, what do I do instead",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-17",
+      "prompt": "Pass an absolute path in and have the agent change into it first",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-18",
+      "prompt": "Confirm the field is set on every call whose agent will commit",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-19",
+      "prompt": "A number is true of something but not of the branch I am measuring",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-20",
+      "prompt": "Before this batch goes out, what should I read back",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-21",
+      "prompt": "The prompt asserts isolation and I never checked the call itself",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "neg-1",
+      "prompt": "A collision already happened and two sessions clobbered one checkout",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "concurrent-session-checkout-clobbers-shared-worktree"
+    },
+    {
+      "id": "neg-2",
+      "prompt": "Create a worktree for me with the manager script",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "git-worktree"
+    },
+    {
+      "id": "neg-3",
+      "prompt": "Give the review agent an explicit budget so it does not socket close",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "db-access-review-subagent-needs-explicit-probe-budget"
+    },
+    {
+      "id": "neg-4",
+      "prompt": "The fact check agent got a partial source and called a claim fabricated",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "factcheck-subagent-needs-complete-sources"
+    },
+    {
+      "id": "neg-5",
+      "prompt": "My pull request conflicts because main moved while it was open",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "pr-conflict-from-mid-flight-merges"
+    },
+    {
+      "id": "neg-6",
+      "prompt": "Clean up the stale branches and checkouts safely",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "safe-bulk-worktree-branch-cleanup"
+    },
+    {
+      "id": "neg-7",
+      "prompt": "Claim the issue so a sibling session skips it",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "gh-issue-claim-coordination"
+    },
+    {
+      "id": "neg-8",
+      "prompt": "Verify the column names in the scope document before the overnight run",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "pre-dispatch-schema-probe"
+    },
+    {
+      "id": "neg-9",
+      "prompt": "The slices share one file, structure the handoff so they still parallelize",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "shared-file-redesign-parallel-author-serial-integrate"
+    },
+    {
+      "id": "neg-10",
+      "prompt": "A subagent said the task was complete but the pull request is still open",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "subagent-reports-complete-but-pr-unmerged"
+    }
+  ]
+}

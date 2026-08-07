@@ -1,0 +1,205 @@
+{
+  "skill_name": "shared-file-redesign-parallel-author-serial-integrate",
+  "version": "1.0.0",
+  "created_by": "wan-huiyan",
+  "updated": "2026-08-07",
+  "notes": "Trigger-coverage eval suite recorded BEFORE the v1.18.0 description rewrite, so the rewrite has a baseline to be measured against. Positives are natural-language prompts a user would really type; every one was written from the skill's BODY with the frontmatter unopened, and any positive sharing a four-word run with the current description was rejected -- a prompt written from the description measures whether the words survived, not whether the trigger did. Negatives are lifted from SIBLING skills a wrong pick would land on, so the score measures separation from close neighbours rather than recall. Word-overlap scoring is blind to trigger-condition NARROWING -- run check_skill_descriptions.py --compare for that.",
+  "triggers": [
+    {
+      "id": "pos-1",
+      "prompt": "Every remaining slice edits the same template, can I still fan them out",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-2",
+      "prompt": "The disjoint files rule says do not split, but the user asked for parallel work",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-3",
+      "prompt": "I am writing next session prompts and all four slices touch report html",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-4",
+      "prompt": "I want the follow up prompts to carry a real plan, not just a warning",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-5",
+      "prompt": "The schema piece has to land before the panel piece can render anything",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-6",
+      "prompt": "Which slice should go first when one of them is probe gated",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-7",
+      "prompt": "Order these branches so the riskiest one merges last",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-8",
+      "prompt": "The backend change needs to land and bake before the panel has data to render",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-9",
+      "prompt": "Can I split three slices that share one central view",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-10",
+      "prompt": "Should the later slice be authored on top of the merged earlier one",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-11",
+      "prompt": "Mark the narrow collision so the rebase is mechanical",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-12",
+      "prompt": "Extract partials in a prep pull request so the slices stop overlapping",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-13",
+      "prompt": "Write parallel prompts for the rest of this page redesign",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-14",
+      "prompt": "The handoff says skip splitting when tasks share files, is that always right",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-15",
+      "prompt": "Nine items left across four slices and they all edit one stylesheet block",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-16",
+      "prompt": "Pull the longest lead schema change out as a serial prerequisite",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-17",
+      "prompt": "Merge order by ascending blast radius, what does that look like",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-18",
+      "prompt": "Serial to integrate but parallel to author, how do I write that up",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-19",
+      "prompt": "The user explicitly asked for parallel execution on shared file work",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-20",
+      "prompt": "Do I have to sequence everything because they all touch the analysis module",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-21",
+      "prompt": "Structure the fan out so the gating spike resolves the scope question first",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "neg-1",
+      "prompt": "My pull request conflicts because other pull requests landed on main",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "pr-conflict-from-mid-flight-merges"
+    },
+    {
+      "id": "neg-2",
+      "prompt": "Another live session is editing the same file right now, do not clobber it",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "parallel-session-coedit-via-source-mtime-and-idempotent-rebuild"
+    },
+    {
+      "id": "neg-3",
+      "prompt": "Audit the unmerged client branches before the big rewrite starts",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "large-redesign-parallel-branch-collision-audit"
+    },
+    {
+      "id": "neg-4",
+      "prompt": "Make me an isolated checkout for this branch",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "git-worktree"
+    },
+    {
+      "id": "neg-5",
+      "prompt": "Verify the table names in the inherited plan before the long run starts",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "pre-dispatch-schema-probe"
+    },
+    {
+      "id": "neg-6",
+      "prompt": "Clean up the stale branches without losing progress",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "safe-bulk-worktree-branch-cleanup"
+    },
+    {
+      "id": "neg-7",
+      "prompt": "Review the stack of dependent pull requests against their own bases",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "stacked-pr-review-per-base-diff-and-attach"
+    },
+    {
+      "id": "neg-8",
+      "prompt": "Claim the issue so a parallel session does not duplicate the work",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "gh-issue-claim-coordination"
+    },
+    {
+      "id": "neg-9",
+      "prompt": "The conflicting files are derived output, regenerate rather than hand merge",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "merge-conflict-generated-files"
+    },
+    {
+      "id": "neg-10",
+      "prompt": "Bound the review agent's tool calls so it does not run for half an hour",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "db-access-review-subagent-needs-explicit-probe-budget"
+    }
+  ]
+}
