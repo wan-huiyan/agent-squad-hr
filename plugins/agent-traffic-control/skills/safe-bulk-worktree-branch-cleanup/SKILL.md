@@ -1,5 +1,6 @@
 ---
 name: safe-bulk-worktree-branch-cleanup
+listing_tier: rich
 description: |
   Bulk delete accumulated git worktrees and branches without losing anything — "this repo is messy
   with worktrees", "too many branches", "tidy it up but keep X". Use when `git worktree list` or

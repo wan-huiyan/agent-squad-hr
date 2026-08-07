@@ -1,5 +1,6 @@
 ---
 name: pre-dispatch-agent-isolation-parameter-not-prompt
+listing_tier: short
 description: |
   Telling an agent in its prompt it has "your own isolated worktree" creates nothing — isolation
   is the dispatch call's `isolation: "worktree"` parameter. Before fanning out agents that will

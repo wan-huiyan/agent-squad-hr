@@ -1,5 +1,6 @@
 ---
 name: recover-killed-session-from-transcript-and-worktree
+listing_tier: name-led
 description: |
   Recover a prior Claude Code session that crashed or was killed mid task — its plan, its work and
   what killed it — from its transcript and its leftover worktree.

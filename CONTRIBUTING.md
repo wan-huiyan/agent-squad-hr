@@ -7,7 +7,7 @@ applies to the skill listing.
 
 ## What runs automatically
 
-**CI** (`.github/workflows/ci.yml`) runs four checks on every PR and push:
+**CI** (`.github/workflows/ci.yml`) runs six checks on every PR and push:
 
 1. `.github/scripts/validate_plugins.py` — marketplace / plugin / SKILL.md structure.
 2. `scripts/check_skill_descriptions.py` — the **skill-description cap gate**.
@@ -15,6 +15,8 @@ applies to the skill listing.
    patterns: Salesforce custom fields (`__c` / `__r`), API keys / tokens, and real email
    addresses. A hit fails the check.
 4. `scripts/check_skill_routes.py` — the **route gate**: can the model get to a skill at all?
+5. `scripts/check_skill_tiers.py` — the **tier gate**: does the listing still fit, by policy?
+6. A two-line assertion that `--json` reports `within_budget: true`.
 
 ### The route gate
 
@@ -120,6 +122,56 @@ own description; all 29 were rephrased.
 the v1.18.0 rewrite, with the commit it was measured at. Separation is how much better a
 description matches the prompts that should fire it than the prompts a neighbouring skill
 should answer. Measure against that file, not against a number quoted in a PR body.
+
+### The tier gate, and the policy for adding a skill
+
+Getting the listing under budget once is easy. Staying there is the hard part, because
+the failure is silent: descriptions collapse to bare names, every skill still "works",
+and the model just stops being able to see what any of them is for. v1.18.0 landed at
+**7,544 chars against an 8,000 budget** — room for about two more skills. So the size of
+every live description is now policy rather than luck.
+
+**Every live skill declares `listing_tier: rich | short | name-led`.** The class is
+decided by whether the skill has a `skillUsage` record in `~/.claude.json`, because that
+is what decides whether its description is certain to be read or merely might be:
+
+| class | ceiling | who | why |
+|---|---|---|---|
+| `rich` | 600 (`git-worktree` 300) | has a usage record | admitted regardless of size, so the description is what actually drives selection — spend characters here |
+| `short` | 280 | zero usage, name does not state the moment | invisible today; length only decides whether it can ever fit leftover slack |
+| `name-led` | 160 | zero usage, name already states the moment | one sentence expanding the name |
+
+Headcount caps: **8 rich, 8 short, 10 name-led, 24 live in total.** The gate names the
+current holders when one is exceeded, because **promoting a skill means naming the one it
+displaces, in the same pull request.**
+
+```bash
+python3 scripts/check_skill_tiers.py .                        # the CI invocation
+python3 scripts/check_skill_tiers.py . --why                  # the slate: size, live-inbound, usage
+python3 scripts/check_skill_tiers.py . --bytes-per-token 3    # the tighter budget
+python3 scripts/check_skill_tiers.py . --profile strict       # the 6,000-char target
+```
+
+**A new skill starts reference-only** (`disable-model-invocation: true`) **and is named
+from the body of the live skill that owns its moment**, so it is reachable from day one
+without costing the listing anything. Promote it only when it earns a class, and say what
+it displaces.
+
+**The strict profile does not pass today, deliberately.** It models a model given only
+6,000 chars of listing (rich ≤430, short ≤200, name-led ≤120; target 5,863). The shipped
+slate is 7,544, so `--profile strict` exits 1 and prints the exact gap — 19 descriptions
+over their tighter ceiling. It is a target for a future pass, not a claim about today, and
+it is a command rather than a memory. CI runs the default profile only.
+
+**One check in that gate is not about size at all.** A SKILL.md whose frontmatter has no
+closing `---` on its own line is **dropped from the vendored gate's census without any
+error**: breaking one file on purpose took the header from
+`98 SKILL.md (20 model-invocable)` to `97 SKILL.md (19 model-invocable)` and still exited
+0. So the tier gate fails on an unparseable frontmatter, first, before any count that
+would be computed over the wrong set. This was found by writing a script that reassembled
+files from `'---\n' + fm + '\n---' + text[len(fm)+8:]` and glued the delimiter onto the
+body's first line in all 20 — **do not reassemble a file you only need to insert a line
+into.**
 
 ### Getting under the cap is necessary, not sufficient
 
