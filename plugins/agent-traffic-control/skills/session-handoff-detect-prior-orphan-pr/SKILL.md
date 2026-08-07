@@ -156,5 +156,5 @@ The orphan handoff doc was actually richer than my fresh draft (formal frontmatt
 
 - [`main-bash-cwd-persists-nested-worktree`](../main-bash-cwd-persists-nested-worktree/) — why orphan worktree dir names are often mislabeled.
 - [`session-handoff-number-collision-with-unmerged-sibling`](../session-handoff-number-collision-with-unmerged-sibling/) — sibling scenario: two parallel orchestrators both claim session N+1.
-- [`session-handoff`](../session-handoff/) — the canonical workflow this skill protects.
+- `session-handoff` (ships in the separate `session-handoff` plugin, not here) — the canonical workflow this skill protects.
 - [`pr-hijack-via-stale-worktree-branch-ref`](../pr-hijack-via-stale-worktree-branch-ref/) — adjacent worktree-ref staleness pattern.

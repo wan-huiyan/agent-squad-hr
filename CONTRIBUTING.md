@@ -7,13 +7,42 @@ applies to the skill listing.
 
 ## What runs automatically
 
-**CI** (`.github/workflows/ci.yml`) runs three checks on every PR and push:
+**CI** (`.github/workflows/ci.yml`) runs four checks on every PR and push:
 
 1. `.github/scripts/validate_plugins.py` — marketplace / plugin / SKILL.md structure.
 2. `scripts/check_skill_descriptions.py` — the **skill-description cap gate**.
 3. `scripts/leak_scan.sh` — the **leak gate**. It enforces low-false-positive generic
    patterns: Salesforce custom fields (`__c` / `__r`), API keys / tokens, and real email
    addresses. A hit fails the check.
+4. `scripts/check_skill_routes.py` — the **route gate**: can the model get to a skill at all?
+
+### The route gate
+
+Most of this repo is reference-only (`disable-model-invocation: true`). Those skills never
+enter the listing and the Skill tool refuses them outright, so there are exactly two ways in:
+the user types the name, or a skill the model **has** retrieved names it in its body and the
+model opens the file. A reference-only skill that no *live* skill names is unreachable — on
+disk, in the README, and never opened.
+
+Measured on 2026-08-07, before this gate existed: **57 of 77 reference-only skills were named
+by no live skill**, so the real retrieval surface was 41 of 98 rather than 98 of 98.
+
+```bash
+python3 scripts/check_skill_routes.py .            # exit 0 = every skill reachable
+python3 scripts/check_skill_routes.py . --list     # per-skill live-inbound counts
+```
+
+Three things fail it: an unreachable reference-only skill; a `../<name>/SKILL.md` link that
+does not resolve (a skill from *another* plugin is not at that path — name it in backticks,
+see v1.11.1); and a skill with no README index row, or more than one.
+
+**Links from a disabled skill do not count.** The model only reads a disabled skill's body
+after it has already been sent there, so a chain that starts inside the dark half never starts.
+Matching is word-boundary: a mention of `using-git-worktrees` is not an inbound link to
+`git-worktree`. Substring matching inflates that one from 1 live inbound to 4 and hides a real
+orphan.
+
+Body text costs nothing in the skill listing, so satisfying this is free.
 
 ### The skill-description cap gate
 

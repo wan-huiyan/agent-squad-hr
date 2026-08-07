@@ -92,3 +92,14 @@ returned in 28s / 4 tool calls.
   cheap and reliable instead of a coin-flip on whether the agent returns.
 - See also: [[code-reviewer-subagent-no-bash-blocked-on-pr-diff]], [[finding-verification-live-bq-triple-probe]],
   [[subagent-external-wait-orchestrator-takeover]].
+
+## Reference-only siblings in this toolkit
+
+These carry `disable-model-invocation: true`. They never appear in the skill
+listing and the Skill tool refuses them, so the only way in is to open the file
+with Read when one of these matches what you are looking at.
+
+- [`parallel-impl-agent-dies-mid-stream-verify-working-tree`](../parallel-impl-agent-dies-mid-stream-verify-working-tree/SKILL.md) — a dispatched agent died mid-stream leaving no output while the harness reported it completed
+- [`opus-ratelimit-fanout-retry-on-sonnet-throttled-waves`](../opus-ratelimit-fanout-retry-on-sonnet-throttled-waves/SKILL.md) — a large fan-out mass-fails with HTTP 429 / "temporarily limiting requests"
+- [`parallel-subagent-fanout-rate-limit-recover-from-disk`](../parallel-subagent-fanout-rate-limit-recover-from-disk/SKILL.md) — recovering a rate-limited fan-out from the files the surviving agents already wrote
+- [`credit-stall-mid-orchestration-revive-collision`](../credit-stall-mid-orchestration-revive-collision/SKILL.md) — a billing/credit stall froze in-flight subagents and they collide when it resolves

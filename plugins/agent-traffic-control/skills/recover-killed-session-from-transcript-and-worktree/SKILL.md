@@ -97,3 +97,13 @@ clipped) — caught only by re-measuring fully. **Re-verify inherited fixes end-
   `claude-code-projects-jsonl-worktree-fanout` + `claude-code-session-shipped-and-agent-labels-from-transcript`
   (transcript-location + extraction mechanics), `handoff-prompt-stale-user-hint-newer-state` (the
   related "newer state landed since the prompt" case).
+
+## Reference-only siblings in this toolkit
+
+These carry `disable-model-invocation: true`. They never appear in the skill
+listing and the Skill tool refuses them, so the only way in is to open the file
+with Read when one of these matches what you are looking at.
+
+- [`session-handoff-detect-prior-orphan-pr`](../session-handoff-detect-prior-orphan-pr/SKILL.md) — a previous handoff run already left a branch, PR or worktree behind — find it before opening a duplicate
+- [`session-handoff-number-collision-with-unmerged-sibling`](../session-handoff-number-collision-with-unmerged-sibling/SKILL.md) — two sessions picked the same handoff number because each only sees what merged on its own branch
+- [`parallel-session-superseded-validated-fix-verify-live-prod-state-first`](../parallel-session-superseded-validated-fix-verify-live-prod-state-first/SKILL.md) — a parallel session already shipped a different fix to the same live artefact while you were building yours

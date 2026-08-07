@@ -269,3 +269,13 @@ growth is an assumption, not a property of the number.
   sibling rule for where a stated number comes from in the first place ("the rule survives;
   the numbers do not — measure the baseline yourself, never carry a count from a document").
   It says nothing about how to get through the conflict, which is what the variant above adds.
+
+## Reference-only siblings in this toolkit
+
+These carry `disable-model-invocation: true`. They never appear in the skill
+listing and the Skill tool refuses them, so the only way in is to open the file
+with Read when one of these matches what you are looking at.
+
+- [`git-rebase-stalls-async-post-commit-hook`](../git-rebase-stalls-async-post-commit-hook/SKILL.md) — a multi-commit rebase stalls mid-replay in a repo with a background post-commit hook
+- [`git-add-u-after-async-post-commit-hook`](../git-add-u-after-async-post-commit-hook/SKILL.md) — `git add -u` plus `--amend` plus force-push rolls thousands of unrelated deletions into your commit
+- [`git-amend-hits-async-post-commit-hook-commit`](../git-amend-hits-async-post-commit-hook-commit/SKILL.md) — `git commit --amend` silently rewrote the hook's commit instead of yours

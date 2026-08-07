@@ -134,3 +134,13 @@ verifier simply wasn't given.
   load-bearing claim before dispatching reviewers);
   `parallel-rewrite-with-claims-inventory-factcheck` (fact-check a rewrite
   against source DATA, not a derived inventory).
+
+## Reference-only siblings in this toolkit
+
+These carry `disable-model-invocation: true`. They never appear in the skill
+listing and the Skill tool refuses them, so the only way in is to open the file
+with Read when one of these matches what you are looking at.
+
+- [`task-framing-claims-need-subagent-grep-verify`](../task-framing-claims-need-subagent-grep-verify/SKILL.md) — a writing subagent needs permission to grep and correct the framing you handed it
+- [`design-subagent-with-plan-schema-executes-and-deploys-live-infra`](../design-subagent-with-plan-schema-executes-and-deploys-live-infra/SKILL.md) — an agent dispatched only to DECIDE went ahead and executed the plan against live infrastructure
+- [`cjk-structured-llm-output-truncates-json-needs-2x-tokens`](../cjk-structured-llm-output-truncates-json-needs-2x-tokens/SKILL.md) — long Chinese/Japanese/Korean structured output truncates mid-JSON — budget about twice the tokens

@@ -156,3 +156,13 @@ stale. Every deleted SHA was recorded on a `salvage/worktree-cleanup-*` branch.
 - `git worktree` docs — https://git-scm.com/docs/git-worktree
 - `git branch --merged` / `--is-ancestor` only detect ancestor merges, not
   squash or rebase merges — https://git-scm.com/docs/git-merge-base
+
+## Reference-only siblings in this toolkit
+
+These carry `disable-model-invocation: true`. They never appear in the skill
+listing and the Skill tool refuses them, so the only way in is to open the file
+with Read when one of these matches what you are looking at.
+
+- [`pr-hijack-via-stale-worktree-branch-ref`](../pr-hijack-via-stale-worktree-branch-ref/SKILL.md) — `git push -u origin <branch>` from a long-lived worktree overwrote another session's open PR
+- [`deploy-from-stale-worktree-silent-rollback`](../deploy-from-stale-worktree-silent-rollback/SKILL.md) — a deploy built from a stale worktree silently rolled back recently merged fixes in production
+- [`docs-branch-off-feature-branch-smuggles-code`](../docs-branch-off-feature-branch-smuggles-code/SKILL.md) — a docs-only follow-up PR ships the parent feature's code because the branch was cut from the wrong place

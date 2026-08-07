@@ -220,3 +220,19 @@ Step 7: `git push --force-with-lease` succeeded, `gh pr edit` refreshed the body
   https://git-scm.com/docs/git-push#Documentation/git-push.txt---force-with-leaseltrefnamegt
 - gh CLI mergeStateStatus reference:
   https://docs.github.com/en/graphql/reference/enums#mergestatestatus
+
+## Reference-only siblings in this toolkit
+
+These carry `disable-model-invocation: true`. They never appear in the skill
+listing and the Skill tool refuses them, so the only way in is to open the file
+with Read when one of these matches what you are looking at.
+
+- [`squash-merge-content-preservation-vs-ancestor-check`](../squash-merge-content-preservation-vs-ancestor-check/SKILL.md) — checking whether an upstream commit survived a propagation PR — ancestry says no, content says yes
+- [`pr-followup-commit-stranded-after-squash`](../pr-followup-commit-stranded-after-squash/SKILL.md) — commits pushed to an open PR branch never reached main because it was squash-merged between pushes
+- [`async-post-commit-hook-commit-orphaned-by-squash-merge`](../async-post-commit-hook-commit-orphaned-by-squash-merge/SKILL.md) — a background hook's own follow-up commit is orphaned by the squash
+- [`gh-pr-merge-squash-stdout-shows-sibling-files-as-created`](../gh-pr-merge-squash-stdout-shows-sibling-files-as-created/SKILL.md) — `gh pr merge --squash` prints far more files than your PR touched
+- [`gh-pr-merge-unstable-state-needs-auto-and-watch-branch-deletes`](../gh-pr-merge-unstable-state-needs-auto-and-watch-branch-deletes/SKILL.md) — `gh pr merge` fails in a way that looks like a conflict but is an UNSTABLE mergeStateStatus
+- [`gha-pr-merge-ref-shows-upstream-changes`](../gha-pr-merge-ref-shows-upstream-changes/SKILL.md) — CI fails on a file you never changed because it tested the merge ref, not your branch
+- [`git-diff-2dot-vs-3dot-merge-safety`](../git-diff-2dot-vs-3dot-merge-safety/SKILL.md) — a false "this PR deletes files on main" alarm from using two-dot instead of three-dot diff
+- [`pr-from-stale-branch-silently-reverts-newer-main-files`](../pr-from-stale-branch-silently-reverts-newer-main-files/SKILL.md) — a PR from an old branch point silently reverts files that landed on main afterwards, with no conflict
+- [`worktree-stale-local-main-ref-inflates-pr-diff`](../worktree-stale-local-main-ref-inflates-pr-diff/SKILL.md) — `git diff main...<branch>` reports dozens of upstream files because the local `main` ref is stale
