@@ -1,21 +1,17 @@
 ---
 name: safe-bulk-worktree-branch-cleanup
 description: |
-  Safely bulk-clean accumulated git worktrees and branches without losing
-  progress. Use when: (1) user says the repo is "messy with worktrees",
-  "too many branches", "clean up the repo", "review the worktrees";
-  (2) `git worktree list` / `git branch -a` shows dozens of stale entries;
-  (3) you must delete many branches/worktrees but the user said "without
-  losing progress" / "keep <X>". Centres on the non-obvious trap that
-  `git branch --merged` and `git merge-base --is-ancestor` report false
-  "NOT merged" for squash-merged branches — so safety must be gated on PR
-  state, not ancestry. Covers the verify-before-delete gate, salvaging
-  untracked files before `git worktree remove`, and a SHA recovery manifest.
+  Bulk delete accumulated git worktrees and branches without losing anything — "this repo is messy
+  with worktrees", "too many branches", "tidy it up but keep X". Use when `git worktree list` or
+  `git branch -a` prints dozens of stale entries. The trap: `git branch --merged` and `git
+  merge-base --is-ancestor` report a squash merged branch as NOT merged, so they call almost
+  everything unmerged and you stop, or delete believing you are losing work. Gate on the pull
+  request's state instead. Salvages untracked files before `git worktree remove` discards them.
+  Not for one branch that will not merge.
 author: Claude Code
 version: 1.0.0
 date: 2026-05-20
 ---
-
 # Safe Bulk Worktree & Branch Cleanup
 
 ## Problem

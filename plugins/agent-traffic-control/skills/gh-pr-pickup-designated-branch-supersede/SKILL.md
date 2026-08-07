@@ -1,25 +1,12 @@
 ---
 name: gh-pr-pickup-designated-branch-supersede
 description: |
-  Finish someone else's open WIP/draft PR from a session whose harness
-  designates a DIFFERENT branch name for your pushes. Use when: (1) the task
-  is "pick up PR #N and finish it" but your session instructions say all
-  development must go to a specific branch (e.g. `claude/pr-N-<slug>`) and
-  "NEVER push to a different branch", (2) you're tempted to either push to
-  the PR's own head branch (permission violation) or to start from main and
-  lose the PR's commits, (3) after `git checkout -B <designated>
-  origin/<pr-head-branch>` a bare `git push` targets the WRONG branch
-  because the upstream now points at the PR's branch, (4) a stop-hook or
-  linter complains the inherited PR commits are unsigned and suggests
-  rewriting history that is already pushed to the original PR. Outcome
-  pattern: base the designated branch on the PR head, finish the work, open
-  a superseding PR that cross-links, close the original draft with a
-  pointer.
+  Finish somebody else's open draft pull request when your session must push to a different,
+  designated branch name — base it on the PR head and supersede.
 author: Claude Code
 version: 1.0.0
 date: 2026-07-06
 ---
-
 # Picking up an existing PR when the harness designates a different branch
 
 ## Problem

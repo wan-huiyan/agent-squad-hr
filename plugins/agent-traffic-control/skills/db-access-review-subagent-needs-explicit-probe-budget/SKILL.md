@@ -1,25 +1,13 @@
 ---
 name: db-access-review-subagent-needs-explicit-probe-budget
 description: |
-  When dispatching a code-review / verification / research subagent that has LIVE database or cloud
-  access (BigQuery, gcloud, psql, Bash), give it an EXPLICIT tool-call + wall-time budget and tell it
-  which expensive probes NOT to re-run — otherwise it re-verifies everything from scratch, runs 20-40+
-  minutes, and can hit a transport "socket connection was closed unexpectedly" error that returns NO
-  final message (its entire investigation output is LOST and it is NOT resumable unless a continue/
-  SendMessage tool exists). Use when: (1) you're about to dispatch a `general-purpose` agent to review
-  a PR / verify findings with live-DB or gcloud access; (2) an Agent call returned `API Error: The
-  socket connection was closed unexpectedly` with `tool_uses: N` (>0) but `subagent_tokens: 0` / no
-  verdict — its work happened but the result was never delivered; (3) a review agent has been running
-  >20-30 min with no return; (4) you already validated the heavy probes yourself and just want a static
-  diff review + the fast test. Fix: bound the prompt ("≤8 tool calls, target <6 min, do NOT run BQ
-  probes — I already verified X/Y/Z; review the diff statically + run only the fast unit test") and
-  prefer several short bounded reviewers over one open-ended one. See also
-  subagent-watchdog-stall-on-ui-template-track (the UI-agent 600s-watchdog variant), schedule-poll-orchestrator-pattern.
+  Dispatching a review or verification agent with live database, gcloud, psql or bash access: give
+  it a tool call and time budget, plus the probes NOT to re-run. Also when it gives `API Error:
+  The socket connection was closed unexpectedly`, or has run 30 minutes. Not its sources.
 author: Claude Code
 version: 1.0.0
 date: 2026-05-29
 ---
-
 # A review subagent with live-DB access needs an explicit probe budget
 
 ## Problem

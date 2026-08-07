@@ -1,8 +1,10 @@
 ---
 name: gh-issue-claim-coordination
-description: Coordinate GitHub issue pickup across parallel Claude Code sessions (or human + agent) using BOTH `assignees` and a `wip` label, so sibling sessions detect the claim and skip. Use BEFORE writing any code that closes / addresses a GitHub issue when there's any chance another session is working the same repo. Trigger on phrases like "pick up issue #N", "work on #N", "let's grab the next one from the backlog", "implement the bug-tagged issues", "start the next session", "before I start coding on this issue", "did anyone else pick this up?", "is anyone on #N?", "another session is working on…", "WIP label", "in-progress label", "issue lock", "agent claim", "claim the issue", "release the claim". ALSO trigger when the user explicitly runs multiple parallel sessions / worktrees on the same repo, when an agent is dispatched to "work through the open issues", or when about to file a PR with `Closes #N`. NOT for: filing new issues, commenting without claiming, reviewing PRs, single-session work with no parallel risk, or changes that aren't backed by an issue.
+description: |
+  Before writing code for a GitHub issue when another session might take the same one, claim it
+  with BOTH an assignee and a `wip` label so a sibling sees it and skips. Trigger on "pick up
+  issue #N", "work through the open issues", "is anyone on this?". Not for filing or reviewing.
 ---
-
 # GitHub issue claim coordination (assignee + label)
 
 When multiple Claude Code sessions (or human + agent) work the same repo in parallel, two sessions can independently pick up the same issue, do parallel implementations, and collide at PR time — burning hours of duplicated work and forcing one branch to be rebased or abandoned.

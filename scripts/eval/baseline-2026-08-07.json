@@ -79,7 +79,7 @@
       "negative_mean": 0.1643,
       "separation": 0.3159
     },
-    "pre-dispatch-schema-probe": {
+    "inherited-scope-doc-names-may-not-exist": {
       "desc_chars_visible": 1423,
       "positives": 20,
       "negatives": 10,

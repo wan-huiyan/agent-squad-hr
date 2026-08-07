@@ -1,24 +1,17 @@
 ---
 name: pr-conflict-from-mid-flight-merges
 description: |
-  Diagnose and resolve a GitHub PR that flips to CONFLICTING / DIRTY (or "This branch
-  has conflicts that must be resolved") because OTHER PRs landed on `main` while this
-  PR was open. Use when: (1) a PR was clean when opened but is now CONFLICTING after
-  hours/days, (2) `gh pr view N --json mergeStateStatus` returns DIRTY / mergeable
-  CONFLICTING, (3) the feature branch has accumulated commits whose content is
-  already on main via a different PR (squash-merged with a different SHA), (4) you
-  need to figure out WHICH PRs landed and which of YOUR commits are now redundant
-  before rebasing. Prescribes a 7-step recipe: gh status → list landed commits →
-  detect redundant cherry-picks → reset to origin tip → rebase → reconcile →
-  force-push with lease and refresh the PR body.
-  Reconciling a stated COUNT (a "N tests" / "N skills" claim in a README) is the one
-  step where taking either side of the conflict is wrong — in a stack where both sides
-  added tests, the merged tree's number is on NEITHER side. Re-measure the merged tree.
+  A pull request that was clean when you opened it now says on GitHub "This branch has conflicts
+  that must be resolved", because others landed on main over the days it sat open. Use when `gh pr
+  view N --json mergeable,mergeStateStatus` returns CONFLICTING and DIRTY, when your branch
+  carries commits you do not recognise, or when some of yours are already on main under a
+  different sha from a squash merge. Find which landed and which of yours are redundant, then
+  reset to the origin tip, rebase and force push with lease. Special case: a stated test count
+  both sides added. Not for generated output.
 author: Claude Code
 version: 1.1.0
 date: 2026-04-27
 ---
-
 # PR Conflict from Mid-Flight Merges
 
 ## Problem

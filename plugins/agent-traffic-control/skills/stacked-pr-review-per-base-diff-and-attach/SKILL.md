@@ -1,23 +1,12 @@
 ---
 name: stacked-pr-review-per-base-diff-and-attach
 description: |
-  Two paired patterns for reviewing a stack of dependent PRs (#A → #B → #C
-  where each is based on the prior, not on main). (1) Reviewer agents need
-  each PR's diff against ITS OWN base, not all-vs-main — otherwise upstream
-  PR's changes show as part of downstream PR's diff and reviewers
-  misattribute findings. Use `gh pr diff <N> -R owner/repo > prN-vs-its-base.diff`
-  per PR. (2) Review reports for the whole stack should be committed to the
-  BASE branch of the stack (the bottom PR's branch), not to the most recent
-  one — every PR up the stack inherits them via base-branch advance, and PR
-  diffs still show only the actual feature changes because merge-base advances
-  too. Use when: dispatching a multi-agent review panel against 2+ stacked
-  PRs; deciding where to commit reviewer report .md files; auditing whether
-  a stacked-PR review panel saw the right per-PR scope.
+  Reviewing a stack of dependent pull requests: diff each one against ITS OWN base rather than
+  against main, and attach the reports to the bottom branch.
 author: Claude Code
 version: 1.0.0
 date: 2026-05-28
 ---
-
 # Stacked PR review: per-base diffs + base-branch attachment
 
 ## Problem

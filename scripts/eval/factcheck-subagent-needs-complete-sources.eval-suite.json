@@ -150,7 +150,7 @@
       "prompt": "Check the table and column names in the scope doc before dispatching",
       "should_trigger": false,
       "category": "negative",
-      "notes": "pre-dispatch-schema-probe"
+      "notes": "inherited-scope-doc-names-may-not-exist"
     },
     {
       "id": "neg-4",
