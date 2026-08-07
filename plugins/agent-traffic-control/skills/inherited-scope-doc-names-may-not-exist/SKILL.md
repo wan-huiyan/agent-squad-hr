@@ -1,27 +1,13 @@
 ---
-name: pre-dispatch-schema-probe
+name: inherited-scope-doc-names-may-not-exist
 description: |
-  Before firing a multi-hour or multi-agent data dispatch (overnight insight runs, parallel
-  subagent fleets, Cloud Run batch jobs, scheduled pipelines), run a fast 5-minute schema probe to
-  verify that every dataset path, table name, and column name referenced in the plan/scope doc
-  actually exists in the warehouse. Use when: (1) you inherited a scope doc authored by a
-  predecessor session and are about to dispatch 2+ long-running agents or jobs based on its table
-  references, (2) the plan doc mentions specific BQ paths like `project.dataset.table` or column
-  names like `enrolled_2025` and you're copying them verbatim into agent prompts or SQL, (3)
-  you're tempted to trust a scope doc that "looks authoritative" (prior-PR approvals,
-  multi-session review history), (4) dispatch cost is $50+ or wallclock is in hours. Catches
-  predecessor docs that assert dataset/column names confidently but wrongly — fabricated from
-  memory or stale from a prior schema. Typical catches: a dataset path that doesn't exist
-  (`project.dataset_a` instead of `project.dataset_b.dataset_a`), a label column that is
-  plausible but wrong (`enrolled_2025` instead of `enrolled_segment_a`), a column-name prefix
-  convention that is assumed but absent (`evt_page_visit_30d` instead of
-  `page_visit_8_30d`). Related but distinct from checking enum/category VALUES inside
-  columns; this skill covers the STRUCTURE (dataset paths, table names, column names).
+  A scope or plan doc from a prior session references dataset paths, table and column names that
+  may not exist. Verify every `project.dataset.table` and column name exists, with a fast schema
+  probe, before a multi hour dispatch of parallel subagents or batch jobs. NOT enum VALUES.
 author: Claude Code
 version: 1.1.2
 date: 2026-08-05
 ---
-
 # Pre-Dispatch Schema Probe
 
 ## Problem

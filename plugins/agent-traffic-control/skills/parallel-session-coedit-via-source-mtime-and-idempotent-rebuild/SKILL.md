@@ -1,28 +1,17 @@
 ---
 name: parallel-session-coedit-via-source-mtime-and-idempotent-rebuild
 description: |
-  Safely co-edit a deliverable WHILE another live session (a second Claude Code
-  session, or a colleague's agent) is actively editing the same file. Use when:
-  (1) the user warns "a parallel session is making active edits on the same file,
-  don't delete each other's work / maybe only write when the other is finished",
-  (2) the deliverable is BUILT from many per-item source files by an assembler
-  (e.g. sections/*.html -> _assemble.py -> one big HTML; docs, slides, reports),
-  (3) you must make edits without clobbering — or being clobbered by — the other
-  session's concurrent work. Covers: mapping hot/cool items via source-file mtime,
-  editing only disjoint sources, why an idempotent rebuild is NON-destructive
-  (so your edits survive the other session's rebuild), the false-negative
-  grep gotcha when verifying content landed in assembled HTML, how to CHECK
-  COVERAGE ("is card X present / missing?") against the sources rather than the
-  build, and the end-of-session HANDOFF/COMMIT discipline on the shared branch
-  (commit only your own docs, unpushed; leave the co-owned deliverable uncommitted) —
-  including the worktree-GLOBAL-index gotcha: staging then pausing lets the OTHER
-  session's `git commit` absorb your staged files into its commit (stage+commit
-  atomically; re-verify `git diff --cached` in the instant before committing).
+  Edit a shared deliverable while another live session or a colleague's agent is editing the same
+  file right now — "don't delete each other's work", "only write when the other one is finished".
+  When the file is built from many per item sources by an assembler (sections into one HTML,
+  slides, reports): source mtime shows which items they are on, disjoint sources cannot clobber,
+  and an idempotent rebuild merges everybody's sources. Grepping the assembled build is a false
+  negative test, and staging then pausing lets their commit absorb your files. Not for planning
+  who edits what next session.
 author: Claude Code
 version: 1.2.0
 date: 2026-07-01
 ---
-
 # Co-editing a section-assembled deliverable alongside a live parallel session
 
 ## Problem

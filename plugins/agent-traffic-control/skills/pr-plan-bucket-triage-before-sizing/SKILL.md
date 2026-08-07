@@ -1,32 +1,12 @@
 ---
 name: pr-plan-bucket-triage-before-sizing
 description: |
-  Run a 1-day "Phase 0 bucket triage" with subagent-per-bucket dispatch
-  BEFORE writing detailed PR plans, when scoping work on a codebase that
-  (a) someone else is actively shipping on, (b) you haven't audited
-  recently, or (c) you're relying on assumptions about route existence,
-  UI wiring, storage shape, or defect scope. Use when: (1) you're about
-  to invoke `superpowers:writing-plans` for 3+ PRs and your LOC estimates
-  contain question marks or "TBD by triage" markers; (2) brainstorming
-  output references "the colleague's module is a stub" / "the UI doesn't
-  exist yet" / "the report download is missing" — assumptions you haven't
-  grep'd; (3) the design says "PR-N depends on triage findings"; (4) you
-  catch yourself writing "size: 150-600 LOC" ranges; (5) the codebase has
-  a roadmap doc claiming features are "Done" but with caveats that haven't
-  been re-verified. The skill defines the bucket-triage pattern (6 typical
-  buckets: routes/templates, existing surface, module integration, break
-  diagnosis, pattern audit, storage convention), the subagent dispatch
-  shape for investigation work (vs. implementation), and the findings-doc
-  structure that turns assumptions into per-bucket verdicts. Demonstrated
-  ROI on its motivating case: caught 4 wrong assumptions in 4 hours that
-  would have invalidated 3 detailed PR plans. NOT for: greenfield work
-  (no existing code to audit), bug fixes you can reproduce in 5 minutes,
-  or solo work on a codebase you've touched this week.
+  Before writing detailed pull request plans against a codebase you have not audited, triage it by
+  bucket so sizes rest on findings rather than assumptions.
 author: Claude Code
 version: 1.0.0
 date: 2026-05-15
 ---
-
 # Phase 0 Bucket Triage Before Writing PR Plans
 
 ## Problem

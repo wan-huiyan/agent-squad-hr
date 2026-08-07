@@ -1,26 +1,13 @@
 ---
 name: pre-dispatch-agent-isolation-parameter-not-prompt
 description: |
-  Before launching parallel agents that will WRITE to a repo (commit, branch, rebase, push),
-  confirm each one actually gets its own git worktree. Isolation comes from the dispatch tool's
-  `isolation: "worktree"` parameter and from nothing else — a sentence in the prompt saying "you
-  are in your own isolated worktree" creates nothing. Use when: (1) you are about to fan out
-  2 or more Agent / Workflow / Task calls
-  whose agents will commit, (2) your prompt template tells each agent it is isolated and you have
-  not read the call's parameters back, (3) you want each agent to prove where it landed before it
-  writes anything, (4) you are wondering "does my prompt actually isolate them?". Prescribes:
-  check the CALL, not the prose; require `git rev-parse --show-toplevel` and
-  `git branch --show-current` as each agent's FIRST bash call, echoed in its report — two agents
-  naming one toplevel is a shared checkout, visible in 30 seconds; and treat a total that moves
-  with no merge in between as a LOCATION question first. PREVENTION only — for a collision that
-  has ALREADY happened, see
-  concurrent-session-checkout-clobbers-shared-worktree, subagent-bash-cd-wrong-worktree and
-  verifying-subagent-in-your-live-worktree-measures-your-uncommitted-work.
+  Telling an agent in its prompt it has "your own isolated worktree" creates nothing — isolation
+  is the dispatch call's `isolation: "worktree"` parameter. Before fanning out agents that will
+  commit, read the CALL back and make each prove where it landed. Prevention, not cleanup.
 author: Claude Code
 version: 1.0.0
 date: 2026-08-07
 ---
-
 # Agent isolation is a parameter, not a sentence in the prompt
 
 ## Problem

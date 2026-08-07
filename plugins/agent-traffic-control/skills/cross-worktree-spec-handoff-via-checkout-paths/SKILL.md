@@ -1,28 +1,13 @@
 ---
 name: cross-worktree-spec-handoff-via-checkout-paths
 description: |
-  Pass design specs or any shared artefact between two parallel Claude Code sessions working
-  in different worktrees/branches, without merging that branch to main first. Use when: (1)
-  session A produced design docs / a handoff prompt / a mockup on branch X, (2) session B
-  (other cwd/worktree, branch Y off main) reports "the file doesn't exist" or "I can't find
-  the design spec you mentioned", (3) you want B unblocked NOW, no PR review cycle, (4) both
-  worktrees share one `.git`. `git checkout <producing-branch> -- <paths>` in B's worktree
-  pulls them in as staged additions. Covers the gitignore-exception trick for blanket-ignored
-  files (`*.html` mockups). Diagnostic-search variant: user says "execute <path/to/file>" but
-  it isn't in your worktree — `git log --all --diff-filter=A -- "<path>"` + `git branch -a
-  --contains <sha>` find which branch holds it; `git show <branch>:<path>` reads it without
-  modifying your tree. Clean-PR-extraction variant: land a mergeable SUBSET on main from a
-  branch SHARED with a live session or DO-NOT-MERGE content — cut a THROWAWAY worktree off
-  origin/main, check safe paths in, never branch-switch the SHARED worktree (it yanks that
-  session's files). `gh pr merge --delete-branch` fails when main is checked out elsewhere.
-  cwd-relative-pathspec trap: `git log -- <root-relative-path>` returns EMPTY in a subdir
-  (pathspecs are cwd-relative), masking a committed file on your own branch; use `git log
-  --all --name-only | grep`, `git -C <root>`, or absolute-path Read.
+  Pass a shared file between two parallel sessions in different worktrees or branches, without
+  merging to main first — a design spec, docs, a handoff prompt, a mockup. `git checkout <branch>
+  -- <paths>` stages it. Use when a session says "the file doesn't exist". Not co editing.
 author: Claude Code
 version: 1.3.1
 date: 2026-08-04
 ---
-
 # Cross-worktree spec handoff via `git checkout <branch> -- <paths>`
 
 ## Problem

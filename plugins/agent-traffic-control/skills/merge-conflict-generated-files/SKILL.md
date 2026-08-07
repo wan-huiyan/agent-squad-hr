@@ -1,26 +1,12 @@
 ---
 name: merge-conflict-generated-files
 description: |
-  Resolve merge/rebase conflicts where the conflicting files are DERIVED OUTPUTS from a
-  source-of-truth generator script. Use when: (1) multiple files conflict but they are all
-  generated from a single source (e.g., site/*.html from a tracker Python script, dist/*.js
-  from a bundler config, openapi.json from OpenAPI spec, Sphinx/Docusaurus HTML from .rst/.md),
-  (2) hand-merging the generated files line-by-line would produce wrong/stale output because
-  the files encode computed aggregates, (3) two parallel branches both modified the generator
-  source AND committed regenerated outputs. Core insight: generated outputs are fully derived —
-  resolve their source, re-run the generator, stage the fresh output. Don't waste time resolving
-  HTML/JSON conflicts in files that will be overwritten by the generator anyway.
-  ALSO covers the variant where the derived thing is a single VALUE inside a HAND-AUTHORED
-  file — a stated test count, a coverage figure, a totals row in a README — which has no
-  generator at all, so only condition (4) holds and (1)–(3) do not. Use when a stack of PRs each
-  adds tests and every rebase conflicts on the same counted line: the correct merged value
-  is on NEITHER side, so resolve to a literal placeholder (PENDING-REMEASURE), finish the
-  rebase, then measure the final tree once and replace it.
+  The conflicting files are derived output from a generator: resolve their source, re-run it and
+  stage the fresh result rather than hand merging the output.
 author: Claude Code
 version: 1.1.0
 date: 2026-04-30
 ---
-
 # Merge Conflict in Generated Output Files
 
 ## Problem
