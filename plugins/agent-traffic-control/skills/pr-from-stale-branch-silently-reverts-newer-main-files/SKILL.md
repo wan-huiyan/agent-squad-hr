@@ -13,8 +13,13 @@ description: |
   merge-CONFLICT skills — this is the no-conflict, clean-merge silent-regression
   case. See also: pr-conflict-from-mid-flight-merges,
   large-redesign-parallel-branch-collision-audit, merge-conflict-generated-files.
+  ALSO covers the variant where the branch is NOT behind main: its parent IS
+  current main and `git merge origin/main` says "Already up to date", because
+  only the POINTER moved while the TREE stayed old. Every behindness check
+  passes and the diff still deletes what landed in between. Use when a PR
+  deletes files you never touched AND the branch looks perfectly rebased.
 author: Claude Code
-version: 1.0.0
+version: 1.1.0
 date: 2026-06-17
 disable-model-invocation: true
 ---
@@ -59,6 +64,73 @@ branch simply doesn't mention those files), so nothing warns you — the PR look
    hand off to `pr-conflict-from-mid-flight-merges` /
    `merge-conflict-generated-files` (generated-file union playbooks).
 
+## The harder variant: the branch is NOT behind main, and every check says so
+
+Everything above assumes the branch is *behind* main, so "am I behind?" catches
+it and "merge main in" fixes it. **Both fail on the variant that does the most
+damage**, because only the branch POINTER was moved onto current main while the
+working TREE stayed old:
+
+- `git log --oneline -2` shows your commit sitting directly on top of the newest
+  main commit. Perfectly linear. Looks freshly rebased.
+- `git merge-base --is-ancestor origin/main HEAD` → **true**. You are not behind.
+- `git merge origin/main` → **"Already up to date."** The documented fix is a
+  no-op.
+- No conflict, `mergeable: MERGEABLE`, CI green.
+
+And the diff still deletes every file that landed between the old tree and the
+new parent. How it happens: `git reset --soft origin/main` (or `--mixed` then
+`git add -A`) run from a branch whose base was old — the index still holds the
+OLD tree, so committing records "delete everything added since" as part of your
+change. A stale worktree committed with `git add -A` does the same.
+
+**The check that survives this** — deletions, not behindness:
+
+```sh
+git fetch origin main
+git diff --diff-filter=D --name-only origin/main...HEAD    # MUST be only files you meant to delete
+```
+
+**And the tell that identifies it as a stale tree**, when the deletion list is
+long enough to argue about — compare the diff size against several candidate
+bases. If your branch differs from an OLD commit by FEWER files than from its
+own parent, the tree predates the parent:
+
+```sh
+for base in <parent> <a few older main shas>; do
+  printf "%s  %s files\n" "$base" "$(git diff --name-only $base HEAD | wc -l)"
+done
+```
+
+**The fix is NOT to merge main in** (it is already an ancestor). Restore the
+paths, or rebuild the work on a fresh checkout of current main:
+
+```sh
+git checkout origin/main -- <each deleted path>     # surgical
+# or: branch from origin/main and re-apply only your own edits
+```
+
+## If one of these has already merged: splice, never revert
+
+`git revert` on the offending squash commit re-deletes everything that has
+merged *since* — the same failure, aimed the other way. Recover each lost object
+individually from the last commit where it was intact and re-insert it into
+*current* main:
+
+```sh
+git checkout <last-good-sha> -- <path>                    # files
+git show <last-good-sha>:<ledger> | ...                   # hand-edited ledgers: splice ONE object
+```
+
+**Check the hand-maintained ledger separately from the files.** A tracker entry
+can be gone while its files are fine, and vice versa — and a text field can be
+rolled back to its earlier wording while the record still exists, which no
+id-presence check catches. Diff the field, not just the key.
+
+**Then tell the other sessions.** Losses are per-session and nobody else can see
+yours; a broadcast with a copy-pasteable `git cat-file -e origin/main:<path>`
+loop is the only thing that finds the ones whose owners have already wrapped.
+
 ## Verification
 Post-merge-of-main, `git diff --stat origin/main..HEAD` lists only files you
 intended to change (no foreign deletions). The PR's "files changed" on GitHub
@@ -72,6 +144,30 @@ snapshot, two S257b handoffs, a legend edit) alongside the intended S258 additio
 — a clean merge would have reverted all of S257b's work. `git merge origin/main
 --no-edit` was conflict-free (docs were disjoint) and the diff then showed only the
 7 S258 files. PR opened safely.
+
+## Example 2 — the variant, and it cost four sessions (DoodleRun, 2026-08-07)
+
+PR #853 (`claude/floor500-rulings`, squash `6c79ff26`) shipped three ticked
+owner rulings **and deleted 11 files plus 15 hand-maintained ledger entries**
+belonging to four other sessions — 59 files, 5,081 deletions.
+
+**Its parent was the newest commit on main.** `git log` showed it directly on
+top; nothing was behind. The tree, however, was ~8 hours old: the branch tip
+differed from its own parent by **59** files but from an 8-hour-old commit by
+only **39**. Everything merged in that window was recorded as a deletion.
+
+**Nothing gated it.** The PR was **created at 09:30:12Z and merged at
+09:30:23Z — eleven seconds** — so no reviewer and no CI run ever saw the diff.
+
+**It was found 3½ hours later, by accident**, during an unrelated wrap-up check
+that happened to re-read the ledger. Two follow-up PRs restored some casualties;
+one session's four files and six ledger entries were still missing hours after
+that, because that session had already finished and nobody was coming back.
+
+**The two habits that would have caught it**, in order of cost: run
+`git diff --diff-filter=D` before merging, and — in a solo repo where no human
+reviews — re-verify your own merged work still exists on main *after* the last
+sibling merge, not at the moment you write the ledger entry.
 
 ## Notes
 - The tell is **deletions in the diff stat**, not a conflict marker — conflict-only
