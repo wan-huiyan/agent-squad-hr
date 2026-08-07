@@ -138,6 +138,17 @@ by usage rather than by length — so a description can be fully under the cap a
 the model as a name only. `check_skill_descriptions.py` prints the budget line for a given
 `--context`. Claim "no longer truncated"; never claim "guaranteed visible".
 
+**And that budget is GLOBAL, which is why no number this repo can measure will ever settle
+the question.** Every model-invocable skill from every installed plugin competes for the same
+8,000 chars — on the machine this work was done on, 105 skills wanting ≥91,094 chars, more
+than ten times the budget. Admission is ranked by `usageCount × max(0.5^(days/7), 0.1)` out of
+`~/.claude.json → skillUsage`, and a skill nobody has ever invoked scores **0**. So
+`check_skill_descriptions.py`'s "fits, N chars to spare" is a statement about THIS REPO'S
+share, not about visibility: getting the repo's own total down stops it crowding out other
+plugins, and that is the whole of what it does. Never write "it fits, so the descriptions are
+visible" — write what was actually achieved (nothing truncated, the repo no longer dominates
+a shared budget) and what still depends on the machine (whether any one description survives).
+
 ## One-time local setup (recommended)
 
 Enable the committed pre-push hook so both gates run **before** anything leaves your machine:
