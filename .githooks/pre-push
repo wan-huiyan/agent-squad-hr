@@ -1,10 +1,25 @@
 #!/usr/bin/env bash
 # Committed publishing gates (pre-push). Enable once per clone:
 #   git config core.hooksPath .githooks
-# 1. Blocks a push carrying a candidate client/PII identifier.
-# 2. Blocks a push whose SKILL.md description would be truncated mid-sentence
-#    by Claude Code's skill-listing cap. See CONTRIBUTING.md.
+#
+# These are the same checks CI runs, in the same order, so a red CI is something you
+# already saw locally. Keep the two lists in step: a hook that runs fewer gates than
+# CI is a hook that tells you a push is clean when it is not.
+#
+# 1. Blocks a push whose SKILL.md description would be truncated mid-sentence by
+#    Claude Code's skill-listing cap, or whose folded scalar has a hyphen split
+#    across lines.
+# 2. Blocks a push that leaves a reference-only skill unreachable, a relative
+#    cross-link dead, or a skill without exactly one README index row.
+# 3. Blocks a push that breaks the listing-budget tier policy.
+# 4. Blocks a push carrying a candidate client/PII identifier.
+#
+# `validate_plugins.py` is CI's first step and runs here too -- it is what caught a
+# version bump that truncated both manifests to zero bytes.
 set -e
 ROOT="$(git rev-parse --show-toplevel)"
+python3 "$ROOT/.github/scripts/validate_plugins.py"
 python3 "$ROOT/scripts/check_skill_descriptions.py" "$ROOT" --no-color --triggers
+python3 "$ROOT/scripts/check_skill_routes.py" "$ROOT"
+python3 "$ROOT/scripts/check_skill_tiers.py" "$ROOT" --context 200000 --bytes-per-token 4
 exec bash "$ROOT/scripts/leak_scan.sh" "$ROOT"

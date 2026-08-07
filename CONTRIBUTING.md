@@ -62,8 +62,29 @@ python3 scripts/check_skill_descriptions.py . --no-color --triggers   # exit 0 =
 synonym runs and cut prose/implementation detail — never delete a distinct concept, and keep
 any "NOT for ..." negative list, which is what stops false firing. Land ~30–50 chars under the
 cap so the next edit does not re-break it. The script is vendored from
-[wan-huiyan/context-police](https://github.com/wan-huiyan/context-police) (currently v2.2.1 —
-a plugin version, not a git tag); fix it there and re-vendor rather than forking it here.
+[wan-huiyan/context-police](https://github.com/wan-huiyan/context-police); fix it there and
+re-vendor rather than forking it here.
+
+**Read the version out of the file, not out of this page.** The file's own header states it:
+upstream commit `c413fd4`, upstream version 2.3.0 (a plugin/marketplace version, not a git
+tag — upstream's newest tag is v2.0.0), re-vendored 2026-08-05. This paragraph said "currently
+v2.2.1" until v1.19.1, which was two re-vendorings stale: v2.3.0 changed what the gate scores
+(wrap corruption over every skill, disabled included) and added a NO HEADROOM tier, so the
+stale number was not a cosmetic slip.
+
+> **The digest in that header is currently UNVERIFIABLE, and that is a gap rather than a
+> finding.** The header says the file is byte-identical to upstream apart from the note
+> between its `--8<--` markers, "so a parity test can strip it and hash the rest", and pins
+> `sha256 f72dcfa…`. **There is no such parity test in this repo**, and the stripping
+> convention is not written down — whether the docstring's own opening line, the marker lines
+> themselves, or the surrounding blank lines are included changes the hash. Stripping the
+> marker block and hashing the remainder gives `5a592be…`, which is evidence about a guessed
+> convention and **not** evidence that the file is a stale fork. Do not cite it as either.
+> What is owed is the parity test, written against upstream so the convention is defined by
+> something executable. Note also the header's own warning: a feature-presence grep is not a
+> substitute — a test asserting `find_wrap_corruption` and `compare_descriptions` were present
+> stayed green on a copy that genuinely was a stale fork, because the drift was inside a
+> function whose name never changed.
 
 The same script also fails on **line-wrap corruption**: `description: >` and `description: |`
 join their lines, so a line that ends in a hyphen silently becomes `token- efficient` in the
@@ -71,9 +92,10 @@ text the harness injects. The usual cause is re-wrapping with `textwrap.wrap()`,
 on hyphens by default — pass `break_on_hyphens=False`. The character count is unchanged, so no
 length check can see it.
 
-> **The exit code only covers MODEL-INVOCABLE skills — and 77 of this repo's 98 are not.**
-> (That is the gate's own header line, `98 SKILL.md (21 model-invocable, 77 disabled)`. Re-read
-> it from a run rather than from here — it moves with every skill added.)
+> **The exit code only covers MODEL-INVOCABLE skills — and 78 of this repo's 98 are not.**
+> (That is the gate's own header line, `98 SKILL.md (20 model-invocable, 78 disabled)`. Re-read
+> it from a run rather than from here — it moves with every skill added, and it moved twice in
+> one day: 21/77 before v1.18.0 demoted `using-git-worktrees`.)
 > The text report's exit code is `1 if (over or corrupt) else 0`, where both lists are built
 > from `live = [s for s in skills if not s.disabled]`. A hyphen break inside a
 > `model-invocation: false` skill is **printed by neither and fails nothing**. Verified by
@@ -211,9 +233,31 @@ plugins, and that is the whole of what it does. Never write "it fits, so the des
 visible" — write what was actually achieved (nothing truncated, the repo no longer dominates
 a shared budget) and what still depends on the machine (whether any one description survives).
 
+## Releasing: move all three manifests in one commit
+
+`VERSION`, `.claude-plugin/marketplace.json` and
+`plugins/agent-traffic-control/.claude-plugin/plugin.json` all carry the version number, and
+**they must move together in the same commit.** `validate_plugins.py` cross-checks the
+marketplace entry against `plugin.json` precisely because that drift has reddened `main`
+before: v1.5.0 shipped with a stale marketplace entry, and the same drift recurred on the
+v1.8.1 branch until review caught it.
+
+Two ways this goes wrong, both seen:
+
+- **Bumping two of the three.** A version number is copied into three files; there is no
+  single source. Grep the old number across the tree before you commit and expect zero hits.
+- **Truncating a manifest while editing it.** `open(p, 'w').write(open(p).read().replace(…))`
+  evaluates the outer `open(p, 'w')` first, which truncates the file, so the inner read
+  returns `''` and you write an empty manifest. That happened during v1.19.0 and left both
+  JSON files at zero bytes; `validate_plugins.py` caught it with
+  `invalid JSON … Expecting value: line 1 column 1`. Read the file fully, close it, then
+  write.
+
 ## One-time local setup (recommended)
 
-Enable the committed pre-push hook so both gates run **before** anything leaves your machine:
+Enable the committed pre-push hook so all five gates run **before** anything leaves your
+machine. It runs the same checks as CI, in the same order — a hook that runs fewer gates than
+CI is a hook that tells you a push is clean when it is not, so keep the two lists in step:
 
 ```bash
 git config core.hooksPath .githooks
