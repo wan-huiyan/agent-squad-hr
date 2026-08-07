@@ -1,24 +1,12 @@
 ---
 name: claude-code-projects-jsonl-worktree-fanout
 description: |
-  Search prior-session JSONL transcripts across worktree-namespaced project
-  directories under `~/.claude/projects/`. Use when: (1) the user asks "find a
-  previous session about X" or "remind me when we discussed Y" for a project
-  that uses git worktrees, (2) you grep the canonical
-  `~/.claude/projects/<project-dir>/*.jsonl` and the matching session isn't
-  there, (3) you need to enumerate every conversation that touched a project
-  regardless of which worktree it ran from. Claude Code stores each git
-  worktree's session JSONLs under a separately-namespaced project directory
-  (`<project-name>--claude-worktrees-<worktree-name>/`), not under the
-  canonical `<project-name>/` directory. Searching only the canonical dir
-  silently misses sessions run from worktrees — even though the user
-  experienced them as "in the same project". Sister to the `git-worktree`
-  skill family at the Claude-Code-state layer.
+  Find a prior session's transcript that `~/.claude/projects/<project>/` does not hold: each git
+  worktree gets its own separately namespaced project directory.
 author: Claude Code
 version: 1.0.0
 date: 2026-05-28
 ---
-
 # Claude Code projects/ JSONL transcripts fan out across worktrees
 
 ## Problem
@@ -161,3 +149,12 @@ Final keyword grep across all 7 surfaced the right one in seconds (opening promp
 - Claude Code project state docs (CC stores per-cwd session histories under `~/.claude/projects/`)
 - The `superpowers:using-git-worktrees` skill describes the worktree workflow that produces this fan-out
 - Sibling pattern: `claude-code-session-jsonl-whitespace-text-block` and `claude-code-session-jsonl-orphan-advisor-tool-result` operate on the same JSONL files; this skill is the discovery layer for finding them in the first place
+
+## Neighbouring skills
+
+These were named in this skill's description until v1.18.0. The description is
+resident in context on every turn, so a cross-link there costs budget on every
+turn and buys nothing -- a user never types another skill's name. They belong
+here, where the model reads them once retrieval has already succeeded.
+
+- [`git-worktree`](../git-worktree/SKILL.md)
