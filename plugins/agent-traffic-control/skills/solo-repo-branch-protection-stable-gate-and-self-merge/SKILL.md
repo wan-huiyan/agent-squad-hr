@@ -1,13 +1,13 @@
 ---
 name: solo-repo-branch-protection-stable-gate-and-self-merge
 description: |
-  Lock main on a repo you maintain alone so nothing red lands and you are not deadlocked — no
-  second reviewer needed. Use when something broken reached main by direct push — CI runs after
-  the push, too late to block it — or status checks are required and direct pushes still land.
-  Three traps: a matrix names check runs `test (20)` and `test (22)`, never the workflow name, so
-  require a stable aggregation gate that fails, not skips; `required_status_checks` alone only
-  gates merges; and `required_approving_review_count: 0` with `enforce_admins` lets you self
-  merge. Not for an undeployed merge.
+  Lock main on a solo repo so nothing red lands and you are not locked out — no second
+  reviewer needed. Use when something broken reached main by direct push (CI runs too late to
+  block it), or status checks are required and pushes still land. Traps: a matrix names check
+  runs `test (20)`/`test (22)`, not the workflow name, so require a stable aggregation gate
+  that fails, not skips; `required_status_checks` gates merges, not pushes; and
+  `required_approving_review_count: 0` is what lets you self-merge — `enforce_admins` does the
+  OPPOSITE, it removes your bypass. Not for an undeployed merge.
 author: wan-huiyan
 version: 1.0.0
 date: 2026-06-01
@@ -64,9 +64,17 @@ also require a pull request (`required_pull_request_reviews` must be present/non
 
 ### Trap 3 — Solo self-merge
 
-Set `required_approving_review_count: 0` — a PR is required, but zero approvals, so you
-can merge your own PR once the check is green. `enforce_admins: true` makes it a real
-guarantee (even the owner can't bypass).
+**`required_approving_review_count: 0` is the whole of it.** A PR is required, but zero
+approvals are, so you can merge your own PR once the check is green. GitHub will not let
+you approve your own pull request, so any value ≥ 1 deadlocks a solo maintainer outright.
+
+**`enforce_admins` is not part of that and does the opposite of what its placement here
+suggests.** The REST docs are explicit: *"Enforce all configured restrictions for
+administrators. Set to true to enforce required status checks for repository
+administrators."* It APPLIES the rules to admins — it removes the bypass an owner would
+otherwise have. So it is what makes the gate real, and it is also the switch you flip to
+`false` if you ever need to get past your own protection (see Emergency lift below). It
+never grants a merge. Do not cite it as the reason self-merge works.
 
 ### Apply it
 
