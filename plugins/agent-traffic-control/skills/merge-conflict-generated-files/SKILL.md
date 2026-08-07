@@ -10,8 +10,14 @@ description: |
   source AND committed regenerated outputs. Core insight: generated outputs are fully derived —
   resolve their source, re-run the generator, stage the fresh output. Don't waste time resolving
   HTML/JSON conflicts in files that will be overwritten by the generator anyway.
+  ALSO covers the variant where the derived thing is a single VALUE inside a HAND-AUTHORED
+  file — a stated test count, a coverage figure, a totals row in a README — which has no
+  generator at all, so conditions (1) and (3) do not apply. Use when a stack of PRs each
+  adds tests and every rebase conflicts on the same counted line: the correct merged value
+  is on NEITHER side, so resolve to a literal placeholder (PENDING-REMEASURE), finish the
+  rebase, then measure the final tree once and replace it.
 author: Claude Code
-version: 1.0.0
+version: 1.1.0
 date: 2026-04-30
 ---
 
@@ -41,6 +47,11 @@ Apply this skill when ALL of these hold:
    also modified on your branch, meaning both sides touched the source AND re-ran the generator.
 4. Hand-merging the outputs would produce semantically wrong results (e.g., duplicate tracker
    entries, stale totals, mismatched sort order, broken JSON).
+
+**If condition 2 fails because the conflicting thing is one derived NUMBER inside a file a
+human wrote** — a stated test count, a coverage percentage, a totals row — the reasoning
+still holds but the remedy is different, because there is no generator to re-run. Skip to
+*Variant — the derived thing is a VALUE inside a hand-authored file*, below.
 
 **Common generator → output patterns:**
 
@@ -167,6 +178,66 @@ When Branch A merges main:
 - Verify `index.html` now contains both `id-101` AND `id-102`
 - Commit
 
+## Variant — the derived thing is a VALUE inside a hand-authored file
+
+Everything above assumes a generator you can re-run. **The same insight applies one level
+down, to a single derived NUMBER embedded in a file a human wrote** — and that is exactly
+the case trigger condition 2 excludes, so without this section a model in a stacked rebase
+never loads this skill at all.
+
+The usual shapes: a README gate table row stating how many tests a suite collects
+(`pytest docs` → N), a coverage percentage in a badge line, an "N skills" / "N endpoints"
+figure in an intro paragraph, a row count in a data dictionary. Nothing generates these.
+Whoever last measured typed them in by hand.
+
+### Why every resolution of that conflict is wrong
+
+In a stack of PRs where each one adds tests and each one edits the same counted line,
+**the correct merged value exists on NEITHER side of the conflict**:
+
+- *Your side* is your branch's base plus your own tests.
+- *Their side* is main plus everybody else's tests.
+- *The merged tree* is the base plus yours plus theirs — a third number nobody has measured.
+
+Measured across three PRs in one stack (DoodleRun, 2026-08-07):
+
+| PR | The rebase resolved the line to | What the merged tree actually collects |
+|---|---|---|
+| #780 | 459 | **461** |
+| #807 | 461 | **476** |
+| #781 | 476 | **480** |
+
+Three resolutions, three wrong — and each looked perfectly reasonable when it was made,
+because each side of the conflict was a real count of a real tree.
+
+### Resolve to a placeholder, then measure once
+
+```bash
+# 1. During the rebase, put a literal that CANNOT be mistaken for a measurement:
+#      | `pytest docs` | **PENDING-REMEASURE** collected |
+$EDITOR README.md
+git add README.md
+git rebase --continue
+
+# 2. AFTER the rebase completes — not between two --continue steps, which would measure a
+#    tree that exists only mid-replay — measure the final tree, once:
+pytest docs -q --co 2>&1 | tail -1
+
+# 3. Put that number in, then prove no placeholder survived:
+grep -rn "PENDING-REMEASURE" .        # must be empty before you push
+```
+
+**Why a placeholder and not "take the more recent side":** a half-plausible number survives
+by inertia. Nobody re-checks a value that already looks like a value, so a
+wrong-but-reasonable count ships and then gets copied into the next document.
+`**PENDING-REMEASURE**` cannot ship quietly — it fails a grep, a reviewer's eye, and often
+the repo's own doc gate.
+
+**And "bigger is newer" is not a tiebreak, because the count can go DOWN.** A later PR in
+the same repo was rebased four times and the row went **530 → 559 → 516**, while the merged
+tree collected **517**. Tests get deleted, renamed, and moved between suites; monotonic
+growth is an assumption, not a property of the number.
+
 ## Notes
 
 - **"Take either side" for generated files is intentional** — both sides are equally wrong
@@ -190,3 +261,8 @@ When Branch A merges main:
   branches claiming the same synthetic ID (tracker IDs, ADR numbers, migration filenames)
 - `pr-conflict-from-mid-flight-merges` — broader recipe for identifying and clearing all
   mid-flight conflicts across a stale PR
+- `overnight-multi-issue-implementation`
+  ([overnight-workflows](https://github.com/wan-huiyan/overnight-workflows)) — carries the
+  sibling rule for where a stated number comes from in the first place ("the rule survives;
+  the numbers do not — measure the baseline yourself, never carry a count from a document").
+  It says nothing about how to get through the conflict, which is what the variant above adds.

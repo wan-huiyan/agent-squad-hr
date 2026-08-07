@@ -8,10 +8,13 @@ description: |
   "file was modified, either by the user or by a linter" system reminder,
   (2) `git branch --show-current` shows a branch you didn't switch to,
   (3) `git reflog` shows a `checkout: moving from X to Y` you never ran,
-  (4) unfamiliar files/changes appear in `git status`. Covers detecting the
-  collision and recovering via an isolated git worktree.
+  (4) unfamiliar files/changes appear in `git status`, (5) you are ABOUT to
+  dispatch parallel agents whose prompts say they are isolated — prose is not
+  configuration, and the tool's `isolation: "worktree"` parameter is what
+  actually creates one. Covers detecting the collision, recovering via an
+  isolated git worktree, and the pre-dispatch check that prevents it.
 author: Claude Code
-version: 1.1.0
+version: 1.2.0
 date: 2026-06-23
 disable-model-invocation: true
 ---
@@ -85,6 +88,67 @@ Session A's `app/config.py` edit vanishes; `git reflog` shows
 `git worktree add ../iap-worktree team-1-iap-deploy`, copy the untracked new
 files in, re-apply the lost `config.py` edit, `git checkout app/main.py` + `rm`
 the strays in `repo/`, then `EnterWorktree` and carry on — committing each task.
+
+## Prevention — the case where YOU caused it: the prompt said "isolated" and nothing was
+
+Everything above is recovery, and it only starts once damage shows. The variant that
+costs the most is the one where **you** fanned agents out and believe they are already
+isolated — so none of the triggers above ever prompts you to look.
+
+**Prose in a dispatch prompt is not configuration.** The isolation comes from the tool
+parameter — `isolation: "worktree"` on the Workflow/Agent call — and from nothing else.
+A prompt opening *"You are in your OWN isolated git worktree"* creates no worktree. It
+only makes every agent report as though it had one.
+
+DoodleRun, 2026-08-07: four parallel implementation agents were launched with exactly
+that sentence in their prompts and the parameter unset. All four shared one checkout.
+What that produced, none of it an error:
+
+- **One agent's first commit landed on a DIFFERENT agent's branch.** It noticed,
+  restored that branch without touching the other agent's uncommitted work, and rebuilt
+  its own work elsewhere — a chunk of its run spent on repair nobody asked for.
+  Recognising that from the *other* side is
+  [`subagent-bash-cd-wrong-worktree`](https://github.com/wan-huiyan/agent-traffic-control/blob/main/plugins/agent-traffic-control/skills/subagent-bash-cd-wrong-worktree/SKILL.md):
+  the reported SHA is real and `git branch --contains <sha>` finds it on a sibling
+  branch.
+- **The ORCHESTRATING session's own worktree branch was switched out from under it
+  mid-run** — the failure at the top of this page, aimed at the session that started
+  the fan-out.
+
+### Two checks, both cheap
+
+**1. Before you fan out, read the tool CALL back — not the prompt.** Every
+Workflow/Agent invocation in the batch needs `isolation: "worktree"` actually set.
+[`dispatched-bash-agent-git-checkout-clobbers-uncommitted-edit`](https://github.com/wan-huiyan/agent-traffic-control/blob/main/plugins/agent-traffic-control/skills/dispatched-bash-agent-git-checkout-clobbers-uncommitted-edit/SKILL.md)
+already names this remedy; the point here is that it is a **field**, and a field is easy
+to describe in English and forget to set.
+
+**2. Make every agent prove where it is, in its first 30 seconds.** Require this as the
+agent's FIRST bash call, and require both values echoed back in its report:
+
+```bash
+git rev-parse --show-toplevel      # which checkout am I in?
+git branch --show-current          # on which branch?
+```
+
+Two agents naming the same toplevel means one shared tree — visible before either has
+written a line. Reports that all cite the same directory are the entire signal; you do
+not need to wait for a symptom.
+
+### The tell, once it is already running
+
+**A number that is TRUE of something, but not of the branch you are measuring.** In that
+fan-out, an agent measuring its own branch read `pytest docs` as **446**; on the branch
+it was **445**. The extra test was real — another agent had committed it into the shared
+tree minutes earlier. Nothing errored, nothing conflicted, and 446 looked exactly like a
+number.
+
+Same reconciliation failure as
+[`verifying-subagent-in-your-live-worktree-measures-your-uncommitted-work`](https://github.com/wan-huiyan/agent-traffic-control/blob/main/plugins/agent-traffic-control/skills/verifying-subagent-in-your-live-worktree-measures-your-uncommitted-work/SKILL.md),
+where an agent in a dirty tree reports the branch plus your uncommitted edits. So treat
+any total that moves with no merge in between as a **location** question first — run
+`git rev-parse --show-toplevel` in the agent that reported it — before hunting for what
+changed.
 
 ## Notes
 
