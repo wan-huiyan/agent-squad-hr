@@ -137,8 +137,18 @@ should answer. Measure against that file, not against a number quoted in a PR bo
 Getting the listing under budget once is easy. Staying there is the hard part, because
 the failure is silent: descriptions collapse to bare names, every skill still "works",
 and the model just stops being able to see what any of them is for. v1.18.0 landed at
-**7,544 chars against an 8,000 budget** — room for about two more skills. So the size of
-every live description is now policy rather than luck.
+**7,542 chars against an 8,000-char hard ceiling**, and the default profile's target is
+**7,780**. So the size of every live description is now policy rather than luck.
+
+**What the 238 chars between 7,542 and the target actually buy: one more name-led skill.**
+An entry costs `len(name) + 4 + len(description) + 1`, so a name-led entry at its 160-char
+ceiling costs `len(name) + 165` — 177 to 237 across this repo's name lengths (12 to 72
+chars), and 238 was chosen to cover the longest of them. A `short` entry costs up to 357
+and a `rich` one up to 677 — neither fits, and nor does a second name-led. Adding any of
+them means **shortening something else in the same pull request**, which is the decision
+this gate exists to force. The 220 chars between the target and 8,000 are a warning band,
+not spare capacity: over target is a red build you fix at leisure, over 8,000 is the
+harness silently dropping descriptions.
 
 **Every live skill declares `listing_tier: rich | short | name-led`.** The class is
 decided by whether the skill has a `skillUsage` record in `~/.claude.json`, because that
@@ -168,7 +178,7 @@ it displaces.
 
 **The strict profile does not pass today, deliberately.** It models a model given only
 6,000 chars of listing (rich ≤430, short ≤200, name-led ≤120; target 5,863). The shipped
-slate is 7,544, so `--profile strict` exits 1 and prints the exact gap — 19 descriptions
+slate is 7,542, so `--profile strict` exits 1 and prints the exact gap — 19 descriptions
 over their tighter ceiling. It is a target for a future pass, not a claim about today, and
 it is a command rather than a memory. CI runs the default profile only.
 
