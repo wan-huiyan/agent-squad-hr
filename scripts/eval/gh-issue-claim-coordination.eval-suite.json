@@ -1,0 +1,205 @@
+{
+  "skill_name": "gh-issue-claim-coordination",
+  "version": "1.0.0",
+  "created_by": "wan-huiyan",
+  "updated": "2026-08-07",
+  "notes": "Trigger-coverage eval suite recorded BEFORE the v1.18.0 description rewrite, so the rewrite has a baseline to be measured against. Positives are natural-language prompts a user would really type; every one was written from the skill's BODY with the frontmatter unopened, and any positive sharing a four-word run with the current description was rejected -- a prompt written from the description measures whether the words survived, not whether the trigger did. Negatives are lifted from SIBLING skills a wrong pick would land on, so the score measures separation from close neighbours rather than recall. Word-overlap scoring is blind to trigger-condition NARROWING -- run check_skill_descriptions.py --compare for that.",
+  "triggers": [
+    {
+      "id": "pos-1",
+      "prompt": "Pick up issue forty two and start working on it",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-2",
+      "prompt": "Take whatever is at the top of the queue and get going",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-3",
+      "prompt": "Go through everything tagged as a defect and fix them",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-4",
+      "prompt": "Has somebody already taken this one",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-5",
+      "prompt": "Is another session already on this one",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-6",
+      "prompt": "Two sessions independently implemented the same issue and collided at merge time",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-7",
+      "prompt": "How do I flag that I am working on something so a sibling skips it",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-8",
+      "prompt": "Set an assignee and a label so the claim is visible in the issue list",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-9",
+      "prompt": "Why both an assignee and a label, is one not enough",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-10",
+      "prompt": "Sweep up claims that have been sitting untouched for a day",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-11",
+      "prompt": "Release the claim when the pull request merges",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-12",
+      "prompt": "I run several sessions against this repo at once, install a pickup protocol",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-13",
+      "prompt": "What should I run first so I do not duplicate somebody",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-14",
+      "prompt": "Create the work in progress label if it does not exist yet",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-15",
+      "prompt": "Show me every issue that is currently claimed",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-16",
+      "prompt": "List the issues nobody has taken",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-17",
+      "prompt": "An agent was dispatched to work the backlog and does not check for duplicates",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-18",
+      "prompt": "I am about to open a pull request that closes this issue",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-19",
+      "prompt": "The label create fails because my account cannot manage labels here",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-20",
+      "prompt": "Someone reassigned the issue without thinking about coordination",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-21",
+      "prompt": "Give me a sixty second protocol for claiming work at pickup",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "neg-1",
+      "prompt": "A planning pull request's closes keyword shut the issue before the work was done",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "prep-pr-close-keyword-auto-closes-issue"
+    },
+    {
+      "id": "neg-2",
+      "prompt": "Squash merging closed only one of the three issues I listed",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "gh-squash-merge-closes-only-one-issue"
+    },
+    {
+      "id": "neg-3",
+      "prompt": "Finish someone else's draft pull request on a designated branch",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "gh-pr-pickup-designated-branch-supersede"
+    },
+    {
+      "id": "neg-4",
+      "prompt": "My pull request conflicts because other pull requests landed on main",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "pr-conflict-from-mid-flight-merges"
+    },
+    {
+      "id": "neg-5",
+      "prompt": "Create an isolated checkout for this feature",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "git-worktree"
+    },
+    {
+      "id": "neg-6",
+      "prompt": "Clean up the stale branches without losing work",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "safe-bulk-worktree-branch-cleanup"
+    },
+    {
+      "id": "neg-7",
+      "prompt": "Another session is live editing the same file as me",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "parallel-session-coedit-via-source-mtime-and-idempotent-rebuild"
+    },
+    {
+      "id": "neg-8",
+      "prompt": "Set branch protection so a red commit cannot reach main",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "solo-repo-branch-protection-stable-gate-and-self-merge"
+    },
+    {
+      "id": "neg-9",
+      "prompt": "An executed brief was never retired and a sibling redid the work",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "executed-prompt-not-retired-sibling-redoes-it"
+    },
+    {
+      "id": "neg-10",
+      "prompt": "Audit the parallel branches before starting the redesign",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "large-redesign-parallel-branch-collision-audit"
+    }
+  ]
+}

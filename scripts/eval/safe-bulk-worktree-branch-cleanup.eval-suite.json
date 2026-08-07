@@ -1,0 +1,205 @@
+{
+  "skill_name": "safe-bulk-worktree-branch-cleanup",
+  "version": "1.0.0",
+  "created_by": "wan-huiyan",
+  "updated": "2026-08-07",
+  "notes": "Trigger-coverage eval suite recorded BEFORE the v1.18.0 description rewrite, so the rewrite has a baseline to be measured against. Positives are natural-language prompts a user would really type; every one was written from the skill's BODY with the frontmatter unopened, and any positive sharing a four-word run with the current description was rejected -- a prompt written from the description measures whether the words survived, not whether the trigger did. Negatives are lifted from SIBLING skills a wrong pick would land on, so the score measures separation from close neighbours rather than recall. Word-overlap scoring is blind to trigger-condition NARROWING -- run check_skill_descriptions.py --compare for that.",
+  "triggers": [
+    {
+      "id": "pos-1",
+      "prompt": "This repo is a mess with all the worktrees, help me clean it up",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-2",
+      "prompt": "I have far too many branches, get rid of the ones I do not need",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-3",
+      "prompt": "Tidy this place up and make sure nothing gets thrown away",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-4",
+      "prompt": "Listing my checkouts prints thirty odd old ones I do not recognise",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-5",
+      "prompt": "git branch -a is full of old feature and docs branches",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-6",
+      "prompt": "Delete the finished branches but keep the one I am still using",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-7",
+      "prompt": "git branch --merged says almost nothing is merged, that cannot be right",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-8",
+      "prompt": "Is it safe to delete a branch whose tip is not an ancestor of main",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-9",
+      "prompt": "How do I tell whether a branch was squash merged before deleting it",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-10",
+      "prompt": "Removing a checkout directory, does that throw away my untracked files",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-11",
+      "prompt": "Some worktrees are prunable because their directory is gone",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-12",
+      "prompt": "Map every branch to its pull request state before I delete anything",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-13",
+      "prompt": "Which of these branches have an open pull request I would auto close",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-14",
+      "prompt": "Save the untracked files out of these directories before I remove them",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-15",
+      "prompt": "Record the shas somewhere so I can get a branch back if I was wrong",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-16",
+      "prompt": "Should I use -d or -D on branches that were squash merged",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-17",
+      "prompt": "Review all my checkouts and tell me which are safe to remove",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-18",
+      "prompt": "The pull request titles all end with a number in brackets, does that matter here",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-19",
+      "prompt": "Delete the remote branches too, or should I confirm first",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-20",
+      "prompt": "Check each directory for uncommitted work before the bulk delete",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-21",
+      "prompt": "Give me an inventory of branches and checkouts sorted by last commit",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "neg-1",
+      "prompt": "Create a new isolated checkout for this feature",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "git-worktree"
+    },
+    {
+      "id": "neg-2",
+      "prompt": "My pull request went conflicting after other pull requests landed",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "pr-conflict-from-mid-flight-merges"
+    },
+    {
+      "id": "neg-3",
+      "prompt": "A push from an old checkout overwrote someone else's open pull request",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "pr-hijack-via-stale-worktree-branch-ref"
+    },
+    {
+      "id": "neg-4",
+      "prompt": "Every shell command fails saying it cannot read the current working directory",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "shell-pinned-to-deleted-worktree-cwd-blocks-git"
+    },
+    {
+      "id": "neg-5",
+      "prompt": "Recover a prior session that was killed halfway through its task",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "recover-killed-session-from-transcript-and-worktree"
+    },
+    {
+      "id": "neg-6",
+      "prompt": "Two sessions might grab the same issue, install a claim protocol",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "gh-issue-claim-coordination"
+    },
+    {
+      "id": "neg-7",
+      "prompt": "The rebase conflicts are all in generated output files",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "merge-conflict-generated-files"
+    },
+    {
+      "id": "neg-8",
+      "prompt": "Set up branch protection so a red commit cannot reach main",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "solo-repo-branch-protection-stable-gate-and-self-merge"
+    },
+    {
+      "id": "neg-9",
+      "prompt": "Audit long running branches before rewriting the shared templates",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "large-redesign-parallel-branch-collision-audit"
+    },
+    {
+      "id": "neg-10",
+      "prompt": "Pull the spec file across from another branch without merging it",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "cross-worktree-spec-handoff-via-checkout-paths"
+    }
+  ]
+}

@@ -108,6 +108,19 @@ do not clear them with a number.
 actually saw — not the full oversized source. **If a PR quotes coverage figures, the eval suite
 must be committed under `scripts/eval/`.** An unreproducible table is worse than no table.
 
+**Write the positive prompts from the skill's BODY, with the frontmatter unopened.** A prompt
+written from the description it will later score measures whether the *words* survived, not
+whether the *trigger* did — the suite agrees with the description by construction and cannot
+report a loss. The mechanical form of that rule: reject any positive that shares a four-word
+run with the current description. It fired on 29 of the 273 prompts written for v1.17.0,
+including four in `gh-issue-claim-coordination` that were verbatim quoted phrases out of its
+own description; all 29 were rephrased.
+
+`scripts/eval/baseline-2026-08-07.json` holds the separation of every description **before**
+the v1.18.0 rewrite, with the commit it was measured at. Separation is how much better a
+description matches the prompts that should fire it than the prompts a neighbouring skill
+should answer. Measure against that file, not against a number quoted in a PR body.
+
 ### Getting under the cap is necessary, not sufficient
 
 A second limit, `skillListingBudgetFraction` (1% of the context window), sizes the whole

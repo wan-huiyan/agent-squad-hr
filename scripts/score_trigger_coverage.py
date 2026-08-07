@@ -31,7 +31,18 @@ USAGE
         --eval scripts/eval/<skill>.eval-suite.json
 
     Adapted from wan-huiyan/agent-review-panel (scripts/score_trigger_coverage.py).
-    Only the USAGE paths differ; the scoring logic is unchanged.
+    The scoring logic is unchanged. Two things diverge, both in READING the file,
+    neither in what is measured:
+
+      · the USAGE paths.
+      · `read_description` accepts a PLAIN YAML scalar, not only a folded (`>`) or
+        block (`|`) one. Upstream exits with "no folded/block description" on a
+        plain one -- and two of this repo's live skills, `git-worktree` and
+        `gh-issue-claim-coordination`, are written that way, so they could not be
+        scored at all. A description that cannot be measured is the one most likely
+        to rot. The parsing now mirrors `check_skill_descriptions.py::_scalar`, so
+        both tools read the same string out of the same file; a divergence there
+        would let one gate clear a description the other never saw.
 """
 
 from __future__ import annotations
@@ -60,7 +71,12 @@ def words(s: str) -> set:
 
 
 def read_description(spec: str) -> str:
-    """Read a SKILL.md description from a path or a `git-ref:path` spec."""
+    """Read a SKILL.md description from a path or a `git-ref:path` spec.
+
+    Handles plain, quoted, folded (`>`) and block (`|`) scalars -- the same four
+    forms `check_skill_descriptions.py::_scalar` handles, so the two tools always
+    score the identical string.
+    """
     if ":" in spec:
         ref, _, path = spec.partition(":")
         r = subprocess.run(["git", "show", f"{ref}:{path}"], capture_output=True, text=True)
@@ -70,11 +86,37 @@ def read_description(spec: str) -> str:
     if not text.startswith("---"):
         sys.exit(f"no frontmatter in {spec}")
     fm = text[4:4 + re.search(r"^---\s*$", text[4:], re.M).start()]
-    m = re.search(r"^description:\s*[|>]\s*\n((?:[ \t]+.*\n?)*)", fm, re.M)
+
+    m = re.search(r"^description:[ \t]*(.*)$", fm, re.M)
     if not m:
-        sys.exit(f"no folded/block description in {spec}")
-    body = " ".join(l.strip() for l in m.group(1).splitlines() if l.strip())
-    return re.sub(r"\s+", " ", body).strip()
+        sys.exit(f"no description in {spec}")
+    head = m.group(1).strip()
+
+    if head[:1] in ("|", ">"):
+        lines = fm[m.end():].splitlines()
+        body = []
+        for line in (lines[1:] if lines and not lines[0].strip() else lines):
+            if line.strip() and not line[:1].isspace():
+                break                       # dedented -> next key
+            body.append(line.strip())
+        joined = " ".join(p for p in body if p)
+        return re.sub(r"\s+", " ", joined).strip()
+
+    if not head:
+        sys.exit(f"empty description in {spec}")
+
+    if len(head) >= 2 and head[0] == head[-1] and head[0] in ("'", '"'):
+        head = head[1:-1]
+
+    # A plain scalar's continuation lines are indented.
+    tail = []
+    for line in fm[m.end():].splitlines()[1:]:
+        if not line.strip() or not line[:1].isspace():
+            break
+        tail.append(line.strip())
+    if tail:
+        head = head + " " + " ".join(tail)
+    return re.sub(r"\s+", " ", head).strip()
 
 
 def main() -> int:
