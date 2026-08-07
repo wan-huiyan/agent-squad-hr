@@ -1,0 +1,115 @@
+{
+  "recorded": "2026-08-07",
+  "commit": "6cbc55759a74d82d361a5c11140266675d8e6beb",
+  "tool": "scripts/score_trigger_coverage.py",
+  "what_this_is": "Separation for every description as it stands BEFORE the v1.18.0 rewrite. Separation = mean word-overlap coverage on the suite's positive prompts minus the mean on its negatives -- how much better this description matches the prompts that should fire it than the prompts a neighbouring skill should answer. Higher is better; the negative mean on its own is better lower.",
+  "how_to_reproduce": "python3 scripts/score_trigger_coverage.py --old <ref>:<SKILL.md> --new <SKILL.md> --eval scripts/eval/<skill>.eval-suite.json --json",
+  "acceptance_for_the_rewrite": "rich class must retain >=80% of its baseline separation; short class >=60%; in both classes the mean coverage on the negative prompts must not rise. Boundary clauses are exempt -- a bag of words reads a boundary as evidence for the wrong skill and a real model reads it the opposite way.",
+  "caveat": "Word overlap is structurally blind to trigger-condition NARROWING: rewriting 'trigger on X -- separately watch for Y' into 'trigger on X WHOSE Y' keeps the identical word set and scores identically while the trigger now fires for fewer users. check_skill_descriptions.py --compare is the check for that class. Do not clear one with the other's number.",
+  "skills": {
+    "cross-worktree-spec-handoff-via-checkout-paths": {
+      "desc_chars_visible": 1501,
+      "positives": 25,
+      "negatives": 15,
+      "positive_mean": 0.6839,
+      "negative_mean": 0.1502,
+      "separation": 0.5337
+    },
+    "db-access-review-subagent-needs-explicit-probe-budget": {
+      "desc_chars_visible": 1380,
+      "positives": 21,
+      "negatives": 10,
+      "positive_mean": 0.4686,
+      "negative_mean": 0.0905,
+      "separation": 0.3781
+    },
+    "factcheck-subagent-needs-complete-sources": {
+      "desc_chars_visible": 1023,
+      "positives": 21,
+      "negatives": 10,
+      "positive_mean": 0.387,
+      "negative_mean": 0.1859,
+      "separation": 0.201
+    },
+    "gh-issue-claim-coordination": {
+      "desc_chars_visible": 1066,
+      "positives": 21,
+      "negatives": 10,
+      "positive_mean": 0.3437,
+      "negative_mean": 0.2194,
+      "separation": 0.1243
+    },
+    "git-worktree": {
+      "desc_chars_visible": 198,
+      "positives": 21,
+      "negatives": 10,
+      "positive_mean": 0.0502,
+      "negative_mean": 0.0143,
+      "separation": 0.036
+    },
+    "large-redesign-parallel-branch-collision-audit": {
+      "desc_chars_visible": 1353,
+      "positives": 21,
+      "negatives": 10,
+      "positive_mean": 0.4221,
+      "negative_mean": 0.2755,
+      "separation": 0.1465
+    },
+    "parallel-session-coedit-via-source-mtime-and-idempotent-rebuild": {
+      "desc_chars_visible": 1326,
+      "positives": 21,
+      "negatives": 10,
+      "positive_mean": 0.4573,
+      "negative_mean": 0.2187,
+      "separation": 0.2386
+    },
+    "pr-conflict-from-mid-flight-merges": {
+      "desc_chars_visible": 1024,
+      "positives": 21,
+      "negatives": 10,
+      "positive_mean": 0.3966,
+      "negative_mean": 0.1363,
+      "separation": 0.2603
+    },
+    "pre-dispatch-agent-isolation-parameter-not-prompt": {
+      "desc_chars_visible": 1241,
+      "positives": 21,
+      "negatives": 10,
+      "positive_mean": 0.4802,
+      "negative_mean": 0.1643,
+      "separation": 0.3159
+    },
+    "pre-dispatch-schema-probe": {
+      "desc_chars_visible": 1423,
+      "positives": 20,
+      "negatives": 10,
+      "positive_mean": 0.6709,
+      "negative_mean": 0.2342,
+      "separation": 0.4366
+    },
+    "safe-bulk-worktree-branch-cleanup": {
+      "desc_chars_visible": 705,
+      "positives": 21,
+      "negatives": 10,
+      "positive_mean": 0.3045,
+      "negative_mean": 0.0718,
+      "separation": 0.2327
+    },
+    "shared-file-redesign-parallel-author-serial-integrate": {
+      "desc_chars_visible": 981,
+      "positives": 21,
+      "negatives": 10,
+      "positive_mean": 0.3841,
+      "negative_mean": 0.1083,
+      "separation": 0.2757
+    },
+    "solo-repo-branch-protection-stable-gate-and-self-merge": {
+      "desc_chars_visible": 900,
+      "positives": 21,
+      "negatives": 10,
+      "positive_mean": 0.4515,
+      "negative_mean": 0.0468,
+      "separation": 0.4047
+    }
+  }
+}

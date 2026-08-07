@@ -1,0 +1,205 @@
+{
+  "skill_name": "db-access-review-subagent-needs-explicit-probe-budget",
+  "version": "1.0.0",
+  "created_by": "wan-huiyan",
+  "updated": "2026-08-07",
+  "notes": "Trigger-coverage eval suite recorded BEFORE the v1.18.0 description rewrite, so the rewrite has a baseline to be measured against. Positives are natural-language prompts a user would really type; every one was written from the skill's BODY with the frontmatter unopened, and any positive sharing a four-word run with the current description was rejected -- a prompt written from the description measures whether the words survived, not whether the trigger did. Negatives are lifted from SIBLING skills a wrong pick would land on, so the score measures separation from close neighbours rather than recall. Word-overlap scoring is blind to trigger-condition NARROWING -- run check_skill_descriptions.py --compare for that.",
+  "triggers": [
+    {
+      "id": "pos-1",
+      "prompt": "I am dispatching a review agent that has live warehouse access",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-2",
+      "prompt": "The reviewer has bash and cloud credentials, how do I bound it",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-3",
+      "prompt": "The reviewer I dispatched has not come back after thirty five minutes",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-4",
+      "prompt": "The agent call came back with a socket connection closed unexpectedly error",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-5",
+      "prompt": "It used twenty tool calls but returned no final message at all",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-6",
+      "prompt": "The subagent did real work and its verdict never arrived",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-7",
+      "prompt": "Can I resume an agent that died mid run or do I start again",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-8",
+      "prompt": "The reviewer re derives every claim from scratch with expensive queries",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-9",
+      "prompt": "I already ran the heavy probes myself, I just want eyes on the diff",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-10",
+      "prompt": "Tell the agent which expensive checks not to repeat",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-11",
+      "prompt": "Should I use one open ended reviewer or several short ones",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-12",
+      "prompt": "Put a wall time and tool call ceiling in the dispatch prompt",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-13",
+      "prompt": "The verification agent is running full window joins I did not ask for",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-14",
+      "prompt": "I burned the tokens and got nothing back from the reviewer",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-15",
+      "prompt": "How long is too long before I give up on a dispatched reviewer",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-16",
+      "prompt": "Give it the ground truth as facts to sanity check rather than reproduce",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-17",
+      "prompt": "The agent has psql access and is doing multi date sweeps",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-18",
+      "prompt": "Capture the agent id when the connection drops",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-19",
+      "prompt": "All I want is a look over the diff plus one quick unit test",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-20",
+      "prompt": "Re dispatch a fresh bounded agent instead of assuming it nearly finished",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-21",
+      "prompt": "What budget should I put on a code review agent with database access",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "neg-1",
+      "prompt": "Set the isolation parameter so the writing agents get their own checkouts",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "pre-dispatch-agent-isolation-parameter-not-prompt"
+    },
+    {
+      "id": "neg-2",
+      "prompt": "The fact check agent needs complete sources or it reports false positives",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "factcheck-subagent-needs-complete-sources"
+    },
+    {
+      "id": "neg-3",
+      "prompt": "Verify the dataset paths in the plan before the multi hour dispatch",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "pre-dispatch-schema-probe"
+    },
+    {
+      "id": "neg-4",
+      "prompt": "A reviewer agent invented specifics to make a finding look severe",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "code-review-subagent-fabricates-specifics-to-inflate-severity"
+    },
+    {
+      "id": "neg-5",
+      "prompt": "Review the stacked pull requests against each one's own base",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "stacked-pr-review-per-base-diff-and-attach"
+    },
+    {
+      "id": "neg-6",
+      "prompt": "Make me an isolated checkout for this branch",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "git-worktree"
+    },
+    {
+      "id": "neg-7",
+      "prompt": "My pull request is conflicting after other work merged to main",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "pr-conflict-from-mid-flight-merges"
+    },
+    {
+      "id": "neg-8",
+      "prompt": "Claim the issue before starting so nobody duplicates it",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "gh-issue-claim-coordination"
+    },
+    {
+      "id": "neg-9",
+      "prompt": "Clean up the stale worktrees without losing anything",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "safe-bulk-worktree-branch-cleanup"
+    },
+    {
+      "id": "neg-10",
+      "prompt": "A large fan out mass failed with rate limit errors",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "opus-ratelimit-fanout-retry-on-sonnet-throttled-waves"
+    }
+  ]
+}

@@ -1,0 +1,205 @@
+{
+  "skill_name": "git-worktree",
+  "version": "1.0.0",
+  "created_by": "wan-huiyan",
+  "updated": "2026-08-07",
+  "notes": "Trigger-coverage eval suite recorded BEFORE the v1.18.0 description rewrite, so the rewrite has a baseline to be measured against. Positives are natural-language prompts a user would really type; every one was written from the skill's BODY with the frontmatter unopened, and any positive sharing a four-word run with the current description was rejected -- a prompt written from the description measures whether the words survived, not whether the trigger did. Negatives are lifted from SIBLING skills a wrong pick would land on, so the score measures separation from close neighbours rather than recall. Word-overlap scoring is blind to trigger-condition NARROWING -- run check_skill_descriptions.py --compare for that.",
+  "triggers": [
+    {
+      "id": "pos-1",
+      "prompt": "Create a worktree for this feature so I can work on it separately",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-2",
+      "prompt": "How do I set up an isolated checkout to review this pull request",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-3",
+      "prompt": "List the worktrees I have open right now and tell me which are dirty",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-4",
+      "prompt": "Switch me over to the worktree for the billing branch",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-5",
+      "prompt": "Clean up the worktree I finished with last week",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-6",
+      "prompt": "I need a second checkout of this repo so two branches can be open at once",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-7",
+      "prompt": "Set up parallel development directories for these three branches",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-8",
+      "prompt": "Does the new checkout get a copy of my env file automatically",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-9",
+      "prompt": "My new checkout is missing the local env file the main repo has",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-10",
+      "prompt": "Add the worktrees directory to gitignore so it does not get committed",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-11",
+      "prompt": "Run the manager script to make me a fresh branch directory",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-12",
+      "prompt": "Where is the worktree manager script installed on a plugin install",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-13",
+      "prompt": "The manager script died with exit 127 and named no path at all",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-14",
+      "prompt": "Is it safe to call git worktree add directly or should I use the helper",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-15",
+      "prompt": "Tear down the finished checkouts and delete their branches interactively",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-16",
+      "prompt": "I want a throwaway checkout to test something without touching my current one",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-17",
+      "prompt": "Make me an isolated directory off main with a clear branch name",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-18",
+      "prompt": "Show me the status of every checkout so I can decide what to remove",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-19",
+      "prompt": "The mise config in my new checkout is untrusted and keeps prompting me",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-20",
+      "prompt": "direnv will not allow the env in the review checkout I just created",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-21",
+      "prompt": "Give me the create list switch and clean commands for managing checkouts",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "neg-1",
+      "prompt": "A pull request flipped to conflicting because other pull requests landed on main",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "pr-conflict-from-mid-flight-merges"
+    },
+    {
+      "id": "neg-2",
+      "prompt": "The repo is a mess with dozens of stale branches, clean it up without losing progress",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "safe-bulk-worktree-branch-cleanup"
+    },
+    {
+      "id": "neg-3",
+      "prompt": "Two sessions picked up the same issue and duplicated hours of work",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "gh-issue-claim-coordination"
+    },
+    {
+      "id": "neg-4",
+      "prompt": "Audit the long running branches before I start rewriting the shared templates",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "large-redesign-parallel-branch-collision-audit"
+    },
+    {
+      "id": "neg-5",
+      "prompt": "A parallel session is editing the same deliverable and I must not clobber it",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "parallel-session-coedit-via-source-mtime-and-idempotent-rebuild"
+    },
+    {
+      "id": "neg-6",
+      "prompt": "Set up branch protection so nothing red can reach main on a solo repo",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "solo-repo-branch-protection-stable-gate-and-self-merge"
+    },
+    {
+      "id": "neg-7",
+      "prompt": "The generated html files all conflict on rebase, resolve them",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "merge-conflict-generated-files"
+    },
+    {
+      "id": "neg-8",
+      "prompt": "Review this stack of dependent pull requests against each one's own base",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "stacked-pr-review-per-base-diff-and-attach"
+    },
+    {
+      "id": "neg-9",
+      "prompt": "A previous session got killed mid task, recover what it was doing",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "recover-killed-session-from-transcript-and-worktree"
+    },
+    {
+      "id": "neg-10",
+      "prompt": "Give the review agent a probe budget so it does not run for forty minutes",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "db-access-review-subagent-needs-explicit-probe-budget"
+    }
+  ]
+}

@@ -1,0 +1,205 @@
+{
+  "skill_name": "large-redesign-parallel-branch-collision-audit",
+  "version": "1.0.0",
+  "created_by": "wan-huiyan",
+  "updated": "2026-08-07",
+  "notes": "Trigger-coverage eval suite recorded BEFORE the v1.18.0 description rewrite, so the rewrite has a baseline to be measured against. Positives are natural-language prompts a user would really type; every one was written from the skill's BODY with the frontmatter unopened, and any positive sharing a four-word run with the current description was rejected -- a prompt written from the description measures whether the words survived, not whether the trigger did. Negatives are lifted from SIBLING skills a wrong pick would land on, so the score measures separation from close neighbours rather than recall. Word-overlap scoring is blind to trigger-condition NARROWING -- run check_skill_descriptions.py --compare for that.",
+  "triggers": [
+    {
+      "id": "pos-1",
+      "prompt": "I am about to rewrite the base layout across fourteen pull requests overnight",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-2",
+      "prompt": "We have a client variant branch and I am starting a big template restructure",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-3",
+      "prompt": "Before this migration, what should I check about the other long lived branches",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-4",
+      "prompt": "I am throwing away the current report markup and writing new markup",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-5",
+      "prompt": "There is a staging branch nobody has merged in weeks and I am rewriting shared views",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-6",
+      "prompt": "Which unmerged branches have commits touching the files my restructure will replace",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-7",
+      "prompt": "My overnight redesign merged fine but now the release branch will not cherry pick",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-8",
+      "prompt": "The accessibility hotfixes on the other branch collide with my new markup",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-9",
+      "prompt": "Each customer gets their own trunk here, and the base layout is being rewritten",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-10",
+      "prompt": "Should I promote the parallel branch first or carve my scope around it",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-11",
+      "prompt": "Plan a multi pull request restructure of the central views",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-12",
+      "prompt": "How do I find branches that are ahead of main and still active",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-13",
+      "prompt": "A colleague asked what happens to their whitelabel branch after my rewrite",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-14",
+      "prompt": "The redesign is locked and green, but I never looked at the other branches",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-15",
+      "prompt": "Moving their commits over collides straight into my rewritten markup",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-16",
+      "prompt": "I want to stake out the scope so my rewrite does not touch the colliding files",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-17",
+      "prompt": "How stale is too stale for a branch to matter to this migration",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-18",
+      "prompt": "Their accessibility fixes are stuck and somebody has to re apply them by hand",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-19",
+      "prompt": "Check every branch that has not landed for overlap with my planned files",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-20",
+      "prompt": "This restructure touches four templates and the shared stylesheet",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-21",
+      "prompt": "Is a pure class rename risky the same way a structural rewrite is",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "neg-1",
+      "prompt": "Two pull requests are targeting the same scope at the same time, which wins",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "parallel-pr-scope-overlap-tiebreaker-delta-check"
+    },
+    {
+      "id": "neg-2",
+      "prompt": "My pull request went conflicting after other pull requests landed on main",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "pr-conflict-from-mid-flight-merges"
+    },
+    {
+      "id": "neg-3",
+      "prompt": "Create an isolated checkout so I can work on this feature",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "git-worktree"
+    },
+    {
+      "id": "neg-4",
+      "prompt": "The slices of this redesign all edit one hot file, can they still run in parallel",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "shared-file-redesign-parallel-author-serial-integrate"
+    },
+    {
+      "id": "neg-5",
+      "prompt": "Clean up dozens of stale worktrees and branches without losing progress",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "safe-bulk-worktree-branch-cleanup"
+    },
+    {
+      "id": "neg-6",
+      "prompt": "Claim this issue so another session does not start the same work",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "gh-issue-claim-coordination"
+    },
+    {
+      "id": "neg-7",
+      "prompt": "The conflicting files are all generated output from one script",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "merge-conflict-generated-files"
+    },
+    {
+      "id": "neg-8",
+      "prompt": "Design a shared recent items index that concurrent producers write to",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "shared-mutable-index-rmw-race-use-marker-blob-per-item"
+    },
+    {
+      "id": "neg-9",
+      "prompt": "Pick up someone else's draft pull request and finish it on my own branch",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "gh-pr-pickup-designated-branch-supersede"
+    },
+    {
+      "id": "neg-10",
+      "prompt": "The fact check agent says a claim is unsupported, should I believe it",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "factcheck-subagent-needs-complete-sources"
+    }
+  ]
+}

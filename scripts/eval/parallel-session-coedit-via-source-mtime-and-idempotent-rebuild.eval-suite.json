@@ -1,0 +1,205 @@
+{
+  "skill_name": "parallel-session-coedit-via-source-mtime-and-idempotent-rebuild",
+  "version": "1.0.0",
+  "created_by": "wan-huiyan",
+  "updated": "2026-08-07",
+  "notes": "Trigger-coverage eval suite recorded BEFORE the v1.18.0 description rewrite, so the rewrite has a baseline to be measured against. Positives are natural-language prompts a user would really type; every one was written from the skill's BODY with the frontmatter unopened, and any positive sharing a four-word run with the current description was rejected -- a prompt written from the description measures whether the words survived, not whether the trigger did. Negatives are lifted from SIBLING skills a wrong pick would land on, so the score measures separation from close neighbours rather than recall. Word-overlap scoring is blind to trigger-condition NARROWING -- run check_skill_descriptions.py --compare for that.",
+  "triggers": [
+    {
+      "id": "pos-1",
+      "prompt": "Another session is editing this same file right now, how do I not clobber it",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-2",
+      "prompt": "Somebody else's agent is live on this document, should I wait for them",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-3",
+      "prompt": "Two of us are working the same big html report at the same time",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-4",
+      "prompt": "The output is assembled from many section files by a build script",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-5",
+      "prompt": "How do I tell which sections the other session is touching right now",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-6",
+      "prompt": "Can I edit safely while someone else rebuilds the same artifact",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-7",
+      "prompt": "I grepped the assembled output for my text and it is not there, did I lose it",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-8",
+      "prompt": "Is a rebuild going to overwrite the edits the other session just made",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-9",
+      "prompt": "Which cards are hot and which are cool so I can pick disjoint ones",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-10",
+      "prompt": "Should I hand edit the two megabyte generated file or the sources",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-11",
+      "prompt": "The other agent moves between items quickly, how often do I recheck",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-12",
+      "prompt": "Check whether card seven is present or missing in this deliverable",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-13",
+      "prompt": "How do I split ownership by item so neither of us waits on the other",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-14",
+      "prompt": "I ran add and then waited, and somebody else's commit picked up my files",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-15",
+      "prompt": "What do I commit at the end when the deliverable is co owned",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-16",
+      "prompt": "The assembler reads every source and regenerates one output, does that help",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-17",
+      "prompt": "Verify my content actually landed without trusting a grep of the build",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-18",
+      "prompt": "I was told the two of us must not wipe out one another on this document",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-19",
+      "prompt": "We share a branch and I only want to commit my own notes",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-20",
+      "prompt": "How do I make edits fast without serializing behind the other session",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "pos-21",
+      "prompt": "Do our edits auto merge if we both only touch source files",
+      "should_trigger": true,
+      "category": "positive"
+    },
+    {
+      "id": "neg-1",
+      "prompt": "A pull request is conflicting because other pull requests merged while it was open",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "pr-conflict-from-mid-flight-merges"
+    },
+    {
+      "id": "neg-2",
+      "prompt": "Make me an isolated worktree for this feature branch",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "git-worktree"
+    },
+    {
+      "id": "neg-3",
+      "prompt": "The remaining slices all edit one template, structure the handoff for parallelism",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "shared-file-redesign-parallel-author-serial-integrate"
+    },
+    {
+      "id": "neg-4",
+      "prompt": "Audit the other branches before I start the big template rewrite",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "large-redesign-parallel-branch-collision-audit"
+    },
+    {
+      "id": "neg-5",
+      "prompt": "Bulk delete the stale branches but keep anything unmerged",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "safe-bulk-worktree-branch-cleanup"
+    },
+    {
+      "id": "neg-6",
+      "prompt": "Another session already shipped a better fix to the same production artifact",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "parallel-session-superseded-validated-fix-verify-live-prod-state-first"
+    },
+    {
+      "id": "neg-7",
+      "prompt": "Design a shared activity list that many producers append to concurrently",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "shared-mutable-index-rmw-race-use-marker-blob-per-item"
+    },
+    {
+      "id": "neg-8",
+      "prompt": "Move the design spec from that branch into my worktree without merging",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "cross-worktree-spec-handoff-via-checkout-paths"
+    },
+    {
+      "id": "neg-9",
+      "prompt": "Set the isolation parameter on the dispatch call, not in the prompt text",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "pre-dispatch-agent-isolation-parameter-not-prompt"
+    },
+    {
+      "id": "neg-10",
+      "prompt": "Claim the issue with an assignee and a work in progress label",
+      "should_trigger": false,
+      "category": "negative",
+      "notes": "gh-issue-claim-coordination"
+    }
+  ]
+}
