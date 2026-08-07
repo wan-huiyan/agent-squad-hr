@@ -1,5 +1,6 @@
 ---
 name: db-access-review-subagent-needs-explicit-probe-budget
+listing_tier: short
 description: |
   Dispatching a review or verification agent with live database, gcloud, psql or bash access: give
   it a tool call and time budget, plus the probes NOT to re-run. Also when it gives `API Error:

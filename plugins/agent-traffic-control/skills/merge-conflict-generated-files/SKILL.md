@@ -1,5 +1,6 @@
 ---
 name: merge-conflict-generated-files
+listing_tier: name-led
 description: |
   The conflicting files are derived output from a generator: resolve their source, re-run it and
   stage the fresh result rather than hand merging the output.

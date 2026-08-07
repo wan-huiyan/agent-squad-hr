@@ -1,5 +1,6 @@
 ---
 name: inherited-scope-doc-names-may-not-exist
+listing_tier: short
 description: |
   A scope or plan doc from a prior session references dataset paths, table and column names that
   may not exist. Verify every `project.dataset.table` and column name exists, with a fast schema

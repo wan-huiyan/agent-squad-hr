@@ -1,5 +1,6 @@
 ---
 name: cross-worktree-spec-handoff-via-checkout-paths
+listing_tier: short
 description: |
   Pass a shared file between two parallel sessions in different worktrees or branches, without
   merging to main first — a design spec, docs, a handoff prompt, a mockup. `git checkout <branch>

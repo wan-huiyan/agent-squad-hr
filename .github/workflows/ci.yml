@@ -18,3 +18,9 @@ jobs:
         run: bash scripts/leak_scan.sh .
       - name: Skill-route gate (reachability, links, README index)
         run: python3 scripts/check_skill_routes.py .
+      - name: Skill-tier gate (listing budget policy)
+        run: python3 scripts/check_skill_tiers.py . --context 200000 --bytes-per-token 4
+      - name: Listing budget assertion (from the vendored gate's own JSON)
+        run: |
+          python3 scripts/check_skill_descriptions.py . --json > /tmp/desc.json
+          python3 -c "import json,sys; d=json.load(open('/tmp/desc.json')); sys.exit(0 if d['within_budget'] else print('listing %d over budget %d' % (d['listing_chars'], d['budget_chars'])) or 1)"

@@ -1,5 +1,6 @@
 ---
 name: factcheck-subagent-needs-complete-sources
+listing_tier: short
 description: |
   Writing the prompt for a verifier that will "fact check" or "verify" a document or report
   against sources: hand it complete originals, never your own partial dump. And a verdict back

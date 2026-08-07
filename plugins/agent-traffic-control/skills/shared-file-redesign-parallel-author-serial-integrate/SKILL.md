@@ -1,5 +1,6 @@
 ---
 name: shared-file-redesign-parallel-author-serial-integrate
+listing_tier: rich
 description: |
   Writing the next session's prompts for several remaining slices that ALL edit one hot file — a
   template, a central view, one stylesheet block — so the usual "split only if the file sets are

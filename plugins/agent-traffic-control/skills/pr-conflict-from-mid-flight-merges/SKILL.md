@@ -1,5 +1,6 @@
 ---
 name: pr-conflict-from-mid-flight-merges
+listing_tier: rich
 description: |
   A pull request that was clean when you opened it now says on GitHub "This branch has conflicts
   that must be resolved", because others landed on main over the days it sat open. Use when `gh pr
