@@ -175,6 +175,14 @@ $ git branch -f main origin/main   # safe to snap, content is preserved
   3-dot operator against a stale LOCAL `main` ref);
   `pr-from-stale-branch-silently-reverts-newer-main-files` (the case where deletions
   under 3-dot are REAL — a stale tree under a current pointer).
+- **`--diff-filter=D` empty does NOT mean nothing was lost.** It catches removed
+  *files*; it says nothing about reverted *content*. A branch can roll a corrected
+  figure back to its old value, or drop rows from a shared ledger, with an empty
+  `D` filter, zero conflicts and green CI — the loss shows only as `-` lines in the
+  content diff. Read the 3-dot diff; do not merely gate on it. For the ledger shape
+  specifically, see [`stale-base-drops-rows-from-a-shared-ledger`](../stale-base-drops-rows-from-a-shared-ledger/SKILL.md).
+- **Use `--diff-filter=DR`, not `D`.** A rename reports as `R100`, so a served path
+  renamed away is invisible to a `D`-only filter.
 
 ## References
 
