@@ -4,11 +4,28 @@
 WHY THIS EXISTS
     `check_skill_descriptions.py` (vendored, do not edit) measures the listing and
     tells you when it is over. It does not stop the next skill from putting it over.
-    v1.18.0 cut the listing from 23,174 chars to 7,544 against an 8,000-char budget,
-    which leaves room for roughly two more skills. Without a gate that is a state the
-    repo drifts out of silently -- and the failure is invisible: descriptions get
-    collapsed to bare names, everything still "works", and the model just stops being
-    able to see what a skill is for.
+    v1.18.0 cut the listing from 23,174 chars to 7,542 against an 8,000-char HARD
+    CEILING. Without a gate that is a state the repo drifts out of silently -- and the
+    failure is invisible: descriptions get collapsed to bare names, everything still
+    "works", and the model just stops being able to see what a skill is for.
+
+    HOW MUCH ROOM IS LEFT, exactly. The default profile's target is 7,780, which is 238
+    chars above today's 7,542 and 220 below the hard ceiling. Say what 238 buys, because
+    "room to grow" on its own is how a gate ends up refusing the first real addition:
+
+      one more NAME-LED skill fits.  An entry costs len(name) + 4 + len(description) + 1
+      separator, so a name-led entry at its 160-char ceiling costs len(name) + 165 --
+      177 to 237 across this repo's name lengths (12 to 72 chars). 238 was chosen to
+      cover the LONGEST of those, so one fits whatever it is called, and a second does
+      not fit at any name length.
+
+      nothing else fits.  A short entry costs up to 357 and a rich one up to 677 at the
+      longest name here. Adding either -- or a second name-led -- means SHORTENING
+      something in the same pull request, which is the decision this gate exists to force.
+
+    The 220-char strip between the target and the hard ceiling is the warning band: over
+    target is a red build you can fix at leisure, over 8,000 is the harness silently
+    dropping descriptions. Do not raise the target to 8,000 to make a build pass.
 
     So every live skill declares a SIZE CLASS, each class has a headcount cap and a
     length ceiling, and promoting a skill means naming the one it displaces.
@@ -73,11 +90,14 @@ CAPS = {"rich": 8, "short": 8, "name-led": 10}
 TOTAL_CAP = 24
 
 PROFILES = {
-    # the shipped slate: 8,000-char budget, an opus-class model at 200k context
+    # The shipped slate: 8,000-char hard ceiling, an opus-class model at 200k context.
+    # target 7,780 = today's 7,542 + 238, which is exactly one more name-led entry, and
+    # sits 220 below the ceiling as a warning band. See HOW MUCH ROOM IS LEFT above --
+    # if you change this number, change that paragraph in the same edit.
     "default": {"rich": 600, "short": 280, "name-led": 160,
-                "overrides": {"git-worktree": 300}, "target": 7643},
+                "overrides": {"git-worktree": 300}, "target": 7780},
     # the tighter target for a model that only gets 6,000 chars of listing. NOT the
-    # shipped slate -- v1.18.0 lands at 7,544 and does not meet this. Kept so the gap
+    # shipped slate -- v1.18.0 lands at 7,542 and does not meet this. Kept so the gap
     # is a command rather than a memory.
     "strict": {"rich": 430, "short": 200, "name-led": 120,
                "overrides": {"git-worktree": 300}, "target": 5863},
@@ -258,7 +278,12 @@ def main() -> int:
               f"listing has that much collapsed to bare names; run `--profile strict` "
               f"for the ceilings that would fit {budget:,}.")
     else:
-        print(f"  fits, {budget - total:,} chars to spare")
+        print(f"  fits, {budget - total:,} chars to spare — but that is THIS PLUGIN'S "
+              f"share, not visibility: the budget is shared with every installed "
+              f"plugin, and admission is ranked by usage.")
+    print(f"  headroom to the {a.profile} target: {prof['target'] - total:,} chars "
+          f"(one entry costs len(name) + 4 + len(description) + 1: a name-led entry "
+          f"177-237 here, a short one up to 357, a rich one up to 677)")
 
     # 5 -- reachability (delegated)
     orphans = [n for n in ref if not inbound[n]]
