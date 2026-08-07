@@ -12,9 +12,12 @@ description: |
   reflects the world WHEN IT WAS WRITTEN; "issue open" ≠ "unfixed"; a parallel session can ship between
   your build and your deploy. Verify the LIVE DEPLOYED state of the target artifact at task START and
   again IMMEDIATELY before any deploy — a 1-query live-state check can save a whole redundant build,
-  and prevents clobbering a live fix.
+  and prevents clobbering a live fix. ALSO covers the variant where you BUILT NOTHING and the whole
+  deliverable is an ASSESSMENT ("do not deploy", "safe to ship", "the regression is still live"): a
+  verdict is perishable in exactly the way an implementation is, so pin the base SHA the assessment
+  was computed against and diff it against origin/main before you publish the verdict.
 author: Claude Code
-version: 1.0.0
+version: 1.1.0
 date: 2026-06-22
 disable-model-invocation: true
 ---
@@ -72,6 +75,53 @@ verified live main had the other fix (grep compiled target: 0 carry-forward mark
 was workspace-only (never touched main), deleted the dev workspace, stood down, filed the residual
 systemic finding (#1291), commented the supersession on #1212. One marginal edge of the abandoned fix was
 noted in the follow-up (defense-in-depth), but NOT atomic-swapped in.
+
+## Variant — you built NOTHING, and the deliverable is an assessment
+
+Every trigger condition above assumes you **built** something: *"you invested a full
+implementation"*, *"you're about to deploy"*. A session whose only output is a judgement —
+*do not deploy*, *safe to ship*, *the regression is still live* — matches none of them, so
+the skill never fires, while being exposed to exactly the same clock.
+
+**DoodleRun, 2026-08-07.** Three agents spent about **80 minutes** on a production-deploy
+assessment and concluded **do NOT deploy**: main shrank every dog route and capped a 20 km
+wish at 12.16 km. A commit pinning the route sizes landed **mid-run**. The verdict was
+false before it finished being written — and nothing in the analysis was wrong. Only its
+base was.
+
+### Pin the base, and diff it before you publish the verdict
+
+```bash
+# At assessment START — record this in the notes, not just in a shell variable:
+BASE=$(git rev-parse origin/main)
+
+# ...the fan-out runs...
+
+# IMMEDIATELY before the verdict is written down:
+git fetch origin main
+git log --oneline "$BASE"..origin/main     # empty ⇒ the verdict still stands
+```
+
+Anything that comes back is a commit your conclusion has never seen. Re-check the claims
+whose inputs those commits could have moved — not the whole assessment, just those.
+
+**An assessment older than its own runtime is not evidence.** If the fan-out took 80
+minutes, a live-state check at minute 0 is 80 minutes stale by the time the verdict is
+written, and the start-of-task check prescribed above would have passed cleanly.
+
+### Two things about this that are easy to get wrong
+
+- **Put the re-check at the END of the fan-out, not only at the start.** What caught this
+  was the verifier agent that ran **last**. Run only at dispatch time, the same check
+  would have *confirmed* the premise — the regression genuinely was live then — and the
+  no-go would have shipped as a fact.
+- **The window the assessment described was real — that is a separate lesson, not a
+  softening.** Before the pinning commit landed, main carried the regression for
+  **8h25m across 24 commits**. Auto-deploy-on-merge would have shipped it within seconds
+  of the merge that introduced it, which is the concrete argument that a gate between
+  merge and deploy is not optional in a repo with no human reviewer. A stale assessment
+  does not make the danger imaginary; it makes the assessment the wrong instrument to
+  lean on.
 
 ## Notes
 - Distinct from siblings: `deploy-from-stale-worktree-silent-rollback` (deploying YOUR OWN stale local

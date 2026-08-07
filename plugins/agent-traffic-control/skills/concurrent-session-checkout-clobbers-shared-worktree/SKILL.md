@@ -9,9 +9,12 @@ description: |
   (2) `git branch --show-current` shows a branch you didn't switch to,
   (3) `git reflog` shows a `checkout: moving from X to Y` you never ran,
   (4) unfamiliar files/changes appear in `git status`. Covers detecting the
-  collision and recovering via an isolated git worktree.
+  collision and recovering via an isolated git worktree. Every trigger above is
+  a symptom, so this skill fires only once damage exists; the pre-dispatch check
+  that prevents the fan-out case is a separate skill,
+  `pre-dispatch-agent-isolation-parameter-not-prompt`.
 author: Claude Code
-version: 1.1.0
+version: 1.2.0
 date: 2026-06-23
 disable-model-invocation: true
 ---
@@ -85,6 +88,20 @@ Session A's `app/config.py` edit vanishes; `git reflog` shows
 `git worktree add ../iap-worktree team-1-iap-deploy`, copy the untracked new
 files in, re-apply the lost `config.py` edit, `git checkout app/main.py` + `rm`
 the strays in `repo/`, then `EnterWorktree` and carry on — committing each task.
+
+## If YOU dispatched the agents: the prevention lives in a different skill
+
+Everything on this page is recovery, and every trigger above is a symptom — so if you are
+the one who fanned agents out believing they were already isolated, nothing here will
+prompt you to look until the damage exists.
+
+**Prose in a dispatch prompt is not configuration.** The isolation comes from the dispatch
+tool's `isolation: "worktree"` parameter and from nothing else; a prompt opening *"You are
+in your OWN isolated git worktree"* creates no worktree. The pre-dispatch check for that —
+read the call back, and make each agent print `git rev-parse --show-toplevel` and
+`git branch --show-current` as its first bash call — is
+[`pre-dispatch-agent-isolation-parameter-not-prompt`](https://github.com/wan-huiyan/agent-traffic-control/blob/main/plugins/agent-traffic-control/skills/pre-dispatch-agent-isolation-parameter-not-prompt/SKILL.md).
+It carries the worked example and the tell; it is not repeated here.
 
 ## Notes
 

@@ -18,8 +18,11 @@ description: |
   only the POINTER moved while the TREE stayed old. Every behindness check
   passes and the diff still deletes what landed in between. Use when a PR
   deletes files you never touched AND the branch looks perfectly rebased.
+  Auditing as a VICTIM: source every content needle from the merged diff
+  (`git show <squash-sha> -- <file>`), never from memory, and check the state AT
+  the suspect commit rather than at origin/main.
 author: Claude Code
-version: 1.1.0
+version: 1.2.0
 date: 2026-06-17
 disable-model-invocation: true
 ---
@@ -153,7 +156,9 @@ did, all in one session, each after an earlier check had reported clean:
 
 The executable form is a needle per *claim*, not per file — one distinctive
 phrase for every paragraph you amended, every ledger field you edited, and every
-computed figure re-derived rather than matched:
+computed figure re-derived rather than matched. **Save it as a file** (called
+`needle-audit.sh` throughout this section), because you will run it more than
+once with different values of `REF`:
 
 ```sh
 REF=${REF:-origin/main}                       # override to check a BRANCH pre-merge
@@ -167,6 +172,50 @@ test "$(pytest docs -q --co 2>&1 | tail -1 | awk '{print $1}')" = "$(grep -oE '[
 Keep the `REF` override: the same script is the pre-merge gate for *your* PR and
 the post-merge audit for someone else's, and only the second one is usually
 written.
+
+#### Where the needle comes from — and what it costs to guess one
+
+**Take every needle out of the merged artifact, never out of recall.** Paste the
+line you took it from next to the check:
+
+```sh
+git show <squash-sha> -- path/to/file.py | grep '^+' | grep -i finalist
+# → +    finalist_km = ...           ← THIS line is the needle
+```
+
+The audit of PR #853 (DoodleRun, 2026-08-07, tracked under #863) grepped for
+`route_km_finalist` — a
+symbol name recalled from the session that had written it. The real symbol was
+**`finalist_km`**. The grep found nothing, and for a minute the session believed
+an entire merged PR had been deleted.
+
+**The failure is two-sided, and only one side is intuitive:**
+
+| A guessed needle that… | …manufactures |
+|---|---|
+| MISSES | a phantom deletion — alarming, but self-correcting: somebody goes and looks |
+| happens to MATCH | a **false all-clear** — and nobody re-checks a clean audit |
+
+The matching case is the worse one and produces no symptom whatsoever. That is
+why the provenance rule is absolute rather than a nicety: a needle you cannot
+point at a line for is not evidence in *either* direction.
+
+#### Check the state AT the suspect commit, not at `origin/main`
+
+Current state cannot distinguish **"never hit"** from **"hit, and restored by
+someone else"**. If a sibling session already noticed the revert and pushed a
+recovery PR, `origin/main` holds your content again — and an audit run against
+main reads that as proof you were never affected, which is exactly backwards when
+the question is what a particular merge did.
+
+```sh
+REF=<suspect-squash-sha> sh needle-audit.sh   # "did THAT merge drop it?"  ← the real question
+REF=origin/main          sh needle-audit.sh   # "is it there right now?"   ← a different one
+```
+
+This is what the `REF` override above is for, and it is worth running both ways:
+the first says whether you were a victim, the second says whether anything is
+still outstanding.
 
 **Then tell the other sessions.** Losses are per-session and nobody else can see
 yours; a broadcast with a copy-pasteable `git cat-file -e origin/main:<path>`
