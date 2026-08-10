@@ -17,7 +17,7 @@ description: |
   Python function call, leaving an orphaned partial call that causes a SyntaxError
   far from the conflict site — requires ast.parse() verification after resolution.
 author: Claude Code
-version: 1.1.1
+version: 1.1.2
 date: 2026-05-13
 disable-model-invocation: true
 ---
@@ -45,7 +45,7 @@ All four hold:
    - DB migration files: `V025__create_users.sql`, `V026__add_index.sql`
    - Sequential lessons: `## 142. ...`, `## 143. ...` in `lessons.md`
    - OpenAPI operationIds, GraphQL error codes, feature flags with sequential names
-3. `git diff origin/main..HEAD -- <file>` shows your block adding the same ID their already-merged block adds.
+3. `git diff origin/main...HEAD -- <file>` shows your block adding the same ID their already-merged block adds. (3 dots — from the merge-base, so you see what YOUR branch adds, not everything that differs between the two tips.)
 4. The file has a derived/regenerated artifact (HTML site, sphinx index, README badge, openapi.json) that was also touched on both sides — meaning the regenerator runs on whichever wins the merge.
 
 ## Solution
