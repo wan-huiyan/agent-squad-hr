@@ -28,7 +28,7 @@ description: |
   squash-merge. Recovery: rebase `--onto origin/main feat/sN-feature
   docs/sN-handoff` to drop the smuggled commits, force-push.
 author: Claude Code
-version: 1.1.1
+version: 1.1.2
 date: 2026-06-23
 disable-model-invocation: true
 ---
@@ -147,8 +147,9 @@ git rebase --onto origin/main feat/sN-feature docs/sN-handoff
 # Verify only your docs commits remain.
 git log origin/main..HEAD --oneline
 
-# Verify the diff is now docs-only.
-git diff --name-only origin/main..HEAD
+# Verify the diff is now docs-only (3 dots: what the branch PROPOSES,
+# measured from the merge-base, which is what GitHub's diff shows).
+git diff --name-only origin/main...HEAD
 
 # Force-push (use --force-with-lease to refuse if someone pushed
 # concurrently — saves you from clobbering review comments etc.).
@@ -328,7 +329,7 @@ git rebase --onto origin/main feat/s20-wire-render-route \
   docs/s20-handoff-and-s21-prompt
 # Successfully rebased and updated.
 
-git diff --name-only origin/main..HEAD
+git diff --name-only origin/main...HEAD
 # docs/handoffs/session_20_handoff.md
 # docs/handoffs/session_21_prompt.md   ← only docs, as intended
 

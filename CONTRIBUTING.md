@@ -92,10 +92,17 @@ text the harness injects. The usual cause is re-wrapping with `textwrap.wrap()`,
 on hyphens by default — pass `break_on_hyphens=False`. The character count is unchanged, so no
 length check can see it.
 
-> **The exit code only covers MODEL-INVOCABLE skills — and 78 of this repo's 98 are not.**
-> (That is the gate's own header line, `98 SKILL.md (20 model-invocable, 78 disabled)`. Re-read
-> it from a run rather than from here — it moves with every skill added, and it moved twice in
-> one day: 21/77 before v1.18.0 demoted `using-git-worktrees`.)
+> **The exit code only covers MODEL-INVOCABLE skills — and 77 of this repo's 98 are not.**
+> (That is the gate's own header line, `98 SKILL.md (21 model-invocable, 77 disabled)`. Re-read
+> it from a run rather than from here — it moves with every skill added, and it moved three
+> times in four days: 21/77, then 20/78 when v1.18.0 demoted `using-git-worktrees`, then back
+> to 21/77 when v1.20.0 promoted `git-diff-2dot-vs-3dot-merge-safety`.)
+>
+> **A live consequence, found the hard way:** a disabled skill is invisible to this gate, so
+> its description is never checked. `subagent-pre-existing-misattribution` currently sits at
+> **1,548 chars against the 1,536 cap** and CI reports `over: False`, because the gate builds
+> its lists as `live = [s for s in skills if not s.disabled]`. Harmless while disabled — and it
+> truncates mid-word the moment anyone promotes it. Disabling a skill disables the checks on it.
 > The text report's exit code is `1 if (over or corrupt) else 0`, where both lists are built
 > from `live = [s for s in skills if not s.disabled]`. A hyphen break inside a
 > `model-invocation: false` skill is **printed by neither and fails nothing**. Verified by

@@ -9,8 +9,9 @@ description: |
   schema drift, file-content audit) that PASSES on the same SHA locally,
   (2) you're working in a dense parallel-PR window where main is moving
   faster than your CI runs, (3) `gh run view N --json headSha` matches
-  your latest force-push but `git fetch origin main && git diff
-  origin/main..HEAD` shows main is ahead by N commits, (4) the failure
+  your latest force-push but `git fetch origin main && git rev-list
+  --left-right --count origin/main...HEAD` shows main is ahead by N
+  commits, (4) the failure
   references symbols / IDs / values that are present in MAIN but absent
   from your branch. Root cause: GitHub re-computes the merge ref every
   time the base moves, so CI on `pull_request` sees `main-at-CI-start +
@@ -19,7 +20,7 @@ description: |
   `pr-conflict-site-regen` Step 2b (when this surfaces during
   tracker collision sweeps).
 author: Claude Code
-version: 1.0.0
+version: 1.0.1
 date: 2026-05-11
 disable-model-invocation: true
 ---

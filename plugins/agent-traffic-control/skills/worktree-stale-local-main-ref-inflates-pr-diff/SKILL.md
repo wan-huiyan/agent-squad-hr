@@ -20,7 +20,7 @@ description: |
   check is `gh pr diff <N> --name-only` (the reviewer likely read the full-file context
   and mistook already-merged code for this PR's hunks).
 author: Claude Code
-version: 1.1.0
+version: 1.2.0
 date: 2026-06-23
 disable-model-invocation: true
 ---
@@ -72,8 +72,12 @@ git diff origin/main...HEAD --stat
 git rev-list --count HEAD..origin/main   # commits origin/main has, your branch doesn't
 git rev-list --count origin/main..HEAD   # YOUR commits
 
-# Is your branch's base actually on origin/main's history? (clean ancestor → no revert)
+# Is your branch's base actually on origin/main's history? (necessary, NOT sufficient
+# — see the Verification note below; this does not rule out a revert on its own)
 git merge-base --is-ancestor <your-branch-base-sha> origin/main && echo "clean base"
+
+# The check that DOES rule out a revert — deletions, from the merge-base:
+git diff --diff-filter=D --name-only origin/main...HEAD   # empty ⇒ deletes nothing
 
 # Ground truth from GitHub — the actual file list the PR will change:
 gh pr view <N> --json files -q '.files[].path'
@@ -93,8 +97,15 @@ Just diff against `origin/main`; that's the ref that matters for the PR anyway.
 - `git show --stat HEAD` file count == `gh pr view <N> --json files` count.
 - `git diff origin/main...HEAD --stat` shows only your files (small).
 - `gh pr view <N>` → `mergeStateStatus: CLEAN`.
-- `git merge-base --is-ancestor <base-sha> origin/main` returns 0 (your base is on
-  origin/main's history → the squash/merge won't revert upstream).
+- `git diff --diff-filter=D --name-only origin/main...HEAD` is empty (or lists only
+  files you meant to delete). **This is the check that proves no revert.**
+- `git merge-base --is-ancestor <base-sha> origin/main` returns 0 — your base is on
+  origin/main's history. Useful, but **it does not prove the merge won't revert
+  upstream**, and treating it as proof is the mistake. A branch whose POINTER was
+  moved onto current main while its TREE stayed old satisfies this condition exactly
+  — 0 commits behind, ancestor check clean — and still records deleting every file
+  that landed in between (`pr-from-stale-branch-silently-reverts-newer-main-files`,
+  "the harder variant"). Only the `--diff-filter=D` line above closes that gap.
 
 ## Example
 
@@ -146,6 +157,12 @@ proceed. The reviewer's *substantive* findings on your real hunks still stand; o
 
 - `git-diff-2dot-vs-3dot-merge-safety` — 2-dot vs 3-dot operator semantics (assumes a
   correct `origin/main`); this skill is about the local `main` *ref* being stale.
+  **The two are a pair and neither is safe alone:** switching to 3-dot fixes the
+  operator and does nothing about the ref, so `git diff main...HEAD` against a stale
+  local `main` still over-reports. Fetch, then name `origin/main`.
+- `pr-from-stale-branch-silently-reverts-newer-main-files` — the case where the
+  deletions are REAL rather than an artifact (a stale TREE under a current pointer).
+  That is the one the ancestor check above cannot see.
 - `worktree-outer-ls-mistaken-for-main-state` — same stale-local-state family, via `ls`.
 - `stale-base-pr-silently-reverts-upstream-content` — the genuine revert trap (the
   thing this false alarm makes you fear); rule it out via the file list + hunks.
