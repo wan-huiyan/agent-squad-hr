@@ -1,0 +1,5 @@
+{"type": "assistant", "message": {"content": [{"type": "text", "text": "no timestamp here"}]}}
+this line is not json at all
+{"type": "user", "message": {"content": "tool_result with no tool_use_id"}}
+{"type": "queue-operation", "operation": "enqueue", "content": "a queued user message, not a task notification"}
+{}
