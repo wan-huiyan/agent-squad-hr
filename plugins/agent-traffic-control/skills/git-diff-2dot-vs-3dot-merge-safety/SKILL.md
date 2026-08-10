@@ -12,9 +12,8 @@ description: |
   what the branch actually deleted. Also covers the empty-cherry-pick signal that a
   "divergent" local commit's content is already on main under a different hash.
 author: Claude Code
-version: 1.0.0
+version: 1.1.0
 date: 2026-05-01
-disable-model-invocation: true
 ---
 
 # Git Diff 2-dot vs 3-dot — Merge Safety Assessment
@@ -169,8 +168,20 @@ $ git branch -f main origin/main   # safe to snap, content is preserved
 - **`git branch -f main origin/main` blocks if `main` is currently checked out** in
   any worktree (including the parent repo). Check `git worktree list | grep '\[main\]'`
   first; switch any worktree off `main` before forcing.
+- **3-dot against a STALE ref over-reports — always `git fetch` first, and diff against
+  `origin/main`, not `main`.** The merge base is computed from whichever ref you name,
+  so `git diff main...HEAD` in a multi-worktree repo (where the primary checkout's
+  `main` is parked many commits behind) picks an ancient base and pulls in every file
+  that landed on `origin/main` since — one measured case reported **92 files / 8,381
+  insertions** for a commit that touched **6**. Switching from 2-dot to 3-dot without
+  fixing the ref trades one false alarm for another. See
+  `worktree-stale-local-main-ref-inflates-pr-diff`.
 - Related: `git-pull-after-squash-merge` (overwriting-files error after squash);
-  `pr-conflict-from-mid-flight-merges` (DIRTY status from sibling PRs landing).
+  `pr-conflict-from-mid-flight-merges` (DIRTY status from sibling PRs landing);
+  `worktree-stale-local-main-ref-inflates-pr-diff` (the complementary trap: a correct
+  3-dot operator against a stale LOCAL `main` ref);
+  `pr-from-stale-branch-silently-reverts-newer-main-files` (the case where deletions
+  under 3-dot are REAL — a stale tree under a current pointer).
 
 ## References
 

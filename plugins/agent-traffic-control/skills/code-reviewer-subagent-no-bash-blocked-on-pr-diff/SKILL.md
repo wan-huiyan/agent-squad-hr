@@ -12,7 +12,7 @@ description: |
   while siblings succeeded. Fix: pre-generate per-base diffs to files + point the
   agent at materialized worktree paths, don't tell it to run gh/git.
 author: Claude Code
-version: 1.0.0
+version: 1.0.1
 date: 2026-05-29
 disable-model-invocation: true
 ---
@@ -64,10 +64,16 @@ agent **materialized source + pre-generated diffs**, never "run gh":
    ```
 2. **Pre-generate each PR's scoped diff against its own base** to a file:
    ```bash
-   git diff <base-branch>..<pr-branch> -- app/ tests/ > /tmp/diffs/pr<N>.diff
+   git diff <base-branch>...<pr-branch> -- app/ tests/ > /tmp/diffs/pr<N>.diff
    ```
    (For a stacked PR, diff against its *own* base, not main, so the diff is scoped
    to that PR's changes only.)
+
+   **Three dots, not two.** The agent cannot cross-check this against GitHub, so the
+   file you hand it IS its ground truth — and GitHub's Files-changed tab is the
+   merge-base diff. A 2-dot diff renders everything the base gained after the branch
+   point as deletions the PR is not making, and a reviewer with no Bash will report
+   those invented deletions as findings you then have to disprove.
 3. **Prompt the agent with explicit paths**, and tell it up front it has no Bash:
    > "You do NOT have a Bash/git/gh tool — only Read/Grep/Glob. The code is
    > materialized at `/tmp/pr-<N>/`; the scoped diff is at `/tmp/diffs/pr<N>.diff`.

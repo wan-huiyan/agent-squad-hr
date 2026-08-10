@@ -24,7 +24,7 @@ description: |
   running the flagged tests on a real `origin/main` checkout — not by
   `git stash`, and not by eyeballing the working tree.
 author: Claude Code
-version: 1.1.0
+version: 1.1.1
 date: 2026-05-14
 disable-model-invocation: true
 ---
@@ -111,7 +111,7 @@ When reporting "N failures, all pre-existing":
    ```
 2. **Or compare the specific test file** between branch and mainline:
    ```bash
-   git diff origin/main..HEAD -- tests/<file>
+   git diff origin/main...HEAD -- tests/<file>
    ```
    If the file has changed in your branch, "pre-existing" claims need extra scrutiny.
 3. **Run the failing tests against `origin/main` directly**:
@@ -147,7 +147,7 @@ If your plan removes items from a UI list (sidebar tabs, library cards, sub-navs
 
 A claim of "pre-existing failures" is verified when:
 
-1. The reviewer cites `git diff origin/main..HEAD -- <test_file>` showing the file unchanged.
+1. The reviewer cites `git diff origin/main...HEAD -- <test_file>` showing the file unchanged.
 2. OR the reviewer ran the same test on `origin/main` directly (worktree, checkout, or `git show origin/main:<file>` extraction) and observed the same failure.
 3. AND the failure name (not just count) appears in a baseline list captured BEFORE plan execution started.
 
@@ -169,7 +169,7 @@ Total cost of misattribution: ~4 task cycles where reviewers didn't catch the is
 ## Notes
 
 - This is a SISTER pattern to `lint-allowlist-substring-stale-after-rewrite` (which covers stale STRING substring assertions); this skill covers stale NUMERIC count assertions specifically.
-- The git-worktree variant of the verification is most robust but slow. The `git diff origin/main..HEAD -- <file>` quick-check is sufficient for most cases.
+- The git-worktree variant of the verification is most robust but slow. The `git diff origin/main...HEAD -- <file>` quick-check is sufficient for most cases. **Three dots, not two** — 2-dot compares tip to tip, so a file that main changed after your branch point shows as changed by *you*, which is the exact misattribution this skill exists to stop. (This file's own description has prescribed the 3-dot form since 1.1.0; the body said 2-dot in three places until 1.1.1.)
 - Subagent reviewer prompts in `superpowers:subagent-driven-development` should require the verification ref. Consider amending the reviewer template to explicitly forbid "verified on clean tree" and require "verified vs origin/main at SHA <X>."
 - This pattern compounds across long plans: if Task K introduces N stale assertions and the misattribution survives until Task K+5's review, a third of the plan's review cycles operated on a wrong baseline.
 
