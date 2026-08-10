@@ -62,8 +62,10 @@ import sys
 
 FIX = pathlib.Path(__file__).parent / "fixtures"
 
-# Assembled from two halves, never written whole. See the module docstring.
-NEEDLE = "PARTIAL output recovered from the " + "agent"
+# Assembled at runtime, never written whole. NOT `"a" + "b"` - CPython folds
+# adjacent string constants at compile time, so that form puts the whole
+# string into the .pyc where grep finds it. str.join is not folded.
+NEEDLE = "".join(["PARTIAL output recovered from the ", "ag", "ent"])
 PREFIX = "Agent terminated early due to an API error"
 
 SESSION_ID = "00000000-0000-4000-8000-000000000000"
