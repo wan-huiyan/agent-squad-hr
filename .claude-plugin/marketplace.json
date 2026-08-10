@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "wan-huiyan-agent-traffic-control",
-  "description": "Coordination toolkit for parallel Claude Code sessions sharing one repo \u2014 issue-pickup claim protocol (assignee + wip label), worktree & session-isolation pitfalls, parallel-PR conflict recovery, subagent-integrity edge cases, and squash/merge mechanics for parallel-PR workflows.",
+  "description": "Coordination toolkit for parallel Claude Code sessions sharing one repo — issue-pickup claim protocol (assignee + wip label), worktree & session-isolation pitfalls, parallel-PR conflict recovery, subagent-integrity edge cases, and squash/merge mechanics for parallel-PR workflows.",
   "owner": {
     "name": "wan-huiyan"
   },
@@ -9,8 +9,8 @@
     {
       "name": "agent-traffic-control",
       "source": "./plugins/agent-traffic-control",
-      "description": "Coordination toolkit for parallel Claude Code sessions sharing one repo \u2014 issue-pickup claim protocol (assignee + wip label), worktree & session-isolation pitfalls, parallel-PR conflict recovery, subagent-integrity edge cases, and squash/merge mechanics for parallel-PR workflows.",
-      "version": "1.15.0"
+      "description": "Coordination toolkit for parallel Claude Code sessions sharing one repo — issue-pickup claim protocol (assignee + wip label), worktree & session-isolation pitfalls, parallel-PR conflict recovery, subagent-integrity edge cases, and squash/merge mechanics for parallel-PR workflows. Plus resume-gate, an opt-in hook that flags subagent work an interrupted session never reviewed and gates push/merge/deploy behind a human keypress.",
+      "version": "1.16.0"
     }
   ]
 }

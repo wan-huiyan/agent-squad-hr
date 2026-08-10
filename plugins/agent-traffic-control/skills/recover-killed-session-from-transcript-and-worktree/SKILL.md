@@ -14,8 +14,8 @@ description: |
   trap that the dead session's "verified" / "done" claims are often PARTIAL (it was killed
   mid-verification), so re-verify completely before trusting them.
 author: Claude Code
-version: 1.0.0
-date: 2026-06-06
+version: 1.1.0
+date: 2026-08-10
 ---
 
 # Recover a killed Claude Code session from its transcript + worktree
@@ -28,7 +28,21 @@ killed it. The session's full intent + state lives in its **transcript JSONL** +
 artifacts** — recover from there.
 
 ## Context / Trigger Conditions
+
+**Every trigger below depends on a human noticing.** That is this skill's weak point, not its
+scope: a subagent killed mid-run leaves its partial output sitting in the parent's transcript, and
+a later session resuming that branch reads it as a finished result. Nothing prompts anyone to
+reach for this skill at all.
+
+The [`resume-gate`](../../hooks/resume-gate/) hook in this same plugin is the automatic trigger.
+It runs on `SessionStart:resume`, detects the two ways a subagent dies (the harness's own
+partial-output notice for a synchronous one; a non-`completed` task-notification status for an
+async one), names each affected subagent, and puts an `ask` prompt in front of push / merge /
+deploy until they have been re-verified. Its warning points back here. **Install it once and step
+4 below stops depending on you remembering to do it.**
+
 - User: "the session yesterday on worktree X got killed, the transcript might help" / "resume it".
+- A `resume-gate` warning on session start naming a subagent whose work was never assessed.
 - An isolated git worktree with uncommitted WIP + a leftover `tasks/session_N_todo.md` (or similar
   plan file) + maybe a baseline screenshot, but no matching merged PRs.
 - A branch with uncommitted changes whose intent you need.
@@ -91,6 +105,11 @@ clipped) — caught only by re-measuring fully. **Re-verify inherited fixes end-
 - Inherited "done" items are re-verified, not assumed.
 
 ## Notes
+- **Recovery is the second-best outcome; being told is the first.** Install the
+  [`resume-gate`](../../hooks/resume-gate/) hook so the next killed subagent announces itself on
+  resume instead of waiting to be found. It also gates push/merge/deploy behind a human keypress
+  while anything is outstanding, which is the part that stops a partial result from shipping while
+  you are still deciding whether to run this procedure.
 - The dead session's worktree branch + uncommitted WIP may be reconcilable onto current main
   (stash → checkout main → branch → pop) if its base has moved since.
 - See also: `playwright-screenshot-hangs-on-infinite-animation` (a common session-killer),
