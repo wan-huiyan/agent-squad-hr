@@ -12,7 +12,12 @@ import sys
 
 SKILL = "agent-traffic-control:recover-killed-session-from-transcript-and-worktree"
 
-NEEDLE = "PARTIAL output recovered from the " + "agent"
+# Assembled at runtime so the whole string never exists as a single literal.
+# `"first half" + "second half"` does NOT achieve this: CPython folds adjacent
+# string constants at COMPILE time, so the joined string lands in the .pyc and
+# `grep` finds it there the moment anyone imports this module. str.join is not
+# folded by the peephole optimiser, so it is.
+NEEDLE = "".join(["PARTIAL output recovered from the ", "ag", "ent"])
 PREFIX = "Agent terminated early due to an API error"
 AGENT_TOOLS = ("Agent", "Task")
 
@@ -37,7 +42,19 @@ def load(path):
 
 
 def _blocks(row):
-    content = (row.get("message") or {}).get("content")
+    """Content blocks of a row, or [] for any shape that is not that.
+
+    Every isinstance here is load-bearing rather than defensive habit. This
+    runs inside PreToolUse, where an uncaught exception becomes exit 2, and
+    exit 2 BLOCKS the tool call - so one unexpected row shape would block
+    every push, merge and publish on the machine until someone worked out
+    why. `(row.get("message") or {}).get(...)` raises AttributeError the
+    moment `message` is a string rather than a dict.
+    """
+    message = row.get("message")
+    if not isinstance(message, dict):
+        return []
+    content = message.get("content")
     return content if isinstance(content, list) else []
 
 
@@ -66,7 +83,11 @@ def agent_calls(entries):
             if not isinstance(block, dict):
                 continue
             if block.get("type") == "tool_use" and block.get("name") in AGENT_TOOLS:
-                desc = (block.get("input") or {}).get("description")
+                # isinstance, not `or {}`: a non-dict `input` would raise
+                # AttributeError here, and in PreToolUse that is exit 2, which
+                # blocks the call. See _blocks().
+                tool_input = block.get("input")
+                desc = tool_input.get("description") if isinstance(tool_input, dict) else None
                 calls[block.get("id")] = desc or "(no description)"
     return calls
 
@@ -186,67 +207,90 @@ def encode_mark(items):
     contains the needle, it reaches the transcript either way; encoding the
     mark changes nothing about that.
     """
-    payload = base64.b64encode(_MARK_ITEM_SEP.join(items).encode("utf-8")).decode("ascii")
-    return "%s outstanding=%d payload=%s" % (MARK_PREFIX, len(items), payload)
+    # The separator is stripped from each item rather than assumed absent. It
+    # is an ASCII unit separator, so nobody types one - but descriptions are
+    # free text from elsewhere, and one containing a separator produces a mark
+    # whose declared count and decoded count disagree, i.e. a hook that
+    # corrupts its own state. That no longer opens the gate (see
+    # window_after_last_mark) but it is still worth preventing at the source.
+    safe = [item.replace(_MARK_ITEM_SEP, " ") for item in items]
+    payload = base64.b64encode(_MARK_ITEM_SEP.join(safe).encode("utf-8")).decode("ascii")
+    return "%s outstanding=%d payload=%s" % (MARK_PREFIX, len(safe), payload)
 
 
-def _last_mark_match(entries):
-    """(entry_index, match) for the most recent segment mark, or (None, None).
+def _decode_mark(match):
+    """Items encoded in one mark match, or None if it does not decode.
 
-    Shared by read_last_mark and window_after_last_mark so both agree on
-    which entry holds "the last mark". They used to scan independently with
-    slightly different checks (`raw.find` vs `in`) — that duplication is part
-    of why a stale-mark decode bug went unnoticed, since the windowing path
-    never decodes and so never surfaced a decode failure.
+    Two ways a mark is unreadable and both must land on None: the payload is
+    not valid base64 or not valid UTF-8, or it decodes cleanly but yields a
+    different number of items than the mark declares. The second is not
+    belt-and-braces — a truncated mark, and non-alphabet noise sitting
+    immediately after `payload=` (which makes the capture group match empty
+    and b64decode succeed on ""), both arrive here without raising anything.
     """
-    last_index = None
-    last_match = None
+    try:
+        decoded = base64.b64decode(match.group(2)).decode("utf-8")
+    except (binascii.Error, UnicodeDecodeError, ValueError):
+        return None
+    items = [part for part in decoded.split(_MARK_ITEM_SEP) if part]
+    if len(items) != int(match.group(1)):
+        return None
+    return items
+
+
+def _marks(entries):
+    """[(entry_index, items_or_None)] for every mark in the file, in order.
+
+    One scan, per match rather than per row, so the LAST element is the
+    newest mark and `items is None` records that it did not decode. Both
+    readers below derive from this, so they cannot disagree about which mark
+    is the last one - they previously scanned independently, and that
+    duplication is part of why a decode bug went unnoticed.
+    """
+    found = []
     for index, (raw, _) in enumerate(entries):
-        matches = list(_MARK_RE.finditer(raw))
-        if matches:
-            last_index = index
-            last_match = matches[-1]
-    return last_index, last_match
+        for match in _MARK_RE.finditer(raw):
+            found.append((index, _decode_mark(match)))
+    return found
 
 
 def read_last_mark(entries):
     """Items recorded by the most recent mark.
 
-    Three states: None when no mark exists at all; [] when the most recent
-    mark lists nothing; the decoded list otherwise. If the most recent mark
-    exists but cannot be decoded — corrupted payload, or a declared item
-    count that doesn't match what actually decoded — this returns None
-    rather than an earlier mark's items. None makes the caller run a full
-    detection pass, which is the safe direction: re-derive rather than trust
-    stale state. Falling back to an earlier mark is unsafe in both
-    directions — it can resurrect already-resolved items, and it can hide
-    new ones.
+    Three states: None when no mark exists at all OR the newest one cannot be
+    decoded; [] when the newest mark lists nothing; the decoded list
+    otherwise. An undecodable newest mark deliberately does NOT fall back to
+    an earlier mark's items — that is unsafe in both directions, since it can
+    resurrect already-resolved items and can hide new ones. None tells the
+    caller to re-derive by scanning, which is the safe direction.
     """
-    _, match = _last_mark_match(entries)
-    if match is None:
+    marks = _marks(entries)
+    if not marks:
         return None
-    declared_count = int(match.group(1))
-    token = match.group(2)
-    try:
-        decoded = base64.b64decode(token).decode("utf-8")
-    except (binascii.Error, UnicodeDecodeError):
-        return None
-    items = [part for part in decoded.split(_MARK_ITEM_SEP) if part]
-    if len(items) != declared_count:
-        # The declared outstanding=N count and the decoded item count
-        # disagree — e.g. non-base64 noise sat immediately after "payload="
-        # and the capture group matched empty. That's corruption, not a
-        # legitimately empty mark (which declares outstanding=0 and decodes
-        # to zero items in agreement).
-        return None
-    return items
+    return marks[-1][1]
 
 
 def window_after_last_mark(entries):
-    index, _ = _last_mark_match(entries)
-    if index is None:
-        return entries
-    return entries[index + 1:]
+    """Rows after the most recent mark THAT DECODES.
+
+    Deliberately not "after the most recent mark". A corrupt mark is not a
+    trustworthy segment boundary, and treating it as one turned
+    read_last_mark's careful None into a fail-open: the caller re-derives with
+    detect(), detect() windows to the rows after the corrupt mark, and there
+    usually are none - so the re-derivation that None exists to trigger scans
+    nothing and the gate goes quiet. Measured on the incident fixture:
+    appending a single undecodable mark took detect() from two hits to zero,
+    and the PreToolUse decision from `ask` to silence.
+
+    Falling back to the last boundary that can actually be read re-scans more
+    rows than strictly necessary, which is the safe direction. It cannot
+    resurrect items from before that boundary - those sit outside the window
+    either way.
+    """
+    for index, items in reversed(_marks(entries)):
+        if items is not None:
+            return entries[index + 1:]
+    return entries
 
 
 def detect(entries):
@@ -376,14 +420,18 @@ def _reason(items):
 def run_pre_tool_use(payload):
     """Return (exit_code, stdout, stderr).
 
-    Three-state read of the last mark: None means no mark exists (this
-    session was never warned), so fall back to a full detect() pass;
-    [] means a mark exists and listed nothing, so allow silently; a
-    non-empty list means ask. Ship-action filtering is not this
-    function's job - it lives in the hook config's `if:` conditions.
+    Three-state read of the last mark: None means there is no mark to trust —
+    either none exists (this session was never warned) or the newest one did
+    not decode — so fall back to a detect() pass; [] means a mark exists and
+    listed nothing, so allow silently; a non-empty list means ask.
+    Ship-action filtering is not this function's job - it lives in the hook
+    config's `if:` conditions.
 
     Fails CLOSED: any internal error exits 2, which for PreToolUse blocks
-    the tool call. A broken gate must never wave a push through.
+    the tool call. A broken gate must never wave a push through. Note that
+    "fails closed" is a claim about exceptions only — the None path above is
+    what covers a mark that is merely unreadable, and it is only safe because
+    window_after_last_mark skips undecodable marks when choosing the window.
     """
     try:
         entries = load(payload["transcript_path"])

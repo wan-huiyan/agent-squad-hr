@@ -85,6 +85,13 @@ pure friction. The `PreToolUse` hook fires only on:
 - `git -C <path> push` — a **separate** condition, because `Bash(git push:*)` is prefix matching and
   this command starts `git -C`, not `git push`. Not hypothetical if you work out of worktrees, and
   `resume_gate.py` itself shells out this way.
+
+  > ⚠️ **This one is unverified.** `Bash(git -C * push:*)` puts a `*` in the *middle* of the
+  > pattern, and that syntax is not confirmed against a primary source — only the trailing `:*` form
+  > is. If a mid-pattern `*` is not honoured, **this condition silently never fires**, with no error
+  > either way. The other seven are unaffected, so the exposure is bare `git -C <path> push`. The
+  > test named `test_ship_conditions_cover_git_dash_c_push` pins that the string is *emitted*; it
+  > cannot show the harness honours it.
 - `gh pr merge`, `gh pr create`
 - `gh pr edit` (covers `--add-label auto-deploy`, which triggers a deployment with no push or merge
   verb in the command at all)
@@ -156,9 +163,22 @@ no-plain-copy rule shipped the string in plain form, in the very sentence explai
 reproduces the original faithfully while the bytes on disk never spell it and `grep` cannot find it
 there. Point at that function; do not re-illustrate it.
 
-`tests/test_fixtures.py::test_no_fixture_contains_the_literal_needle_on_disk` is the guard, and it
-covers every `*.jsonl` in the fixtures directory. If you add a fixture, let that test cover it
-rather than adding a parallel check.
+**Building the constant with `+` does not count as assembling it at runtime.** CPython folds
+adjacent string constants at *compile* time, so `"first half" + "second half"` puts the whole string
+into the `.pyc`, where `grep` finds it in any checkout that has ever run the tests. It is confined
+to gitignored `__pycache__/`, so nothing ships — but the docstring claiming "assembled at runtime"
+was false until the constant moved to `str.join`, which the peephole optimiser leaves alone.
+
+Two guards, both in `tests/test_fixtures.py`:
+`test_no_fixture_contains_the_literal_needle_on_disk` covers every `*.jsonl`, and
+`test_no_source_file_spells_out_the_needle` covers the code, tests and docs — the places it actually
+leaked. Let those cover anything you add rather than writing a parallel check.
+
+**The segment mark needs the same discipline as the needle.** Component 2 reads the newest mark out
+of the transcript and trusts it, and a mark is a fixed literal — so any file that quotes one becomes
+state the gate acts on. A committed *empty* mark is the bad case: every session that reads that file
+disarms its own gate. `test_no_source_file_contains_a_decodable_segment_mark` enforces this. Before
+it existed the repo was clean by luck, not by rule.
 
 ### 2. Do not "clean up" the unpadded base64 in the mark round-trip test
 
@@ -186,15 +206,34 @@ a plugin cache directory, or `/tmp`.**
 
 ```bash
 cd plugins/agent-traffic-control/hooks/resume-gate
-python3 -m pytest tests/ -v          # or: uv run --python 3.11 --with pytest python -m pytest tests/ -v
+python3 -m pytest tests/ -q          # or: uv run --python 3.11 --with pytest python -m pytest tests/ -q
+python3 tests/mutation_check.py      # 38 mutations; exit 0 = every one killed
 ```
 
-77 tests, stdlib plus pytest only.
+94 tests, stdlib plus pytest only.
 
-`tests/test_install.py` exercises `install.build_config()` **only**. Nothing in the suite calls
-`install.main()` — that would write to the real `~/.claude/settings.json` on whatever machine runs
-the tests, which is exactly the side effect the Install section says to make deliberately, not as a
-byproduct of `pytest`.
+`tests/test_install.py` exercises the installer's **pure functions only** — `build_config()`,
+`unstable_install_reason()` and `missing_script_reason()`, all given fake paths. Nothing in the
+suite calls `install.main()`; that would write to the real `~/.claude/settings.json` on whatever
+machine runs the tests, which is exactly the side effect the Install section says to make
+deliberately rather than as a byproduct of `pytest`.
+
+### The mutation harness is committed, and that is the point
+
+`tests/mutation_check.py` holds all 38 mutations with the guard each one deletes. Run it; do not
+take a score on trust.
+
+An earlier revision of this file claimed "25 mutations, 25 killed" with no list committed. An
+independent reviewer then ran a *different* set and **7 of 13 survived** — each a real gap, including
+one where nothing distinguished `count > 0` from `count >= 0` and one where the test named for a
+corrupt payload never reached the decode-exception branch it was named after. A quoted score is not
+reproducible and a list that only its author has seen is not a check.
+
+**If you touch a test, mutate the code it covers and confirm it fails.** Six tests in this tool's
+first build could not fail, and each one hid a real defect — an `assert isinstance(hits, list)` that
+passes for `[]`, a positive path monkeypatched away, three installer tests that asserted strings
+appeared without asserting where they sat. Writing real-looking test code is not writing a test.
+When a mutation survives, fix the test; do not delete the mutation.
 
 ### The fixtures are generated, not captured
 
@@ -218,7 +257,5 @@ them pass **vacuously**:
 - the clean fixture must genuinely contain unmatched `completed` enqueues — otherwise it stops being
   the control that keeps a bare enqueue/`remove` imbalance rule out.
 
-**If you touch a test, mutate the code it covers and confirm it fails.** Six tests in this tool's
-first build could not fail, and each one hid a real defect — an `assert isinstance(hits, list)` that
-passes for `[]`, a positive path monkeypatched away, three install tests that asserted strings
-appeared without asserting where they sat. Writing real-looking test code is not writing a test.
+Both are enforced by assertions in `tests/test_fixtures.py`, and `mutation_check.py` breaks each one
+to prove the assertion notices.

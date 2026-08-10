@@ -204,6 +204,57 @@ def test_install_from_tmp_is_refused():
         "/tmp/resume-gate/resume_gate.py", home="/home/example") is not None
 
 
+def test_a_missing_script_is_refused_and_the_refusal_is_not_overridable(tmp_path):
+    """Installing a path that does not exist is the same disaster as
+    installing one that later stops existing, arriving sooner: a PreToolUse
+    hook whose script is missing exits 2, and exit 2 blocks the tool call.
+
+    The remedy the installer prints is a two-file `cp`; copying only
+    install.py is an easy miss. Unlike the stable-path check, this one has no
+    override - where a file lives is a judgement call, whether it exists is
+    not.
+    """
+    missing = tmp_path / "resume-gate" / "resume_gate.py"
+    reason = install.missing_script_reason(str(missing))
+    assert reason is not None
+    assert "resume_gate.py install.py" in reason, "must show copying BOTH files"
+    assert install.OVERRIDE_FLAG not in reason, "a missing script is not overridable"
+
+
+def test_an_existing_script_passes_the_existence_check(tmp_path):
+    """The check is worthless if it also refuses a real file."""
+    present = tmp_path / "resume_gate.py"
+    present.write_text("# stub\n", encoding="utf-8")
+    assert install.missing_script_reason(str(present)) is None
+
+
+def test_a_directory_is_not_mistaken_for_the_script(tmp_path):
+    """os.path.exists() would accept a directory named resume_gate.py."""
+    d = tmp_path / "resume_gate.py"
+    d.mkdir()
+    assert install.missing_script_reason(str(d)) is not None
+
+
+def test_a_symlinked_home_does_not_refuse_the_correct_directory(tmp_path):
+    """main() resolves symlinks when deriving the script path, so the check
+    must resolve them too - otherwise, on any system where the home directory
+    sits behind a symlink (ostree-based distributions ship exactly this), a
+    user standing in the recommended directory is refused and told to copy
+    the files into the directory they are already in."""
+    real_home = tmp_path / "var" / "home" / "example"
+    (real_home / ".claude" / "tools" / "resume-gate").mkdir(parents=True)
+    script = real_home / ".claude" / "tools" / "resume-gate" / "resume_gate.py"
+    script.write_text("# stub\n", encoding="utf-8")
+
+    linked_home = tmp_path / "home-example"
+    linked_home.symlink_to(real_home)
+
+    assert install.unstable_install_reason(
+        str(linked_home / ".claude" / "tools" / "resume-gate" / "resume_gate.py"),
+        home=str(linked_home),
+    ) is None
+
+
 def test_install_from_the_stable_tools_directory_is_allowed():
     """The whole check is worthless if it also refuses the recommended path."""
     assert install.unstable_install_reason(

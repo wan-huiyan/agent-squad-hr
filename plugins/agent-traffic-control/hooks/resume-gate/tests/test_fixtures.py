@@ -4,7 +4,10 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import make_fixtures
 
 FIX = pathlib.Path(__file__).parent / "fixtures"
-NEEDLE = "PARTIAL output recovered from the " + "agent"
+REPO = pathlib.Path(__file__).resolve().parents[1]
+# str.join, not `+`: adjacent string constants are folded at COMPILE time, so
+# `"a" + "b"` would put the whole string into this file's .pyc.
+NEEDLE = "".join(["PARTIAL output recovered from the ", "ag", "ent"])
 PREFIX = "Agent terminated early due to an API error"
 
 def _rows(name):
@@ -145,6 +148,57 @@ def test_fixtures_match_the_generator(tmp_path):
         assert committed == text, (
             f"fixtures/{name}.jsonl differs from make_fixtures.py output - "
             f"regenerate with `python3 tests/make_fixtures.py`")
+
+def _tracked_source_files():
+    """Every committed text file under the hook, excluding build artefacts."""
+    for path in sorted(REPO.rglob("*")):
+        if not path.is_file():
+            continue
+        if "__pycache__" in path.parts or path.suffix == ".pyc":
+            continue
+        yield path
+
+
+def test_no_source_file_spells_out_the_needle():
+    """Rule 3, enforced over the source and not only the fixtures.
+
+    `test_no_fixture_contains_the_literal_needle_on_disk` covers *.jsonl.
+    This covers the code, the docs and the tests - the places the string
+    actually got leaked twice while this tool was being built, once by a
+    design document quoting it and once by a plan illustrating the escape and
+    losing a backslash to markdown rendering.
+    """
+    for path in _tracked_source_files():
+        assert NEEDLE not in path.read_text(encoding="utf-8", errors="replace"), (
+            "%s spells out the needle - describe it, never write it" % path.name)
+
+
+def test_no_source_file_contains_a_decodable_segment_mark():
+    """The mark needs the same rule the needle has, and did not have one.
+
+    Component 2 reads the newest mark out of the transcript and trusts it. A
+    mark is a fixed literal, so any row that merely QUOTES one - a doc
+    example, a test fixture, someone pasting hook output into a chat while
+    debugging - becomes state the gate acts on. A committed empty mark is the
+    worst case: every session that reads that file disarms its own gate.
+
+    Nothing enforced this before; the repo was clean by luck.
+    """
+    import re, sys
+    sys.path.insert(0, str(REPO))
+    import resume_gate as rg
+
+    offenders = []
+    for path in _tracked_source_files():
+        if path.name == "resume_gate.py":
+            continue  # defines the pattern; cannot match its own regex source
+        text = path.read_text(encoding="utf-8", errors="replace")
+        for match in rg._MARK_RE.finditer(text):
+            if rg._decode_mark(match) is not None:
+                offenders.append("%s: %s" % (path.name, match.group(0)[:60]))
+    assert not offenders, (
+        "these files carry a mark the gate would read as real state: %s" % offenders)
+
 
 def test_generator_never_reads_the_users_transcripts():
     """The previous generator sliced live transcripts out of ~/.claude/projects.

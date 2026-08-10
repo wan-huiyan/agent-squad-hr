@@ -24,3 +24,18 @@ jobs:
         run: |
           python3 scripts/check_skill_descriptions.py . --json > /tmp/desc.json
           python3 -c "import json,sys; d=json.load(open('/tmp/desc.json')); sys.exit(0 if d['within_budget'] else print('listing %d over budget %d' % (d['listing_chars'], d['budget_chars'])) or 1)"
+
+      # The hook ships executable code, so it needs a gate none of the five
+      # above can give it: they check structure, description length, route
+      # reachability, listing budget and identifiers - none of which would
+      # notice a detector that had stopped detecting.
+      - name: resume-gate hook — tests
+        run: |
+          python3 -m pip install --quiet pytest
+          python3 -m pytest plugins/agent-traffic-control/hooks/resume-gate/tests -q
+
+      # Mutation check: breaks each guard in turn and fails if the suite does
+      # not notice. A green suite is not evidence the tests can fail - six
+      # tests in this hook's first build could not, and each hid a real defect.
+      - name: resume-gate hook — mutation check
+        run: python3 plugins/agent-traffic-control/hooks/resume-gate/tests/mutation_check.py

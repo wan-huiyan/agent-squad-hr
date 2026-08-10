@@ -3,9 +3,10 @@
 
 Running this file's main() is a decision for a human to make explicitly -
 it edits the user's GLOBAL Claude Code config, which applies to every
-project on the machine, not just this one. Nothing in the test
-suite calls main(); tests exercise build_config() only, with a fake script
-path, and never touch the real settings file.
+project on the machine, not just this one. Nothing in the test suite calls
+main(); the tests exercise build_config(), unstable_install_reason() and
+missing_script_reason() - all pure functions, given fake paths - so they
+never touch the real settings file.
 
 Two mechanisms, do not conflate them (see DESIGN.md, Component 2):
   - The top-level `matcher` is a regex on the TOOL NAME ONLY. It cannot see
@@ -67,6 +68,16 @@ BASH_MATCHER = "^Bash$"
 # `git -C <path> push` - the command starts "git -C", not "git push". Any
 # worktree-based workflow uses that form constantly, and resume_gate.py
 # itself shells out with `git -C`, so it needs its own condition.
+#
+# !! UNVERIFIED !! `Bash(git -C * push:*)` puts a `*` in the MIDDLE of the
+# pattern, and that syntax is not confirmed against a primary source - only
+# the trailing `:*` form is. If a mid-pattern `*` is not honoured, THIS ONE
+# CONDITION SILENTLY NEVER FIRES. There is no error either way; an `if`
+# pattern that matches nothing looks identical to one that matches nothing
+# yet. The other seven conditions are unaffected, so the exposure is bare
+# `git -C <path> push` and nothing else. test_ship_conditions_cover_git_dash_c_push
+# pins that this string is EMITTED; nothing tests that the harness honours
+# it, and no Python test could.
 SHIP_CONDITIONS = [
     "Bash(git push:*)",
     "Bash(git -C * push:*)",
@@ -144,16 +155,45 @@ STABLE_INSTALL_ROOT = "~/.claude/tools"
 OVERRIDE_FLAG = "--allow-unstable-path"
 
 
+def missing_script_reason(script_path):
+    """Why `script_path` is not a usable hook target, or None if it is fine.
+
+    Installing a path that does not exist is the same disaster as installing
+    one that later stops existing, just arriving sooner: `/usr/bin/python3
+    /gone/resume_gate.py` exits 2, and PreToolUse treats exit 2 as "block the
+    call". The remedy this installer prints is a two-file `cp`; copy only one
+    of them, or delete it later, and every push, merge, PR and publish on the
+    machine fails with nothing naming the cause. Verified: a missing script
+    really does exit 2, not 127.
+    """
+    if os.path.isfile(script_path):
+        return None
+    return (
+        "resume-gate cannot install: %s does not exist.\n"
+        "The hook config would store that path, and a PreToolUse hook whose script\n"
+        "is missing exits 2 - which BLOCKS the tool call. Every push and merge on\n"
+        "this machine would fail. Copy BOTH files, not just install.py:\n"
+        "\n"
+        "  cp resume_gate.py install.py %s/resume-gate/\n"
+        % (script_path, STABLE_INSTALL_ROOT)
+    )
+
+
 def unstable_install_reason(script_path, home=None):
     """Why installing from `script_path` is unsafe, or None if it is fine.
 
     Pure and testable: main() calls it, the tests call it directly, and
     nothing in the test suite has to run main() to exercise the check.
+
+    Both sides are realpath'd. main() resolves symlinks when it derives the
+    script path (`Path(__file__).resolve()`), so comparing that against an
+    unresolved `~` would refuse the CORRECT directory on any system where the
+    home directory sits behind a symlink - and the refusal would tell the
+    user to copy the files into the directory they are already standing in.
     """
-    home = home if home is not None else os.path.expanduser("~")
-    stable = os.path.join(home, "tools" if home.endswith(".claude") else ".claude/tools")
-    stable = os.path.normpath(stable)
-    resolved = os.path.normpath(str(script_path))
+    home = os.path.realpath(home if home is not None else os.path.expanduser("~"))
+    stable = os.path.normpath(os.path.join(home, ".claude", "tools"))
+    resolved = os.path.normpath(os.path.realpath(str(script_path)))
     if resolved == stable or resolved.startswith(stable + os.sep):
         return None
     return (
@@ -182,6 +222,14 @@ def main(argv=None):
     script = str(pathlib.Path(__file__).resolve().parent / "resume_gate.py")
     settings_path = pathlib.Path(os.path.expanduser("~/.claude/settings.json"))
 
+    # Existence first, and NOT overridable. --allow-unstable-path is a
+    # judgement call about where a file lives; a missing file is not a
+    # judgement call, and installing one can only ever block the machine.
+    missing = missing_script_reason(script)
+    if missing:
+        sys.stderr.write(missing + "\n")
+        return 1
+
     reason = unstable_install_reason(script)
     if reason and OVERRIDE_FLAG not in argv:
         sys.stderr.write(reason + "\n")
@@ -189,6 +237,18 @@ def main(argv=None):
     if reason:
         print("resume-gate: %s given; installing from an unstable path anyway."
               % OVERRIDE_FLAG)
+
+    # The backup line used to appear only in the REFUSAL message - the one
+    # path where nothing is written. The path that actually edits the user's
+    # global config said nothing about how to undo it.
+    if settings_path.exists():
+        backup = settings_path.with_suffix(".json.pre-resume-gate.bak")
+        if not backup.exists():
+            backup.write_text(settings_path.read_text(encoding="utf-8"), encoding="utf-8")
+            print("resume-gate: backed up your settings to %s" % backup)
+        else:
+            print("resume-gate: leaving the existing backup at %s untouched" % backup)
+        print("resume-gate: to undo this install, cp that file back over %s" % settings_path)
 
     publish_tools = list(DEFAULT_PUBLISH_TOOLS)
     print("resume-gate: gating these publish tools (edit DEFAULT_PUBLISH_TOOLS in")

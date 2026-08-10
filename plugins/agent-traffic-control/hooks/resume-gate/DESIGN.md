@@ -110,6 +110,20 @@ session that reads the file, permanently.
 > Evidence this is not paranoia: the design session's own count of rows containing the string went
 > **7 → 10 → 15** purely by discussing the problem.
 
+**`"first half" + "second half"` does not satisfy this rule.** CPython folds adjacent string
+constants at *compile* time, so that form puts the whole string into the `.pyc` — and a grep over a
+checkout that has ever run the tests finds it there. It is only in `__pycache__/`, which is
+gitignored, so nothing ever shipped; but the code said "assembled at runtime" and that was not true.
+The constant is now built with `str.join`, which the peephole optimiser does not fold.
+
+**The segment mark needs the same rule, and did not have one.** Component 2 reads the newest mark
+out of the transcript and *trusts it*. A mark is a fixed literal, so any row that merely quotes one
+becomes state the gate acts on — a doc example, a fixture, someone pasting hook output into a chat
+while debugging. A committed empty mark would be the worst case: every session that reads that file
+disarms its own gate. `test_no_source_file_contains_a_decodable_segment_mark` now enforces this the
+way `test_no_fixture_contains_the_literal_needle_on_disk` enforces rule 3. Before that test, the
+repo was clean by luck.
+
 **Rule 4 — the scan is bounded to the current resume segment, marked by a sentinel Component 1
 emits itself.** There is **no** resume marker in the transcript to key off. Verified: no row type
 records one, `sessionId` is constant across all 2,387 rows of the transcript checked, `entrypoint`
@@ -227,8 +241,26 @@ it.** Component 1's detection pass still runs once, over rows after the previous
 of leaving a bare sentinel, it encodes what it found into the mark. Component 2 reads the most
 recent mark and uses its contents directly: no second detection pass, no possibility of two
 detectors disagreeing, because there is exactly one detector and it runs exactly once per segment.
-Component 2 falls back to a full `detect()` pass only when **no mark exists at all** — a session
-that has never been resumed.
+Component 2 falls back to a `detect()` pass in **two** cases: no mark exists at all (a session that
+has never been resumed), and the newest mark exists but **does not decode**.
+
+**That second case is where a fail-open hid**, found in review after the first version was written.
+An undecodable mark correctly returned "no trustworthy state" — but the fallback `detect()` still
+windowed on *the most recent mark*, corrupt one included, so the re-derivation had only the handful
+of rows after it to scan, usually none. Measured on the incident fixture: appending one undecodable
+mark took `detect()` from two hits to zero, and the `PreToolUse` decision from `ask` to silence.
+Two realistic triggers, both reproduced — a truncated mark, and a subagent description containing
+the mark's own item separator, which makes the hook corrupt state it wrote itself.
+
+The fix: `window_after_last_mark` skips marks that do not decode and falls back to the last boundary
+it *can* read. That re-scans more rows than strictly necessary, which is the safe direction, and it
+cannot resurrect items from before that boundary since they sit outside the window either way.
+`read_last_mark` still refuses to fall back to an earlier mark's *items* — that would be unsafe in
+both directions, resurrecting resolved items and hiding new ones.
+
+The lesson generalises past this bug: **"returns None so the caller re-derives" is only safe if you
+check what the caller actually re-derives over.** Both halves were individually reasonable and the
+composition was fail-open.
 
 The mark is base64 so that a subagent description containing a newline cannot break it across
 lines; the mark has to survive as one line found by one regex. **It does not, and never did, stop a
@@ -236,10 +268,14 @@ description leaking the matched string into the transcript** — an earlier draf
 was wrong. Component 1 prints every item in plain text two lines above the mark, and Component 2's
 ask-reason joins them plainly. The encoding is about newline safety only.
 
-**Accepted gap:** a subagent killed in a session that is never resumed gets no mark until its first
-ship action triggers the fallback pass. That is not a hole — the parent session sees the harness's
-partial-output notice inline regardless, which is a different, already-visible signal — but it
-means the mark-based fast path only starts covering a session from its first resume onward.
+**Accepted gap, stated more honestly than it first was:** a subagent killed in a session that is
+never resumed gets no mark until its first ship action triggers the fallback pass — and because
+only `SessionStart:resume` ever *writes* a mark, that session then asks on **every** ship action for
+the rest of its life, with no way to clear it from inside the session. The parent saw the harness's
+partial-output notice inline regardless, so nothing is hidden. But "the mark-based fast path starts
+covering a session from its first resume onward", which is how this paragraph originally read,
+describes the mechanism and not the experience: the repeating prompt is the part a user feels, and
+interrupting and resuming is the only thing that quiets it.
 
 **Components 1 and 2 must share one detector, not two.** After the qualifying rules this is no
 longer a string scan — it is a two-pass parse (collect `Agent` `tool_use` ids, then resolve
@@ -247,10 +283,11 @@ longer a string scan — it is a two-pass parse (collect `Agent` `tool_use` ids,
 last mark. If Component 2 reimplements a cheaper version, the two will disagree and the gate will
 pass work the warning flagged. Write it once, call it twice.
 
-**Cost:** a full JSON parse of an 11 MB transcript is on the order of **a second**, not the tens of
-milliseconds a byte scan would cost. That is acceptable because ship actions are genuinely rare —
-the incident session ran 6 in 181 Bash calls — but it is a real number and should not surprise
-anyone.
+**Cost:** a full JSON parse of an 11 MB transcript measures **~0.24 s** (0.15 s to load, 0.09 s to
+detect) — more than the tens of milliseconds a byte scan would cost, and well under the "on the
+order of a second" this section claimed before anyone timed it. Ship actions are rare enough for
+either number to be fine — the incident session ran 6 in 181 Bash calls — but a cost used to justify
+a design should be measured rather than estimated.
 
 One documented caveat, benign here: the transcript file is written asynchronously and may lag the
 in-memory conversation, so it may not yet include the current turn's most recent messages. This
@@ -274,6 +311,14 @@ minimum:
 - `git -C <path> push` — **a separate condition.** `Bash(git push:*)` is prefix matching and this
   command starts `git -C`, not `git push`. Not hypothetical: worktree-based work uses it constantly,
   and `resume_gate.py` itself shells out with `git -C`.
+
+  > ⚠️ **`Bash(git -C * push:*)` is UNVERIFIED.** It places a `*` in the *middle* of the pattern,
+  > and that syntax is not confirmed against a primary source — only the trailing `:*` form is. If a
+  > mid-pattern `*` is not honoured, **this one condition silently never fires**, and there is no
+  > error to notice: an `if` pattern that matches nothing looks exactly like one that has not
+  > matched yet. The other seven conditions are unaffected, so the exposure is bare
+  > `git -C <path> push` and nothing else. `test_ship_conditions_cover_git_dash_c_push` pins that
+  > the string is *emitted*; nothing tests that the harness *honours* it, and no Python test could.
 - `gh pr edit <n> --add-label auto-deploy` — **triggers a deployment with no push or merge verb at
   all.** The incident session ran exactly this.
 - `gh api -X PUT repos/…/pulls/<n>/merge` — merges via the REST API, no `gh pr merge`.
@@ -295,7 +340,7 @@ array**, not a sibling of `matcher`:
 
 The first build put `if` next to `matcher`, where it is an unrecognised key and is dropped. What
 remains is a group matching bare `Bash` with no condition — so **every** Bash call prompts, once per
-ship condition (six times over), each prompt preceded by a full JSON parse of an 11 MB transcript.
+ship condition (seven times over), each prompt preceded by a full JSON parse of the transcript.
 Silent, and the opposite of the intent.
 
 **The matcher is unanchored**, tested with `RegExp.prototype.test`, so `"Bash"` also matches
