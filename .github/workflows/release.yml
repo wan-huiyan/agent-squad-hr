@@ -1,12 +1,34 @@
 name: Release on version bump
 
-# Cuts a GitHub Release whenever the VERSION file changes on main and no
-# matching release exists yet. Keeps releases from silently drifting behind
-# the shipped version. Bump VERSION in the same PR as the version bump.
+# Cuts a GitHub Release whenever the shipped version has no matching release yet.
+# Bump VERSION in the same PR as the manifests.
+#
+# WHY THIS RUNS ON EVERY PUSH TO MAIN, not just on pushes touching VERSION.
+#
+# It used to filter `paths: ['VERSION']`. That filter lost v1.13.0 for three
+# months, and it lost it by NOT RUNNING — which leaves no failed run, no skip
+# message, and nothing in the Actions list to notice:
+#
+#   43f4d62  "v1.13.0: ..."   marketplace.json + plugin.json -> 1.13.0
+#                             VERSION UNTOUCHED, still 1.12.0   <- no trigger
+#   6a49203  "v1.14.0: ..."   VERSION 1.12.0 -> 1.14.0          <- steps OVER 1.13.0
+#
+# `1.13.0` never existed in VERSION on main, so no later push could cut it either.
+# The drift guard DID catch the mismatch — validate_plugins.py went red on
+# 43f4d62 (run 2026-08-07T10:56:43Z, conclusion: failure) — and the fix bumped
+# to 1.14.0, satisfying the guard while leaving the missing release permanently
+# unreachable. A guard tells you a state is wrong; it does not tell you what
+# that wrong state already cost.
+#
+# The path filter was also the WORST failure mode available here, because the one
+# commit shape that most needs a release — manifests bumped, VERSION forgotten —
+# is exactly the shape that suppressed the job.
+#
+# Running unconditionally is safe: the create step below is idempotent and skips
+# when the release exists. The cost is a ~15s no-op job per push to main.
 on:
   push:
     branches: [main]
-    paths: ['VERSION']
   workflow_dispatch:
 
 permissions:
@@ -30,6 +52,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           V="${{ steps.v.outputs.version }}"
+          # NOTE: both branches exit 0, so this job's `conclusion: success` says
+          # NOTHING about whether a release was cut. Read which line printed, or
+          # check `gh release view v$V`. The release-parity gate in ci.yml is what
+          # actually asserts the outcome.
           if gh release view "v$V" >/dev/null 2>&1; then
             echo "Release v$V already exists — nothing to do."
           else

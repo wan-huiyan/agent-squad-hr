@@ -1,0 +1,45 @@
+# Release-parity baseline — holes that exist and are ACCEPTED, with the reason.
+#
+# Read by scripts/check_release_parity.py. One `version  # reason` per line.
+# Anything NOT listed here that has no release is a hard CI failure.
+#
+# WHY A BASELINE AT ALL. This gate ships red: 7 of the 27 versions this repo has
+# claimed to ship have no GitHub Release. A gate that cannot go green gets muted
+# inside a week, and a muted gate is worse than no gate — it looks like coverage.
+# So the existing holes are recorded here, once, with what is actually known
+# about each, and the gate then fails only on NEW divergence.
+#
+# Reasons below are what was VERIFIED, not what was plausible. Where the cause
+# is unknown it says so — a confident wrong note is worse than an admitted gap,
+# because the note is what someone trusts later instead of re-checking.
+
+# --- predate both VERSION and the release automation ---
+# `release.yml` was added in 435ffaa (2026-05-29), the SAME commit that first set
+# VERSION, to 1.3.0. These three are in the README changelog only; VERSION never
+# held them, and no automation existed. Unreachable, and legitimately so.
+1.0.0  # pre-dates VERSION and release.yml (both introduced in 435ffaa)
+1.1.0  # pre-dates VERSION and release.yml (both introduced in 435ffaa)
+1.2.0  # pre-dates VERSION and release.yml (both introduced in 435ffaa)
+
+# --- workflow existed; cause NOT established ---
+# Do not label these "pre-automation" — that is false and was checked. 435ffaa
+# added release.yml and set VERSION=1.3.0 in one commit, so the workflow was
+# present for all three (1.4.0 on 2026-06-01, 1.5.0 on 2026-07-06) and no
+# release exists for any of them. Why is unknown. Recorded as unknown.
+1.3.0  # release.yml present (added in the same commit); cause unestablished
+1.4.0  # release.yml present; cause unestablished
+1.5.0  # release.yml present; cause unestablished
+
+# --- the hole this gate was written for ---
+# 43f4d62 shipped 1.13.0 in marketplace.json, plugin.json and the README while
+# leaving VERSION at 1.12.0, so the `paths: ['VERSION']` filter meant the release
+# job never ran. 6a49203 then moved VERSION 1.12.0 -> 1.14.0, stepping OVER the
+# value. validate_plugins.py DID catch the manifest/VERSION drift (CI failure on
+# 43f4d62, 2026-08-07T10:56:43Z) and the fix satisfied the guard without cutting
+# the release.
+#
+# UNFILLABLE BY THE AUTOMATION: VERSION never held 1.13.0 on main, so no push can
+# ever trigger a release for it. If you want it to exist, create it by hand
+# against the right commit and DELETE this line — do not leave it suppressed:
+#     gh release create v1.13.0 --target 43f4d62 --title v1.13.0 --generate-notes
+1.13.0  # VERSION never held it (path-filter miss); unfillable by automation, see above
