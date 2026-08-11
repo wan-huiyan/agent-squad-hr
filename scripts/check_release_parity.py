@@ -184,6 +184,21 @@ def main() -> int:
           f"({history[0]} … {history[-1]})")
     print(f"  sources: {len(vhist)} from VERSION history, {len(chlog)} from the "
           f"README changelog")
+
+    # A shallow clone makes `git log --follow VERSION` see ~one commit, which
+    # silently reduces this gate to its changelog half. Found on this gate's own
+    # introducing CI run: 26 claimed versions on the runner vs 28 locally, green
+    # either way. A dead input is not a failure, so it has to announce itself.
+    if len(chlog) > 3 and len(vhist) < len(chlog) / 2:
+        print()
+        print(f"  ::warning::VERSION history has only {len(vhist)} "
+              f"{'value' if len(vhist) == 1 else 'values'} against "
+              f"{len(chlog)} changelog entries.")
+        print("  That is the signature of a SHALLOW CLONE — this gate is running on "
+              "its changelog half")
+        print("  alone. Add `fetch-depth: 0` to the checkout step. Not failing, "
+              "because the changelog")
+        print("  half is still a real check — but half of this gate is not running.")
     if only_changelog:
         print(f"  shipped in the changelog but never in VERSION: "
               f"{', '.join('v' + v for v in only_changelog)}")
