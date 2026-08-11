@@ -9,7 +9,15 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
+      # fetch-depth: 0 is REQUIRED by the release-parity gate. Its default
+      # shallow clone (depth 1) makes `git log --follow VERSION` see one commit,
+      # so the VERSION-history half of that gate's union silently contributes
+      # nothing and only the README changelog half does any work. Measured: the
+      # gate saw 26 claimed versions on a shallow runner against 28 locally, and
+      # stayed green — a dead input, not a failure.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Validate marketplace + plugin structure
         run: python3 .github/scripts/validate_plugins.py
       - name: Skill-description cap gate (skill-listing truncation)
