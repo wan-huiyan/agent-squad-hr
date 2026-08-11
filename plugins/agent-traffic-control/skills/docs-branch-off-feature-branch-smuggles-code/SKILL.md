@@ -259,7 +259,7 @@ After rebase + force-push:
 
 ## Example — 2026-06-23 the project S211 (Variant B: feature already merged)
 
-End of session S211 (per-student drawer behaviour filter, PR #1360 already
+End of session S211 (per-record drawer behaviour filter, PR #1360 already
 squash-merged to main as `b5871bc0`). Wrote handoff + S212 prompt. Created
 the docs branch:
 

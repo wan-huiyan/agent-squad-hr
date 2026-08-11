@@ -148,7 +148,7 @@ git log --all --oneline -- 'docs/handoffs/session_184_*' 2>/dev/null | head -3
 
 ## Example
 
-In S184b (2026-05-12), while writing `session_184b_summer_wow_pre_launch_zeros_handoff.md`,
+In S184b (2026-05-12), while writing `session_184b_campaign_pre_launch_zeros_handoff.md`,
 I needed to characterize the relationship to the canonical S184 session. I ran:
 
 ```bash

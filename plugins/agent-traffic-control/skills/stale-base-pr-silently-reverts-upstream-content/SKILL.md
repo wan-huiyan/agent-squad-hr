@@ -186,7 +186,7 @@ Build a table:
 
 | # | Line | Post-B-merge (regressed) | PR A's intended | Notes |
 |---|------|---|---|---|
-| 1 | #237 | "based on 448 students" | "+ n=448 + 6,483-control" | Lost reproduction context |
+| 1 | #237 | "based on 448 records" | "+ n=448 + 6,483-control" | Lost reproduction context |
 | 2 | #354 | `48% vs 5%` | `50% vs 6%` | Lost number refresh |
 | ... | ... | ... | ... | ... |
 
@@ -253,7 +253,7 @@ After landing the recovery PR, consider:
   recently-merged PRs against current main on a sample of templates
 - An add-on to the codebase's PR template asking "did you rebase
   against latest main before pushing?" for copy/template PRs
-- Adding `value-anchor`-style HTML attributes (`data-cohort-rate-a2="50"`)
+- Adding `value-anchor`-style HTML attributes (`data-rate-a2="50"`)
   that can be unit-tested for value consistency vs the backend constants
 
 ## Verification
@@ -288,7 +288,7 @@ pre-#751 main. Its body claimed "All numbers preserved." Merged at
 **Detection (~3 min post-#759-merge)** via user-prompted content audit:
 
 ```bash
-git show origin/main:templates/actions.html | grep -E '50%|6.0%|n=117|8× the rate|6,483-student'
+git show origin/main:templates/actions.html | grep -E '50%|6.0%|n=117|8× the rate|6,483-record'
 # Returned: nothing for the A2/A3 lines, only A1 line had the new context — that's the regression signal
 ```
 

@@ -163,7 +163,7 @@ Option A's preflight assumes you can stand on the `main` branch. **In a git work
 
 2. **Run the deploy script in CI mode for an image-only deploy.** Setting `CI=1` (or `GITHUB_ACTIONS=1`) is exactly what the label-gated workflow runs, and on these scripts it has a **dual effect** that is the whole point:
    ```sh
-   CI=1 bash ./deploy_baker.sh        # or deploy_propensity_pulse.sh
+   CI=1 bash ./deploy_baker.sh        # or deploy_scoring_pulse.sh
    ```
    - skips the `[[ -z "${CI:-}" ]]` **git-state guard** (you just did it by hand from detached HEAD), AND
    - skips the **manual-only scheduler-flip + IAM re-assert** block (`if [[ -n "${CI:-}" ]]: SKIP`).

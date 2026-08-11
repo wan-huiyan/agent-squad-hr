@@ -132,10 +132,10 @@ body (e.g. if the PR body says "rename X → Y", the diff should show that).
 **S160 incident (2026-05-08):** orchestrator was on branch
 `docs/s159-handoff` in worktree `.claude/worktrees/fix-issues/`. After the
 pick #5 subagent finished work on branch
-`fix/s160-issue490-rename-missing-credentials` in worktree
+`fix/s160-issue490-rename-status-labels` in worktree
 `.claude/worktrees/s160-pick-3/`, the orchestrator ran `gh pr create` from
 its own CWD. The resulting PR #599 had:
-- Correct title: "fix(library): rename Missing Credentials/Awaiting Decision (Closes #490)"
+- Correct title: "fix(library): rename two status labels (Closes #490)"
 - Correct body: described the rename
 - Wrong head: `docs/s159-handoff` (the orchestrator's branch — totally
   unrelated to the rename)

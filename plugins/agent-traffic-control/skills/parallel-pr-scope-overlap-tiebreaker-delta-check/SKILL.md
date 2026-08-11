@@ -267,7 +267,7 @@ for the same issue. Two extra moves beyond the delta-check:
    second mechanism, or drifts source↔deployed state. If B wins: revert-A + deploy-B as ONE change. If
    A wins (already live + verified): the other session stands down. Pick ONE — never run both.
 
-(S266b 2026-06-22, `the-project-repo`: #1271 full-key-set `alien_status` flicker fix was
+(S266b 2026-06-22, `the-project-repo`: #1271 full-key-set `status_code` flicker fix was
 live + verified when a parallel session asked to deploy a competing carry-forward fix for the same
 flicker. Verified the live serving artifact + relayed a stand-down instead of a blind deploy.)
 

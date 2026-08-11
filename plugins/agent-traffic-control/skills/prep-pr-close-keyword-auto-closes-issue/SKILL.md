@@ -40,11 +40,11 @@ You wrote a docs-only PR shipping a paste-ready prompt / implementation plan /
 ADR proposal / scaffolding for future work on issue #N. The PR title looked
 like:
 
-> `docs(s171): next-session prompt — backfill historical sf_enrolled (closes #672)`
+> `docs(s171): next-session prompt — backfill historical sf_converted (closes #672)`
 
 or the PR body opened with:
 
-> Paste-ready S171 prompt for the historical `sf_enrolled` backfill that
+> Paste-ready S171 prompt for the historical `sf_converted` backfill that
 > pre-empts Q3 2026 calibration retrain. Closes-ready for issue #672 (P1).
 
 The PR squash-merged cleanly. Hours or days later, someone (you or the next
@@ -244,10 +244,10 @@ rows that pass Step 1's verdict as true-positive closes).
 
 **Concrete instance (the client, 2026-05-11, S171b)**:
 
-- Issue #672 (P1): "S166 follow-up — backfill historical sf_enrolled
+- Issue #672 (P1): "S166 follow-up — backfill historical sf_converted
   partitions for Q3 2026 calibration retrain"
 - PR #712 (merged 2026-05-11T11:27:13Z): title
-  `docs(s171): next-session prompt — backfill historical sf_enrolled (closes #672)`
+  `docs(s171): next-session prompt — backfill historical sf_converted (closes #672)`
   — diff was only `docs/handoffs/session_171_672_backfill_prompt.md`
   + `docs/generate_roadmap_backlog.py` + regen of `docs/site/*.html`
 - Closing keyword fired on merge → #672 CLOSED at 11:27:12Z

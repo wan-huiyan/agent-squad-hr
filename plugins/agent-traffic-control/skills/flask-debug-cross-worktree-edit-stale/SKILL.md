@@ -172,7 +172,7 @@ edit?** If no, it's this skill. If yes, look elsewhere.
 Real session 2026-05-08 (this is where the skill was extracted):
 
 - Primary worktree (`/Users/.../the-project-repo`) had
-  `wip/monitor-noapp-cohort-broaden` checked out, Flask running on
+  `wip/monitor-segment-broaden` checked out, Flask running on
   :8006 from there.
 - Sister worktree (`.claude/worktrees/monitor-prettify`) was where
   edits were being made.

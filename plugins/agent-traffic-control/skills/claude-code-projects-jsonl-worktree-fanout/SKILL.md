@@ -133,7 +133,7 @@ find ~/.claude/projects/ -name "*.jsonl" -newermt "2026-05-13" ! -newermt "2026-
   | grep -v subagents
 ```
 
-→ 7 matching JSONLs across **5 different project directories** (1 canonical + 4 worktree-namespaced). The target session was in `-Users-<user>-Documents-the-causal-impact-repo--claude-worktrees-eloquent-franklin-fe932f/cff8244f-2194-4448-933c-9a93d417b770.jsonl` — never would have been found by searching the canonical dir alone.
+→ 7 matching JSONLs across **5 different project directories** (1 canonical + 4 worktree-namespaced). The target session was in `-Users-<user>-Documents-the-causal-impact-repo--claude-worktrees-eloquent-franklin-fe932f/00000000-0000-4000-8000-000000000000.jsonl` — never would have been found by searching the canonical dir alone.
 
 Final keyword grep across all 7 surfaced the right one in seconds (opening prompt: *"can you please review the complete commit history or those 2 repos, and help me summarise what we did..."*).
 

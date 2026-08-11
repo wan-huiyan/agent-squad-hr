@@ -17,7 +17,7 @@
     {"id": "pos-10", "prompt": "I think the previous session fabricated these BQ column names from memory", "should_trigger": true, "category": "positive"},
     {"id": "pos-11", "prompt": "The dataset path in the doc might be stale from an older schema version", "should_trigger": true, "category": "positive"},
     {"id": "pos-12", "prompt": "My scheduled Cloud Run batch job reads table references from a plan doc, sanity check them", "should_trigger": true, "category": "positive"},
-    {"id": "pos-13", "prompt": "Is enrolled_2025 really the label column or is that a plausible guess", "should_trigger": true, "category": "positive"},
+    {"id": "pos-13", "prompt": "Is target_2025 really the label column or is that a plausible guess", "should_trigger": true, "category": "positive"},
     {"id": "pos-14", "prompt": "The doc assumes an evt_ prefix on the event columns, does that convention exist here", "should_trigger": true, "category": "positive"},
     {"id": "pos-15", "prompt": "A five minute check before a multi hour dispatch, what is worth checking", "should_trigger": true, "category": "positive"},
     {"id": "pos-16", "prompt": "The dataset path might be missing a level, like project.dataset_a instead of project.dataset_b.dataset_a", "should_trigger": true, "category": "positive"},

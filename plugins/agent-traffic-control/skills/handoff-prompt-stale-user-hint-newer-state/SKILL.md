@@ -149,17 +149,17 @@ please be aware of #642, #662, and #663" on 2026-05-10.
 
 **Fetched state:**
 - `#642` (P1, ml-correctness) — CLOSED via PR #663 (MERGED). Probe 3b verdict:
-  `event_signup` IS leakage-adjacent (pre-app marginal lift −0.62pp).
-- `#662` (P1, ml-correctness) — OPEN. Surfaced wider finding: 6 of 7 events in A1
-  Sharp's basis show negative or near-zero pre-app marginal lift. Named 4 paths.
+  `event_signup` IS leakage-adjacent (pre-conversion marginal lift −0.62pp).
+- `#662` (P1, ml-correctness) — OPEN. Surfaced wider finding: 6 of 7 events in A1's
+  basis show negative or near-zero pre-conversion marginal lift. Named 4 paths.
 - `#663` — MERGED docs/probe-3b artifact.
 - (Discovered by reading #662 body) `#669` — MERGED methodology correction: under
-  the binary-filter framing, 2 of 3 A1 Sharp events ARE clean (program_page_view +
-  checklist_item_complete), not just program_page_view alone.
+  the binary-filter framing, 2 of 3 A1 events ARE clean (content_page_view +
+  task_item_complete), not just content_page_view alone.
 
 **Map:**
 - The prompt's plan: merge PR #656 as-is (3-event basis at 27.3%/n=1,149/~91 today).
-- Post-#669 implication: A1 Sharp's 3-event basis includes 2 leakage-flavored events
+- Post-#669 implication: A1's 3-event basis includes 2 leakage-flavored events
   (event_signup, todo_item_click). The prompt's plan would ship known-leakage to prod.
 - Options narrow to either: (a) accept the leakage with a caveat, (b) narrow basis
   to the 2 clean events per #662 path 1, (c) hold the PR, (d) narrative-only edit.
@@ -172,7 +172,7 @@ basis to clean events."
 #498 + #662 in one merge. Auto-deployed to `the-dashboard-service-00077-b6b`.
 
 Had the prompt been executed verbatim, the narrative-vs-SQL drift class that issue
-#498 was originally opened to fix would have shipped a fresh instance — counsellors
+#498 was originally opened to fix would have shipped a fresh instance — the dashboard's end users
 seeing wrong event chips on the A1 card.
 
 ## Notes
