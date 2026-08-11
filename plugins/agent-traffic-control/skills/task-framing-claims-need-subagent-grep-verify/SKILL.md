@@ -96,7 +96,7 @@ Without the explicit grant, even capable sub-agents default to deference.
 Don't make the sub-agent hunt for which file to verify against. Name the
 canonical source(s):
 
-> "Verify against: `<analytics_pkg>/dataform/<training_features_model>.sqlx`
+> "Verify against: `<analytics_pkg>/dataform/v10_feature_matrix_<analytics_pkg>.sqlx`
 > + `<feature_pkg>/pipeline_stage.py` + `cr_scoring_serve_v6/`.
 > Use grep / Read; do not rely on documentation alone."
 
@@ -149,8 +149,8 @@ Write docs/analysis/foo.md covering 8 v7 retrain implications.
 
 The 8 findings below come from a fact-check panel against the canonical
 sheet. I have NOT grep-confirmed every claim about what v6.1 currently
-contains. Verify each against `<analytics_pkg>/dataform/<training_features_
-model>.sqlx` + `<feature_pkg>/pipeline_stage.py` +
+contains. Verify each against `<analytics_pkg>/dataform/v10_feature_matrix_
+<analytics_pkg>.sqlx` + `<feature_pkg>/pipeline_stage.py` +
 `cr_scoring_serve_v6/`. For each finding, tag it [VERIFIED]
 or [Contradicts task framing] or [NEEDS-VERIFICATION] with file:line
 evidence. If you find me wrong, proceed with the corrected version and
@@ -216,7 +216,7 @@ true in the codebase? If no — add the verify-and-tag block.
 - S217 worked example: PR #963 (`the-project-repo`),
   `docs/analysis/2026-05-27-s216-findings-for-v7.md` — sub-agent
   caught 2 of 8 task-framing errors via grep-verify against
-  `<training_features_model>.sqlx`.
+  `v10_feature_matrix_<analytics_pkg>.sqlx`.
 - Companion skill: `factcheck-subagent-needs-complete-sources` (covers
   feeding fact-check agents complete sources — different direction)
 - Project lesson: `~/.claude/projects/.../memory/lessons.md` #129 (the

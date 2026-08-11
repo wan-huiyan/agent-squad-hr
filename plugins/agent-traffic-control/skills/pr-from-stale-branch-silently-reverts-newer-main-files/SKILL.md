@@ -216,12 +216,12 @@ written.
 line you took it from next to the check:
 
 ```sh
-git show <squash-sha> -- path/to/file.py | grep '^+' | grep -i finalist
+git show <squash-sha> -- path/to/file.py | grep '^+' | grep -i shortlist
 # → +    shortlist_km = ...           ← THIS line is the needle
 ```
 
 The audit of PR #853 (the routing app, 2026-08-07, tracked under #863) grepped for
-`route_km_finalist` — a
+`route_km_shortlist` — a
 symbol name recalled from the session that had written it. The real symbol was
 **`shortlist_km`**. The grep found nothing, and for a minute the session believed
 an entire merged PR had been deleted.

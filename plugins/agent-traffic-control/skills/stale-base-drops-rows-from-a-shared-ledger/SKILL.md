@@ -243,7 +243,7 @@ against the wrong reference.
 - **Why the id-only check is not enough**, restated because it is the part that
   gets skipped: a session's rows can all be present and the ledger still be
   damaged, because another session's *edit* to an existing row was reverted. The
-  the routing app incident's own restore PRs had to file a separate follow-up (#872,
+  routing-app incident's own restore PRs had to file a separate follow-up (#872,
   "Three in-place edits #853 rolled back on entries that still exist — the
   failure an id check cannot see") after the id-based sweep reported clean.
 - **This generalises past trackers** to any hand-edited shared file with

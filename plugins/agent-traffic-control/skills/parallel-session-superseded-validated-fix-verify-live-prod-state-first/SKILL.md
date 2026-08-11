@@ -84,7 +84,7 @@ implementation"*, *"you're about to deploy"*. A session whose only output is a j
 the skill never fires, while being exposed to exactly the same clock.
 
 **the routing app, 2026-08-07.** Three agents spent about **80 minutes** on a production-deploy
-assessment and concluded **do NOT deploy**: main shrank every dog route and capped a 20 km
+assessment and concluded **do NOT deploy**: main shrank every route and capped a 20 km
 wish at 12.16 km. A commit pinning the route sizes landed **mid-run**. The verdict was
 false before it finished being written — and nothing in the analysis was wrong. Only its
 base was.

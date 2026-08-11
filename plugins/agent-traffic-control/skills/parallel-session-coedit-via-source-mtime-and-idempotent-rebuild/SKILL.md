@@ -111,9 +111,9 @@ changes the collision math entirely.
 - **Confirm the OTHER session's work is still present** in the output (grep a
   marker of their concurrent additions) — proves the rebuild merged, not lost, it.
 
-## Example (the client dossier, 2026-06-30)
+## Example (the client report bundle, 2026-06-30)
 
-Two live sessions co-editing `decision_dossier_ENRICHED.html`, assembled from
+Two live sessions co-editing `report_bundle_ENRICHED.html`, assembled from
 `sections/*.html` via `_assemble.py`. `stat` showed the other session sweeping
 cards 01–09 (mtimes in the last ~5 min); my targets 07/08b/10 were cool (hours
 old). I edited 08b first; the other session's later rebuild (16:12) pulled my 08b
@@ -146,7 +146,7 @@ intermixed** — there is no clean per-session diff. Invert Phase 4:
      the one shared index; if the other session runs **its** `git commit` (even a
      plain commit, no `-a`) while your files sit staged, **your staged files ship in
      ITS commit** — you never ran `git commit`. Observed 2026-07-01: path-staged
-     cards 08/10 were absorbed into the parallel session's `f9e63216` ("dossier card
+     cards 08/10 were absorbed into the parallel session's `f9e63216` ("bundle card
      1B…"). Mitigate: run `git add <paths>` and `git commit` **atomically in the same
      step**, and re-check `git diff --cached --name-only` shows **exactly your paths**
      in the instant before committing (abort if a foreign path appears). If you'd
@@ -167,7 +167,7 @@ intermixed** — there is no clean per-session diff. Invert Phase 4:
    `origin/main`** (a "safe-docs PR" excluding the gated deliverable) — never
    branch-switch the shared/active branch.
 
-Net (verified the client dossier 2026-06-30c): 2 path-staged doc commits, unpushed, atop
+Net (verified the client report bundle 2026-06-30c): 2 path-staged doc commits, unpushed, atop
 the other session's commits; every deliverable edit (yours + theirs) left
 uncommitted; one labeled follow-up issue; an existing memory file updated in place.
 

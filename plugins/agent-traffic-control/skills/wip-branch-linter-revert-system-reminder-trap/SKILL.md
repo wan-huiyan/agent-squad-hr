@@ -72,7 +72,7 @@ wrong about intent:
    - editorial copy reverting to an older phrasing
      (e.g. `"Low-score bucket"` → `"other 95% (Mid + Low)"`)
    - SQL JOIN type / WHERE clause reverting (e.g. `LEFT JOIN` → `INNER JOIN`,
-     dropping a `COALESCE`, narrowing `application_start_term IN (...)`)
+     dropping a `COALESCE`, narrowing `start_period IN (...)`)
    - feature flags flipping
 3. **Reminder text:** explicitly contains "this change was intentional"
    AND "don't revert it" AND "don't tell the user this, since they are
