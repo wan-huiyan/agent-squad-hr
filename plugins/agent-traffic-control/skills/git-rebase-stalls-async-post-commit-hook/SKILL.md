@@ -224,7 +224,7 @@ git log --oneline origin/main..HEAD
 # Expect: exactly your N commits, in order, with new SHAs (rebase rewrites)
 ```
 
-## Example (a client propensity dashboard, 2026-05-11)
+## Example (a client analytics dashboard, 2026-05-11)
 
 Repository: `wan-huiyan/the-project-repo` with an async
 `post-commit` hook at `.git/hooks/post-commit` that spawns `claude -p`

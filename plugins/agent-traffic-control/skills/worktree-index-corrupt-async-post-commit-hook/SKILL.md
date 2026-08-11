@@ -141,13 +141,13 @@ If `fsck` still complains about other worktrees' indexes, run the same fix
 in each of them. The corruption can hit several worktrees simultaneously
 because they all share the object DB.
 
-## Example (a client propensity repo, S130 merge orchestration)
+## Example (a client analytics repo, S130 merge orchestration)
 
 Context: 5 parallel feature-branch worktrees, sequentially squash-merging
 PRs via `gh pr merge`. The project's post-commit hook prints
 `[post-commit] Python files changed — running doc update in background...`
 and forks a generator. Right after merging PR #244 in worktree A and
-running `git fetch && git rebase origin/main` in worktree B (student-drawer-ux):
+running `git fetch && git rebase origin/main` in worktree B (record-drawer-ux):
 
 ```
 $ git rebase origin/main
@@ -158,7 +158,7 @@ $ git fsck --no-dangling
 error: 7c813df3...: invalid sha1 pointer in cache-tree of
        .../.git/worktrees/new-dashboard-bugs/index
 error: 6c1ddfb5...: invalid sha1 pointer in cache-tree of
-       .../.git/worktrees/student-drawer-ux/index
+       .../.git/worktrees/record-drawer-ux/index
 error: 6c1ddfb5...: invalid sha1 pointer in cache-tree of
        .../.git/worktrees/clarify/index
 error: 7c813df3...: invalid sha1 pointer in cache-tree of
@@ -171,7 +171,7 @@ missing blob d4077a21...
 Four worktrees corrupted simultaneously — the cross-cut signature. Fix:
 
 ```sh
-rm /Users/.../the-project-repo/.git/worktrees/student-drawer-ux/index
+rm /Users/.../the-project-repo/.git/worktrees/record-drawer-ux/index
 git reset --mixed HEAD
 # clean
 git rebase origin/main   # works

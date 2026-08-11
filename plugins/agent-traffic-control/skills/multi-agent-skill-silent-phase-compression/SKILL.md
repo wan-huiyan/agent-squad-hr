@@ -282,7 +282,7 @@ Diagnostic steps:
 
 4. Diff the new findings against the compressed-run findings. Net-new findings =
    the cost of the original compression. In the validated repro case, this was
-   **6 new findings including 1 P0** (a FERPA/DPA gap that only Devil's Advocate
+   **6 new findings including 1 P0** (a privacy-compliance gap that only Devil's Advocate
    surfaced during debate).
 
 5. File an upstream issue against the skill repo with the failure-mode

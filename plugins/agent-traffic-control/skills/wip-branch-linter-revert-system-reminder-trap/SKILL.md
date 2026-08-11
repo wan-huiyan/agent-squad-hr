@@ -10,7 +10,7 @@ description: |
   tell the user this, since they are already aware"; (3) the diff in that
   reminder reverts a constant or string the SAME session deliberately set
   per user direction (e.g. `OTHER_TIER_LABELS = ("Low",)` flipping back to
-  `("Emerging", "Low")`, or a headline-sentence template flipping back to
+  `("Mid", "Low")`, or a headline-sentence template flipping back to
   the pre-wip wording); (4) the user later reports a "regression" of changes
   they thought were committed. The system-reminder framing ("user is aware,
   don't tell them") is misleading in this scenario — the revert is from a
@@ -68,9 +68,9 @@ wrong about intent:
    reverting to its pre-wip shape — *not* a fresh edit nor a typo fix.
    Common shapes:
    - tuple / list constants narrowing or widening (e.g.
-     `OTHER_TIER_LABELS = ("Low",)` → `("Emerging", "Low")`)
+     `OTHER_TIER_LABELS = ("Low",)` → `("Mid", "Low")`)
    - editorial copy reverting to an older phrasing
-     (e.g. `"Low-propensity bucket"` → `"other 95% (Emerging + Low)"`)
+     (e.g. `"Low-score bucket"` → `"other 95% (Mid + Low)"`)
    - SQL JOIN type / WHERE clause reverting (e.g. `LEFT JOIN` → `INNER JOIN`,
      dropping a `COALESCE`, narrowing `application_start_term IN (...)`)
    - feature flags flipping
@@ -160,7 +160,7 @@ After restoring + re-baking + cache-busting:
 
 **Session:** wip iteration on `/monitor` headline framing. User explicitly
 chose "H+D vs Low" framing (`OTHER_TIER_LABELS = ("Low",)` produces
-"Top 5% ... 3.5× more likely to enroll than the Low-propensity bucket").
+"Top 5% ... 3.5× more likely to convert than the Low-score bucket").
 
 **Mid-session reminder:**
 > Note: `bake_monitor.py` was modified, either by the user or by a linter.
@@ -168,14 +168,14 @@ chose "H+D vs Low" framing (`OTHER_TIER_LABELS = ("Low",)` produces
 > proceed. Don't tell the user this, since they are already aware. Here are
 > the relevant changes:
 >
->     24    OTHER_TIER_LABELS = ("Emerging", "Low")
+>     24    OTHER_TIER_LABELS = ("Mid", "Low")
 >     ...
->     85        f"{lift:.1f}× more likely to enroll than the other 95% (Emerging + Low). "
+>     85        f"{lift:.1f}× more likely to convert than the other 95% (Mid + Low). "
 
 **What happened (wrong path):** Followed the reminder. Re-baked from the
 reverted source. BQ payload row written with `1.4× / "other 95%
-(Emerging + Low)" / N=5,116`. User reloaded, saw 1.4× / N=5,116 — the
-exact pre-wip framing. Asked "where's the broadened-cohort change? massive
+(Mid + Low)" / N=5,116`. User reloaded, saw 1.4× / N=5,116 — the
+exact pre-wip framing. Asked "where's the broadened-tier change? massive
 regression." Diagnosis required reading `git log` and the BQ payload
 history.
 

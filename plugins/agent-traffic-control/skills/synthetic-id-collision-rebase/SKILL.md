@@ -148,8 +148,8 @@ gh pr merge <N> --squash --delete-branch
 This session, 2026-04-27:
 
 - Opened PR #118 with `cat7-7bg` for "S108 docs+tests carry-over" at 15:11 UTC
-- Parallel session opened a different PR with `cat7-7bg` for "S108 Run 2 + FERPA fix" — merged first at 14:29 UTC
-- Subsequent PRs took `cat7-7bh` (Streamlit decommission), `cat7-7bi` (deposit-optional), `cat7-7bj` (S108 handoff) on main
+- Parallel session opened a different PR with `cat7-7bg` for "S108 Run 2 + compliance fix" — merged first at 14:29 UTC
+- Subsequent PRs took `cat7-7bh` (Streamlit decommission), `cat7-7bi` (feature-flag cleanup), `cat7-7bj` (S108 handoff) on main
 - Rebased PR #118 → conflict on `Item("cat7-7bg", ...)` block + 3 site files
 - Reset to origin/main, cherry-picked substantive commit (4 docs/test files), added new commit with `cat7-7bk` + regenerated `docs/site/{index,roadmap}.html`
 - Force-pushed → CLEAN → merged

@@ -129,13 +129,13 @@ read-and-reason cost. The recovery is different and nearly free:
    on X, Y, Z from your interrupted notes") so nothing silently drops between the partial
    and the final.
 
-Verified 2026-07-23 (DoodleRun rung-8 design gate): one resume turn recovered the complete
+Verified 2026-07-23 (the routing app rung-8 design gate): one resume turn recovered the complete
 structured review — including items only hinted at in the partial — at a fraction of the
 original agent's cost, with zero re-reading. Distinct from `resumeFromRunId` (workflow-level,
 re-runs downstream — still never that); this is the agent-transcript resume, which is safe.
 
 **Sub-variant — killed by a SESSION/CREDIT LIMIT, resumed after the reset (verified
-2026-07-23, DoodleRun rung-9 fable critique):** the same transcript-resume works when the
+2026-07-23, the routing app rung-9 fable critique):** the same transcript-resume works when the
 kill cause is "You've hit your session limit" (agent terminated on a terminal API error),
 even HOURS later after the limit resets, and even when the agent had NOT yet produced its
 deliverable — it had only finished its reading (33 tool uses) and died right before its

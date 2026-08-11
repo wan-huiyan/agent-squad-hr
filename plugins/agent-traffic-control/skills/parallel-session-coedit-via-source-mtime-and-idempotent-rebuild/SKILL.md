@@ -103,7 +103,7 @@ changes the collision math entirely.
   build", which is the wrong question for coverage: the build can be **stale**
   vs the sources, AND a tag-stripped scan **over-matches** when the term appears
   in an *unrelated* card (checking if the ruled-out section covered "Distance from
-  campus" false-*positived* on card 09's "by distance" FA figure). So the build
+  HQ" false-*positived* on card 09's "by distance" revenue figure). So the build
   grep fails **both** ways — false-negative raw (tags/wraps), false-positive
   tag-stripped (cross-section collision). Before a handoff/plan declares a card
   missing → "go build it", confirm against `sections/*.html`. See

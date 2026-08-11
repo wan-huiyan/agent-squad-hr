@@ -27,7 +27,7 @@ The failure mode is costly because:
 2. **Predecessor scope docs carry authority.** A scope doc that went through multiple
    review rounds, PR approvals, and handoff sessions LOOKS authoritative. No one re-checks
    the dataset paths because "surely someone already did."
-3. **Plausible-wrong > obviously-wrong.** `enrolled_2025` looks like exactly the kind
+3. **Plausible-wrong > obviously-wrong.** `target_2025` looks like exactly the kind
    of column name a training-features table would have. `analytics.predictions_daily.predictions_daily`
    looks like a sensible namespaced path. Both are wrong. Obviously-wrong paths (typos) fail
    loudly; plausible-wrong paths fail slowly inside agents.
@@ -100,7 +100,7 @@ ORDER BY ordinal_position
 ```
 
 Redirect to a file and grep for the exact names the scope doc uses. If the scope says
-"column `enrolled_2025`" — grep for it. If not found, widen: `grep -i enroll` and
+"column `target_2025`" — grep for it. If not found, widen: `grep -i target` and
 see what the actual naming is.
 
 ### Step 4: Verify prefix / pattern assumptions with a distinct-count
@@ -217,10 +217,10 @@ plausible count.
 
 ## Example
 
-**Scenario:** a propensity-modeling project. A predecessor session authored a v6 scope doc
+**Scenario:** a predictive-scoring project. A predecessor session authored a v6 scope doc
 claiming:
 - Historical scored panels at `analytics.predictions_daily.predictions_daily`
-- Label column `enrolled_2025`
+- Label column `target_2025`
 - Engagement columns follow an `evt_*` prefix pattern
 
 **Probe:**
@@ -234,11 +234,11 @@ bq ls --max_results=30 analytics:ml_predictions
 # → includes `predictions_daily` (partitioned by scoring_date)
 # → Correct path is ml_predictions.predictions_daily
 
-bq query --use_legacy_sql=false "SELECT column_name FROM \`analytics.ml_features.INFORMATION_SCHEMA.COLUMNS\` WHERE table_name='v10_training_features' AND column_name LIKE '%enroll%'"
-# → Returns enrolled_segment_a, enrolled_segment_b, enrolled_segment_c
-# → NOT enrolled_2025 (doesn't exist)
+bq query --use_legacy_sql=false "SELECT column_name FROM \`analytics.ml_features.INFORMATION_SCHEMA.COLUMNS\` WHERE table_name='v10_feature_matrix' AND column_name LIKE '%target%'"
+# → Returns target_segment_a, target_segment_b, target_segment_c
+# → NOT target_2025 (doesn't exist)
 
-bq query --use_legacy_sql=false "SELECT COUNT(*) FROM \`analytics.ml_features.INFORMATION_SCHEMA.COLUMNS\` WHERE table_name='v10_training_features' AND column_name LIKE 'evt_%'"
+bq query --use_legacy_sql=false "SELECT COUNT(*) FROM \`analytics.ml_features.INFORMATION_SCHEMA.COLUMNS\` WHERE table_name='v10_feature_matrix' AND column_name LIKE 'evt_%'"
 # → 0 rows
 # → evt_* prefix assumption wrong; actual pattern is {event_type}_{window}d
 ```

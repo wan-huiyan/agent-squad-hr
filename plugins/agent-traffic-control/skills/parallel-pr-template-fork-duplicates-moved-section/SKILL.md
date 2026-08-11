@@ -63,8 +63,8 @@ ALL of these are typically true:
    the *pre-mover* version of X.
 4. Neither PR's branch was rebased onto the other after both were opened.
 5. User-visible symptom: rendered HTML on two different routes contains the
-   same heading / chart / SVG / id (e.g., `<h2>Cohort Fingerprint</h2>` or
-   `id="cohort-radar-chart"` appears on `/route-y` AND `/route-z`).
+   same heading / chart / SVG / id (e.g., `<h2>Feature Snapshot</h2>` or
+   `id="feature-radar-chart"` appears on `/route-y` AND `/route-z`).
 6. Tests still pass because each route's tests were authored to assert on
    their own template; cross-route uniqueness wasn't part of the contract.
 
@@ -72,7 +72,7 @@ ALL of these are typically true:
 
 ```sh
 # 1. Identify the moved section's stable identifier (id / class / heading text).
-SECTION_ID="cohort-radar-chart"   # or "<h2>Cohort Fingerprint</h2>" etc.
+SECTION_ID="feature-radar-chart"   # or "<h2>Feature Snapshot</h2>" etc.
 
 # 2. Grep ALL templates for that identifier on main HEAD.
 grep -rln "$SECTION_ID" path/to/templates/
@@ -120,19 +120,19 @@ template — because the mover's destination is the canonical home of the
 section per the new IA.
 
 ```diff
-- <h2>Cohort Fingerprint</h2>
-- <p>Compare up to six funnel-stage cohorts...</p>
-- <div id="cohort-radar-chart" class="radar-chart"></div>
+- <h2>Feature Snapshot</h2>
+- <p>Compare up to six pipeline-stage segments...</p>
+- <div id="feature-radar-chart" class="radar-chart"></div>
 + {# Section moved to <Y.html> by PR #A (#mover-issue). The earlier PR #B
 +    (#forker-issue) inherited an older snapshot before the move — drop
 +    the orphan section here so it lives only on the canonical route. #}
 ```
 
 If any tests assert on the duplicate render (e.g., a test for `/route-z`
-that calls `assert "Cohort Fingerprint" in html`), update them too.
+that calls `assert "Feature Snapshot" in html`), update them too.
 
 If a downstream JS bootstrap (e.g., `radar.js` self-bootstraps on
-`document.getElementById('cohort-radar-chart')`) was relying on the duplicate
+`document.getElementById('feature-radar-chart')`) was relying on the duplicate
 for some reason, check that the JS still finds its target on the canonical
 route only.
 
@@ -164,8 +164,8 @@ Three layers, in order of cheapness:
    import pytest
    PRIMARY_ROUTES = ["/", "/actions", "/drivers", "/monitor", "/library/explorer", ...]
    UNIQUE_SECTIONS = {
-       "Cohort Fingerprint": "/library/explorer",
-       "Pipeline by Propensity": "/",
+       "Feature Snapshot": "/library/explorer",
+       "Pipeline by Score": "/",
        # ...
    }
 
@@ -188,7 +188,7 @@ Three layers, in order of cheapness:
    patterns. If any apply to the source template you're forking, port the
    move forward in your PR.
 
-## Worked example (a client propensity dashboard, 2026-05-07)
+## Worked example (a client analytics dashboard, 2026-05-07)
 
 Architecture:
 - `the-dashboard-service` Cloud Run service serves multiple dashboard routes.
@@ -197,8 +197,8 @@ Architecture:
 
 Two of those PRs collided semantically:
 
-- **PR #296 (mover, merged 2026-05-06 21:01 UTC)**: "Move Cohort Fingerprint
-  radar /library/methods → /library/explorer." Removed `<h2>Cohort Fingerprint</h2>`
+- **PR #296 (mover, merged 2026-05-06 21:01 UTC)**: "Move Feature Snapshot
+  radar /library/methods → /library/explorer." Removed `<h2>Feature Snapshot</h2>`
   + radar `<div>` from `library_methods.html`; added them to `library_explorer.html`.
 - **PR #303 (forker, merged 2026-05-06 23:48 UTC)**: "Promote Methods page to
   top-level Drivers tab." Created new `drivers.html` as a near-copy of the
@@ -214,13 +214,13 @@ No textual collision with `library_explorer.html` (which #296 had modified).
 Result: `/library/explorer` shows the radar (PR #296 ✓), and `/drivers` ALSO
 shows the radar (PR #303's literal copy of pre-#296 `library_methods.html`).
 
-User-visible: "this looks nothing like the mockup; I see Cohort Fingerprint
+User-visible: "this looks nothing like the mockup; I see Feature Snapshot
 twice." Tests stayed green because each route had its own test file and
 neither asserted cross-route uniqueness.
 
 Diagnostic:
 ```sh
-grep -rln 'cohort-radar-chart' <analytics_pkg>/cloudrun/<dashboard_app>/templates/
+grep -rln 'feature-radar-chart' <analytics_pkg>/cloudrun/<dashboard_app>/templates/
 # → drivers.html       (incident)
 # → library_explorer.html
 ```
@@ -232,7 +232,7 @@ from app import app
 with app.test_client() as c:
     for r in ['/drivers', '/library/explorer']:
         h = c.get(r).data.decode()
-        print(r, 'count:', h.count('cohort-radar-chart'))
+        print(r, 'count:', h.count('feature-radar-chart'))
 "
 # /drivers count: 1
 # /library/explorer count: 1
@@ -240,7 +240,7 @@ with app.test_client() as c:
 
 Fix: deleted the radar `<div>` block from `drivers.html` (lines 90-103),
 replaced with a `{# moved to /library/explorer per IA brief / PR #296 #}`
-comment. Drive-by: updated `test_library_methods_does_not_call_get_cohort_fingerprint`
+comment. Drive-by: updated `test_library_methods_does_not_call_get_feature_snapshot`
 to expect the post-#303 redirect-shape (302 → /drivers) instead of the stale
 200 it had.
 

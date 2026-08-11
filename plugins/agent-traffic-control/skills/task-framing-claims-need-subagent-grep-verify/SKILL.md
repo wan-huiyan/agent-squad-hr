@@ -96,8 +96,8 @@ Without the explicit grant, even capable sub-agents default to deference.
 Don't make the sub-agent hunt for which file to verify against. Name the
 canonical source(s):
 
-> "Verify against: `<analytics_pkg>/dataform/v10_training_features_<analytics_pkg>.sqlx`
-> + `_feature_common/application_stage.py` + `cr_term_enr_propensity_serve_v6/`.
+> "Verify against: `<analytics_pkg>/dataform/<training_features_model>.sqlx`
+> + `<feature_pkg>/pipeline_stage.py` + `cr_scoring_serve_v6/`.
 > Use grep / Read; do not rely on documentation alone."
 
 ### 3. Require a visible tag for corrections
@@ -136,9 +136,9 @@ Bad sub-agent prompt (no correction permission):
 
 ```
 Write docs/analysis/foo.md covering 8 v7 retrain implications:
-1. aid-eligibility / has_aid_doc — NOT in v6.1, candidate add
+1. doc-eligibility / has_required_doc — NOT in v6.1, candidate add
 2. segment_type — NOT in v6.1 feature set, candidate add
-3. residency_status — needs derivation, candidate add
+3. region_status — needs derivation, candidate add
 ... etc
 ```
 
@@ -149,14 +149,14 @@ Write docs/analysis/foo.md covering 8 v7 retrain implications.
 
 The 8 findings below come from a fact-check panel against the canonical
 sheet. I have NOT grep-confirmed every claim about what v6.1 currently
-contains. Verify each against `<analytics_pkg>/dataform/v10_training_
-features_<analytics_pkg>.sqlx` + `_feature_common/application_stage.py` +
-`cr_term_enr_propensity_serve_v6/`. For each finding, tag it [VERIFIED]
+contains. Verify each against `<analytics_pkg>/dataform/<training_features_
+model>.sqlx` + `<feature_pkg>/pipeline_stage.py` +
+`cr_scoring_serve_v6/`. For each finding, tag it [VERIFIED]
 or [Contradicts task framing] or [NEEDS-VERIFICATION] with file:line
 evidence. If you find me wrong, proceed with the corrected version and
 explain the discrepancy in 1-2 sentences.
 
-1. aid-eligibility / has_aid_doc — NOT in v6.1, candidate add
+1. doc-eligibility / has_required_doc — NOT in v6.1, candidate add
 2. segment_type — NOT in v6.1 feature set, candidate add
 ... etc
 ```
@@ -164,12 +164,12 @@ explain the discrepancy in 1-2 sentences.
 S217 outcome: sub-agent grep-verified all 8 findings. Two came back
 `[Contradicts task framing]`:
 
-> Finding 2 (segment_type): "NOT in v6.1" was wrong — `app_student_type`
+> Finding 2 (segment_type): "NOT in v6.1" was wrong — `app_record_type`
 > IS already a feature in v6.1 at lines 226/769/1039. The v7 implication
 > is vocabulary pinning post-2026-04-17 model promotion, NOT adding.
 
-> Finding 5 (residency_status): "needs derivation" implied absence — it
-> IS already pulled at line 585 into `enrollment_salesforce_features`
+> Finding 5 (region_status): "needs derivation" implied absence — it
+> IS already pulled at line 585 into `crm_derived_features`
 > and surfaced at line 1267. The v7 question is grain semantics + lead-
 > stage proxy quality, not whether to add.
 
@@ -216,7 +216,7 @@ true in the codebase? If no — add the verify-and-tag block.
 - S217 worked example: PR #963 (`the-project-repo`),
   `docs/analysis/2026-05-27-s216-findings-for-v7.md` — sub-agent
   caught 2 of 8 task-framing errors via grep-verify against
-  `v10_training_features_<analytics_pkg>.sqlx`.
+  `<training_features_model>.sqlx`.
 - Companion skill: `factcheck-subagent-needs-complete-sources` (covers
   feeding fact-check agents complete sources — different direction)
 - Project lesson: `~/.claude/projects/.../memory/lessons.md` #129 (the

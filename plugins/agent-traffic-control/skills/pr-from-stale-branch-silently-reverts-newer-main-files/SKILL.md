@@ -217,13 +217,13 @@ line you took it from next to the check:
 
 ```sh
 git show <squash-sha> -- path/to/file.py | grep '^+' | grep -i finalist
-# → +    finalist_km = ...           ← THIS line is the needle
+# → +    shortlist_km = ...           ← THIS line is the needle
 ```
 
-The audit of PR #853 (DoodleRun, 2026-08-07, tracked under #863) grepped for
+The audit of PR #853 (the routing app, 2026-08-07, tracked under #863) grepped for
 `route_km_finalist` — a
 symbol name recalled from the session that had written it. The real symbol was
-**`finalist_km`**. The grep found nothing, and for a minute the session believed
+**`shortlist_km`**. The grep found nothing, and for a minute the session believed
 an entire merged PR had been deleted.
 
 **The failure is two-sided, and only one side is intuitive:**
@@ -287,7 +287,7 @@ The lesson that survives: a two-dot stat full of red on files you never touched
 is the *expected* output of the wrong command. Re-run it with three dots before
 you rebase, block, or escalate anything.
 
-## Example 2 — REAL, and it cost four sessions (DoodleRun, 2026-08-07)
+## Example 2 — REAL, and it cost four sessions (the routing app, 2026-08-07)
 
 PR #853 (`claude/floor500-rulings`, squash `6c79ff26`) shipped three ticked
 owner rulings **and deleted 11 files plus 15 hand-maintained ledger entries**

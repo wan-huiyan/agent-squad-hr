@@ -6,7 +6,7 @@ description: |
   (1) you're doing historical replay (incident replay, mutation testing,
   git bisect with tests) and the suite errors out in 1-2 seconds with no
   test execution, (2) the test command works fine at HEAD but fails at
-  pre-fix SHAs, (3) `pytest scripts/overnight/tests/ goal/tests/ --tb=no
+  pre-fix SHAs, (3) `pytest scripts/overnight/tests/ <analytics_pkg>/tests/ --tb=no
   -q` returns "ERROR: file or directory not found: scripts/overnight/tests/"
   at an old SHA, (4) you're building tooling that runs the project's
   canonical test command across multiple historical SHAs.
@@ -50,7 +50,7 @@ look like pytest failures from the outside.
 - The project's test layout grew over time (test dirs added, removed,
   reorganized in subsequent commits)
 - The test command embeds explicit directory paths:
-  `pytest scripts/overnight/tests/ goal/tests/ ...`
+  `pytest scripts/overnight/tests/ <analytics_pkg>/tests/ ...`
 - Pytest exits 4 (`USAGE_ERROR`) in <5 seconds with no test execution
 - The SAME test command works at HEAD but fails at pre-fix SHAs older than
   the test layout's current shape

@@ -305,14 +305,14 @@ mkdir -p /tmp/new_build && tar -xzf /tmp/new_build.tgz -C /tmp/new_build
 grep -n "<fix-marker>" /tmp/new_build/<path/to/file>   # should now find it
 ```
 
-## Worked example (a client propensity dashboard, 2026-05-07)
+## Worked example (a client analytics dashboard, 2026-05-07)
 
 User: "I just deployed a new version of cloud run but a lot of the
-fixes got regressed. e.g, Cohort Fingerprint are still in driver but we
+fixes got regressed. e.g, Feature Snapshot are still in driver but we
 moved it to explore."
 
 PR #317 (commit `c382b28f`) had merged 8 hours earlier removing the
-duplicate Cohort Fingerprint section from `/drivers`. After the user's
+duplicate Feature Snapshot section from `/drivers`. After the user's
 deploy, it was back.
 
 **Diagnostic:**
@@ -332,8 +332,8 @@ your-project_cloudbuild  source/1778148635.480733-c08dc0a63ec245b98158888fdb0fd3
 
 $ gcloud storage cp gs://your-project_cloudbuild/source/1778148635...tgz /tmp/build.tgz
 $ tar -xzf /tmp/build.tgz -C /tmp/build
-$ grep -n "Cohort Fingerprint" /tmp/build/templates/drivers.html
-92:    Cohort Fingerprint           # ← THE SECTION HEADER, not a comment
+$ grep -n "Feature Snapshot" /tmp/build/templates/drivers.html
+92:    Feature Snapshot           # ← THE SECTION HEADER, not a comment
 ```
 
 The deployed `drivers.html` line 92 was the section header, NOT the

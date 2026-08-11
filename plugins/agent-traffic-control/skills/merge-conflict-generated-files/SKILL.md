@@ -189,7 +189,7 @@ In a stack of PRs where each one adds tests and each one edits the same counted 
 - *Their side* is main plus everybody else's tests.
 - *The merged tree* is the base plus yours plus theirs — a third number nobody has measured.
 
-Measured across three PRs in one stack (DoodleRun, 2026-08-07):
+Measured across three PRs in one stack (the routing app, 2026-08-07):
 
 | PR | The rebase resolved the line to | What the merged tree actually collects |
 |---|---|---|

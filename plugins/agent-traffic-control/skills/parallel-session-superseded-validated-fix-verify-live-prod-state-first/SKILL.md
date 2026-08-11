@@ -64,11 +64,11 @@ handoff was accurate when written but the world moved.
 - Confirm your work never reached prod (isolated dev-workspace compile / local branch only) so "stand
   down" is genuinely a no-op on prod, not a rollback.
 
-## Example (the client term-enrollment, #1212, 2026-06-22)
-Prompt: "ship the REAL #1212 citizenship-flicker fix (carry-forward, scoped in #1270)." Built it fully:
+## Example (a client data-pipeline fix, #1212, 2026-06-22)
+Prompt: "ship the REAL #1212 status-flicker fix (carry-forward, scoped in #1270)." Built it fully:
 serving-only carry-forward, panel-reviewed (5-lens plan + 3-lens diff, all-opus), validated 131/131
 correct, Dataform workspace compile 0 errors. **A parallel session had shipped a DIFFERENT fix ~30 min
-in** — the full identity key-set reconstruction (#1271, `alien_status_resolved` + `IN UNNEST`) — merged
+in** — the full identity key-set reconstruction (#1271, `status_code_resolved` + `IN UNNEST`) — merged
 + live on Dataform main (`346da39f`), verified. Carry-forward was redundant. The **early signal missed**:
 sibling #1242 was already CLOSED at task start (I noted it but didn't chase the closing PR). Recovery:
 verified live main had the other fix (grep compiled target: 0 carry-forward markers), confirmed my work
@@ -83,7 +83,7 @@ implementation"*, *"you're about to deploy"*. A session whose only output is a j
 *do not deploy*, *safe to ship*, *the regression is still live* — matches none of them, so
 the skill never fires, while being exposed to exactly the same clock.
 
-**DoodleRun, 2026-08-07.** Three agents spent about **80 minutes** on a production-deploy
+**the routing app, 2026-08-07.** Three agents spent about **80 minutes** on a production-deploy
 assessment and concluded **do NOT deploy**: main shrank every dog route and capped a 20 km
 wish at 12.16 km. A commit pinning the route sizes landed **mid-run**. The verdict was
 false before it finished being written — and nothing in the analysis was wrong. Only its

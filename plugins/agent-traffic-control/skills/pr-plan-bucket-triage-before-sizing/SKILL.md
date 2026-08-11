@@ -271,10 +271,10 @@ emerged from the same evidence-first pattern.
 
 ## References
 
-- The motivating session: `docs/plans/2026-05-15-sbx-uk-robustness-and-report-design.md`
-  (design), `docs/plans/2026-05-15-sbx-uk-webapp-triage-plan.md` (triage
-  plan), `docs/triage/2026-05-15-sbx-uk-webapp-state.md` (findings) in
-  the `<org>/the-causal-impact-repo` repo, branch `triage/sbx-uk-webapp-state`.
+- The motivating session: `docs/plans/2026-05-15-<client-codename>-robustness-and-report-design.md`
+  (design), `docs/plans/2026-05-15-<client-codename>-webapp-triage-plan.md` (triage
+  plan), `docs/triage/2026-05-15-<client-codename>-webapp-state.md` (findings) in
+  the `<org>/the-causal-impact-repo` repo, branch `triage/<client-codename>-webapp-state`.
 
 ## Reference-only siblings in this toolkit
 

@@ -28,7 +28,7 @@ disable-model-invocation: true
 
 You shipped a fix PR that addresses 4 filed issues. PR title:
 
-> `fix(dashboard): wire /actions cohort tiles + plug 4 audit P0s (closes #447, #448, #449, #450)`
+> `fix(dashboard): wire /actions segment tiles + plug 4 audit P0s (closes #447, #448, #449, #450)`
 
 PR body opens with:
 

@@ -110,7 +110,7 @@ After the first reports come back:
   orchestrator's own checkout.
 - The reported branch names match the assignment, one agent each.
 
-## Example (real — DoodleRun, 2026-08-07)
+## Example (real — the routing app, 2026-08-07)
 
 Four parallel implementation agents were launched with *"You are in your OWN isolated git
 worktree"* in their prompts and the `isolation` parameter unset. All four shared one checkout.

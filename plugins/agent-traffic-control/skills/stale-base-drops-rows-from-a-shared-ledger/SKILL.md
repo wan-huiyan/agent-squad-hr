@@ -205,7 +205,7 @@ python3 scripts/stale_base_audit.py origin/main HEAD    # must exit 1 and name r
 An audit that has only ever printed "clean" is indistinguishable from one that
 does not run.
 
-## Example — DoodleRun PR #848, 2026-08-07
+## Example — the routing app PR #848, 2026-08-07
 
 The repo had just had a stale-base incident: **PR #853 reverted 59 files and
 5,081 deletions** of already-merged work belonging to at least four sessions,
@@ -243,7 +243,7 @@ against the wrong reference.
 - **Why the id-only check is not enough**, restated because it is the part that
   gets skipped: a session's rows can all be present and the ledger still be
   damaged, because another session's *edit* to an existing row was reverted. The
-  DoodleRun incident's own restore PRs had to file a separate follow-up (#872,
+  the routing app incident's own restore PRs had to file a separate follow-up (#872,
   "Three in-place edits #853 rolled back on entries that still exist — the
   failure an id check cannot see") after the id-based sweep reported clean.
 - **This generalises past trackers** to any hand-edited shared file with
