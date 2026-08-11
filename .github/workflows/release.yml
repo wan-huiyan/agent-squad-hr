@@ -15,9 +15,9 @@ name: Release on version bump
 #
 # `1.13.0` never existed in VERSION on main, so no later push could cut it either.
 # The drift guard DID catch the mismatch — validate_plugins.py went red on
-# 43f4d62 (run 2026-08-07T10:56:43Z, conclusion: failure) — and the fix bumped
-# to 1.14.0, satisfying the guard while leaving the missing release permanently
-# unreachable. A guard tells you a state is wrong; it does not tell you what
+# 43f4d62, check-run completed_at 2026-08-07T10:56:58Z, conclusion failure — and
+# the fix bumped to 1.14.0, satisfying the guard while leaving the missing release
+# permanently unreachable. A guard tells you a state is wrong; it does not tell you what
 # that wrong state already cost.
 #
 # The path filter was also the WORST failure mode available here, because the one
