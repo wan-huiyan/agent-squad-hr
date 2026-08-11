@@ -16,9 +16,9 @@ WHY THIS EXISTS
     `1.13.0` never existed in VERSION on main, so no later push could cut it.
 
     The drift guard caught the mismatch at the time — validate_plugins.py went
-    red on 43f4d62 (conclusion: failure, 2026-08-07T10:56:43Z) — and the remedy
-    bumped to 1.14.0. That satisfied the guard and left the missing release
-    permanently unreachable.
+    red on 43f4d62, check-run completed_at 2026-08-07T10:56:58Z, conclusion
+    failure — and the remedy bumped to 1.14.0. That satisfied the guard and left
+    the missing release permanently unreachable.
 
     **A guard tells you a state is wrong. It does not tell you what that wrong
     state already cost.** Fixing forward can satisfy the guard while leaving the

@@ -35,8 +35,8 @@
 # leaving VERSION at 1.12.0, so the `paths: ['VERSION']` filter meant the release
 # job never ran. 6a49203 then moved VERSION 1.12.0 -> 1.14.0, stepping OVER the
 # value. validate_plugins.py DID catch the manifest/VERSION drift (CI failure on
-# 43f4d62, 2026-08-07T10:56:43Z) and the fix satisfied the guard without cutting
-# the release.
+# 43f4d62, check-run completed_at 2026-08-07T10:56:58Z) and the fix satisfied the
+# guard without cutting the release.
 #
 # UNFILLABLE BY THE AUTOMATION: VERSION never held 1.13.0 on main, so no push can
 # ever trigger a release for it. If you want it to exist, create it by hand
