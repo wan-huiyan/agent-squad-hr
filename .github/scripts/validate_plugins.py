@@ -17,7 +17,7 @@ Checks (stdlib only, no external deps):
      numbers, and hyphens only.", which the Skills API restates. Claude Code's own skill
      docs do NOT state a cap, so this is a PORTABILITY gate, not a local style rule -- an
      over-long name loads here and fails a spec validator elsewhere. Five skills shipped
-     at 65-72 characters and every gate in this repo stayed green.
+     at 65-72 characters, four of them in v1.7.0, and nothing here noticed until v1.25.0.
   7. If a VERSION file exists: it is non-empty; and for a single-plugin repo it must
      equal that plugin's plugin.json version (drift guard).
   8. Every marketplace entry's `version` equals that plugin's plugin.json version.
@@ -174,7 +174,7 @@ def check_skill(skill_md):
     if n is not None:
         # An over-long name is invisible to every other gate here: the skill is still
         # on disk, still matches its directory, still has one README row, still routes.
-        # Nothing noticed for five of them across 24 releases.
+        # Nothing noticed for five of them between v1.7.0 and v1.24.0.
         if len(n) > NAME_MAX:
             err(f"{skill_md}: frontmatter name `{n}` exceeds {NAME_MAX} characters ({len(n)})")
         if not NAME_RE.fullmatch(n):
