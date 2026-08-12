@@ -17,8 +17,6 @@ applies to the skill listing.
    addresses — plus the **tracked** industry-vocabulary denylist in `.leakdomains`. A hit
    fails the check, and so does a missing `.leakdomains`. See *The two term files* below.
 4. `scripts/check_skill_routes.py` — the **route gate**: can the model get to a skill at all?
-   It also asserts the README's front-page skill count matches the tree, and that no SKILL.md
-   cites a skill name that resolves to nothing.
 5. `scripts/check_skill_tiers.py` — the **tier gate**: does the listing still fit, by policy?
 6. `scripts/check_release_parity.py` — a version claimed in `VERSION` or the changelog with no
    GitHub Release. Accepted holes live in `.release-parity-accepted`.

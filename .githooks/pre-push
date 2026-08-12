@@ -33,8 +33,7 @@
 #     across lines.
 #  3. Blocks a push carrying a candidate client/PII identifier.
 #  4. Blocks a push that leaves a reference-only skill unreachable, a relative
-#     cross-link dead, a skill without exactly one README index row, a front-page
-#     skill count that disagrees with the tree, or a dangling skill citation.
+#     cross-link dead, or a skill without exactly one README index row.
 #  5. Blocks a push that breaks the listing-budget tier policy.
 #  6. Reports a claimed version with no GitHub Release. This one DEGRADES rather
 #     than failing when `gh` is absent, unauthenticated or offline -- that is its
