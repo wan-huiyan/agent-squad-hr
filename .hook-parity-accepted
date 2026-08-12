@@ -1,0 +1,28 @@
+# Hook/CI parity baseline — gates CI runs that `.githooks/pre-push` deliberately
+# does not, with the reason.
+#
+# Read by check_hook_parity() in .github/scripts/validate_plugins.py. One
+# `key  # reason` per line. Anything CI invokes that the hook does not, and that is
+# NOT listed here, is a hard CI failure.
+#
+# WHY A BASELINE AT ALL. Not every line in a CI `run:` block is a gate. CI has to
+# provision its own environment; a developer's machine already has one, or resolves
+# it differently. Without somewhere to record that, the only way to get the check
+# green is to mute it — and a muted gate is worse than no gate, because it looks
+# like coverage. (Same shape, and the same format, as `.release-parity-accepted`.)
+#
+# An ABSENT file means no omission is accepted. That is the strict reading, so
+# deleting this file makes the check harsher rather than quieter — unlike
+# `.leakdomains`, it needs no fail-closed guard of its own.
+#
+# Reasons here are what was VERIFIED, not what was plausible. An omission whose
+# cause is unknown should say so: a confident wrong note is worse than an admitted
+# gap, because the note is what the next person trusts instead of re-checking.
+
+# --- environment provisioning, not a gate ---
+# CI installs pytest into the runner before running the resume-gate suite. The hook
+# reaches the same end by other means: it resolves an interpreter that already has
+# pytest, or provisions a throwaway one with `uv run --with pytest`, and says loudly
+# when it can do neither. So the DEPENDENCY is satisfied on both sides; only the
+# mechanism differs, and there is nothing here for a path-keyed check to match.
+-m pip  # CI provisions pytest; the hook resolves or provisions an interpreter that has it

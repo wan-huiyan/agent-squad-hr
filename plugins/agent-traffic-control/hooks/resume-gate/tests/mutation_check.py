@@ -24,6 +24,20 @@ test, do not delete the mutation.
 Some fixture mutations are expected to be caught by make_fixtures.py's own
 assertions rather than by pytest; those report GENERATOR-REFUSED, which is a
 kill (the fixture could not be built wrong in the first place).
+
+THIS HARNESS SCORES A MUTANT "KILLED" ON A NON-ZERO PYTEST EXIT CODE, and until
+v1.27.0 it did not ask WHY the exit was non-zero. Anything that stops pytest
+running therefore read as a kill. Measured on a machine with no pytest module
+installed: `python3 tests/mutation_check.py` printed "41 mutations, 41 killed, 0
+needing attention" and exited 0, having executed no test at all. A perfect score
+from a harness that never ran — the same failure shape as a leak gate that prints
+"clean" because its denylist was empty.
+
+So `preflight()` now proves, before any mutant is scored, that pytest is
+importable AND that the UNMUTATED suite passes. A green run means the kills are
+real; a refusal names the reason. CI installs pytest explicitly and the pre-push
+hook resolves an interpreter that has it, so neither path reaches the refusal
+silently.
 """
 import pathlib
 import shutil
@@ -173,7 +187,42 @@ def _run_pytest(cwd):
         cwd=cwd, capture_output=True, text=True)
 
 
+def preflight():
+    """Refuse to score anything until a kill is known to MEAN something.
+
+    Two conditions, because they fail differently and a reader needs to know which:
+    pytest must be importable, and the unmutated suite must PASS. If the clean tree
+    already fails, every mutant's non-zero exit is inherited rather than caused, and
+    the score is noise that reads as a pass.
+    """
+    probe = subprocess.run([sys.executable, "-c", "import pytest"],
+                           capture_output=True, text=True)
+    if probe.returncode != 0:
+        print("REFUSING TO RUN: no pytest module for %s." % sys.executable)
+        print("  This harness scores a mutant KILLED on a non-zero pytest exit code, and")
+        print("  a missing pytest also exits non-zero — so it would report every mutation")
+        print("  killed while running nothing. Install pytest, or use:")
+        print("    uv run --python 3.11 --with pytest python tests/mutation_check.py")
+        return False
+    work = pathlib.Path(tempfile.mkdtemp(prefix="resume-gate-baseline-"))
+    try:
+        dst = work / "hook"
+        shutil.copytree(HOOK, dst, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+        base = _run_pytest(dst)
+        if base.returncode != 0:
+            print("REFUSING TO RUN: the UNMUTATED suite already fails, so a mutant's")
+            print("  non-zero exit would be inherited rather than caused and every")
+            print("  mutation would score KILLED for the wrong reason. Fix the suite first.")
+            print((base.stdout or "").strip()[-1500:])
+            return False
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
+    return True
+
+
 def main():
+    if not preflight():
+        return 2
     results = []
     for label, rel, old, new, regen in MUTATIONS:
         work = pathlib.Path(tempfile.mkdtemp(prefix="resume-gate-mut-"))

@@ -2,35 +2,89 @@
 # Committed publishing gates (pre-push). Enable once per clone:
 #   git config core.hooksPath .githooks
 #
-# These are the six checks CI runs, in CI's order, so a red CI is something you already
-# saw locally. That claim was FALSE until v1.19.1: the hook ran five of the six (it had
-# no `within_budget` assertion) and ran the leak gate last where CI runs it third. A hook
-# that runs fewer gates than CI is a hook that tells you a push is clean when it is not.
+# These are the checks CI runs, in CI's order, so a red CI is something you already
+# saw locally. A hook that runs fewer gates than CI is a hook that tells you a push
+# is clean when it is not.
 #
-# PARITY IS BY HAND. Nothing checks this list against `.github/workflows/ci.yml`; if you
-# add a CI step, add it here in the same position, and diff the two files when in doubt.
+# THAT CLAIM HAS NOW BEEN FALSE TWICE, and both times the sentence was the last
+# thing anyone checked:
+#   · v1.19.1 -- the hook ran five of six (no `within_budget` assertion) and ran the
+#     leak gate last where CI runs it third. Fixed the hook, not the sentence.
+#   · v1.27.0 -- three gates added between v1.22.0 and v1.23.0 (release parity, the
+#     resume-gate tests, the resume-gate mutation check) were never added here. It
+#     drifted for three releases and nothing noticed, because nothing was looking.
 #
-# 1. Marketplace / plugin / SKILL.md structure. CI's first step and it runs here too --
-#    it is what caught a version bump that truncated both manifests to zero bytes.
-# 2. Blocks a push whose SKILL.md description would be truncated mid-sentence by Claude
-#    Code's skill-listing cap, or whose folded scalar has a hyphen split across lines.
-# 3. Blocks a push carrying a candidate client/PII identifier.
-# 4. Blocks a push that leaves a reference-only skill unreachable, a relative cross-link
-#    dead, or a skill without exactly one README index row.
-# 5. Blocks a push that breaks the listing-budget tier policy.
-# 6. Blocks a push whose listing is over budget by the vendored gate's OWN json verdict.
-#    Step 2's text report and this disagree on purpose: the text exit code covers only
-#    model-invocable skills, --json covers every skill.
+# NO COUNT IS WRITTEN IN THIS FILE ON PURPOSE. A hand-maintained number is the same
+# defect as the README's "98 skills" against a tree of 99: it is correct on the day
+# it is typed and silently wrong afterwards. Read the list below, not a total.
+#
+# PARITY IS NOW CHECKED, by `check_hook_parity()` in .github/scripts/validate_plugins.py
+# -- which is step 1 here, so it runs before everything it guards. It compares the
+# gates invoked by .github/workflows/ci.yml against the gates invoked here and fails
+# on anything CI runs that this file does not, unless that gate is listed with a
+# reason in `.hook-parity-accepted`. If you add a CI step, add it here too; the gate
+# will tell you if you forget.
+#
+#  1. Marketplace / plugin / SKILL.md structure, and the CI-parity check above. CI's
+#     first step and it runs here too -- it is what caught a version bump that
+#     truncated both manifests to zero bytes.
+#  2. Blocks a push whose SKILL.md description would be truncated mid-sentence by
+#     Claude Code's skill-listing cap, or whose folded scalar has a hyphen split
+#     across lines.
+#  3. Blocks a push carrying a candidate client/PII identifier.
+#  4. Blocks a push that leaves a reference-only skill unreachable, a relative
+#     cross-link dead, or a skill without exactly one README index row.
+#  5. Blocks a push that breaks the listing-budget tier policy.
+#  6. Reports a claimed version with no GitHub Release. This one DEGRADES rather
+#     than failing when `gh` is absent, unauthenticated or offline -- that is its
+#     own pre-existing design (it says "NOTICE, not a failure" and exits 0), not a
+#     softening added here. It needs no prerequisite check for that reason.
+#  7. Blocks a push whose listing is over budget by the vendored gate's OWN json
+#     verdict. Step 2's text report and this disagree on purpose: the text exit code
+#     covers only model-invocable skills, --json covers every skill.
+#  8. The resume-gate hook's test suite.
+#  9. The mutation check: breaks each of that hook's guards in turn and fails if the
+#     suite does not notice.
+#
+# 8 AND 9 NEED pytest, AND 9 LIES WITHOUT IT. `mutation_check.py` scores a mutant
+# KILLED on a non-zero pytest exit code, and a missing pytest module also exits
+# non-zero -- so under an interpreter with no pytest it prints "41 mutations, 41
+# killed, 0 needing attention" and exits 0, having run nothing. Measured. So these
+# two run only under an interpreter that demonstrably HAS pytest, and say loudly
+# when they are skipped. A silent skip and a vacuous pass are the same lie; a loud
+# skip is not.
 set -e
 ROOT="$(git rev-parse --show-toplevel)"
+HOOKDIR="$ROOT/plugins/agent-traffic-control/hooks/resume-gate"
+
 python3 "$ROOT/.github/scripts/validate_plugins.py"
 python3 "$ROOT/scripts/check_skill_descriptions.py" "$ROOT" --no-color --triggers
 bash "$ROOT/scripts/leak_scan.sh" "$ROOT"
 python3 "$ROOT/scripts/check_skill_routes.py" "$ROOT"
 python3 "$ROOT/scripts/check_skill_tiers.py" "$ROOT" --context 200000 --bytes-per-token 4
+python3 "$ROOT/scripts/check_release_parity.py" "$ROOT"
 DESC_JSON="$(mktemp)"
 trap 'rm -f "$DESC_JSON"' EXIT
 python3 "$ROOT/scripts/check_skill_descriptions.py" "$ROOT" --json > "$DESC_JSON"
 # NOT `exec` -- exec replaces the shell and the EXIT trap above never fires, leaking the
 # temp file on every push.
 python3 -c "import json,sys; d=json.load(open(sys.argv[1])); sys.exit(0 if d['within_budget'] else print('listing %d over budget %d' % (d['listing_chars'], d['budget_chars'])) or 1)" "$DESC_JSON"
+
+# Resolve an interpreter that HAS pytest. `uv run --with pytest` provisions one in a
+# throwaway environment, which is what CI's `python3 -m pip install pytest` does by
+# other means -- so a machine with uv runs these two rather than skipping them.
+PYTEST_PY=""
+if python3 -c "import pytest" 2>/dev/null; then
+    PYTEST_PY="python3"
+elif command -v uv >/dev/null 2>&1; then
+    PYTEST_PY="uv run --python 3.11 --with pytest python"
+fi
+if [ -n "$PYTEST_PY" ]; then
+    $PYTEST_PY -m pytest "$HOOKDIR/tests" -q
+    $PYTEST_PY "$HOOKDIR/tests/mutation_check.py"
+else
+    echo "pre-push: SKIPPED the resume-gate tests and mutation check -- no pytest and" >&2
+    echo "          no uv on this machine, and the mutation check reports a false green" >&2
+    echo "          without pytest rather than an error. CI runs both." >&2
+    echo "          To run them here: pip install pytest, or install uv." >&2
+fi

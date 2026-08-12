@@ -7,9 +7,10 @@ applies to the skill listing.
 
 ## What runs automatically
 
-**CI** (`.github/workflows/ci.yml`) runs six checks on every PR and push:
+**CI** (`.github/workflows/ci.yml`) runs these checks on every PR and push, in this order:
 
-1. `.github/scripts/validate_plugins.py` — marketplace / plugin / SKILL.md structure.
+1. `.github/scripts/validate_plugins.py` — marketplace / plugin / SKILL.md structure, plus the
+   **hook/CI parity check** described under *One-time local setup* below.
 2. `scripts/check_skill_descriptions.py` — the **skill-description cap gate**.
 3. `scripts/leak_scan.sh` — the **leak gate**. It enforces low-false-positive generic
    patterns: Salesforce custom fields (`__c` / `__r`), API keys / tokens, and real email
@@ -17,7 +18,16 @@ applies to the skill listing.
    fails the check, and so does a missing `.leakdomains`. See *The two term files* below.
 4. `scripts/check_skill_routes.py` — the **route gate**: can the model get to a skill at all?
 5. `scripts/check_skill_tiers.py` — the **tier gate**: does the listing still fit, by policy?
-6. A two-line assertion that `--json` reports `within_budget: true`.
+6. `scripts/check_release_parity.py` — a version claimed in `VERSION` or the changelog with no
+   GitHub Release. Accepted holes live in `.release-parity-accepted`.
+7. A two-line assertion that `--json` reports `within_budget: true`.
+8. `plugins/agent-traffic-control/hooks/resume-gate/tests` — the hook's pytest suite.
+9. `…/tests/mutation_check.py` — the **mutation check**: it breaks each of that hook's guards
+   in turn and fails if the suite does not notice.
+
+**No total is written here on purpose.** A hand-maintained count is right on the day it is
+typed and quietly wrong afterwards — this line said "six" for three releases while CI ran
+nine, and the README's front page said 98 skills against a tree of 99 for four. Read the list.
 
 ### The route gate
 
@@ -263,17 +273,52 @@ Two ways this goes wrong, both seen:
 
 ## One-time local setup (recommended)
 
-Enable the committed pre-push hook so all six gates run **before** anything leaves your
-machine. It runs the same six checks as CI, in CI's order — a hook that runs fewer gates than
-CI is a hook that tells you a push is clean when it is not. **That claim was false when it was
-first written**: the hook ran five of the six (no `within_budget` assertion) and ran the leak
-gate last where CI runs it third, so it was fixed rather than reworded in v1.19.1. **Nothing
-enforces the parity** — if you add a CI step, add it to `.githooks/pre-push` in the same
-position, and diff the two files when in doubt:
+Enable the committed pre-push hook so the gates run **before** anything leaves your machine.
+It runs the same checks as CI, in CI's order — a hook that runs fewer gates than CI is a hook
+that tells you a push is clean when it is not.
+
+**That claim has been false twice, and both times the sentence was the last thing anyone
+checked.** In v1.19.1 the hook ran five of six (no `within_budget` assertion) and ran the leak
+gate last where CI runs it third. By v1.26.3 it was three gates behind — release parity, the
+resume-gate suite and the mutation check, all added between v1.22.0 and v1.23.0 and never added
+here — having drifted across three releases while both files asserted parity in prose.
+
+**Parity is now checked** by `check_hook_parity()` in `validate_plugins.py`, which is CI's
+first step and the hook's first line, so it runs before everything it guards. It compares the
+gates `ci.yml` invokes against the gates the hook invokes and fails on anything CI runs that
+the hook does not, in the wrong order or not at all. If an omission is deliberate, record it
+with its reason in **`.hook-parity-accepted`** — one `key  # reason` per line, same format as
+`.release-parity-accepted`. An absent file accepts nothing, so deleting it makes the check
+stricter rather than quieter.
+
+Three mechanics worth knowing before you edit either file:
+
+- **It reads code, not comments.** Both files document the gates they run, and a comment-blind
+  scan would read each file's own banner as invocations and report perfect parity between two
+  pieces of prose.
+- **It self-tests on every run.** The zero-parse guards catch a parser that reads *nothing*;
+  they cannot catch one that reads something and mis-keys it. So each run first asserts the
+  parser still detects a planted omission in a synthetic pair — the only part of this that
+  demonstrates the check is capable of failing.
+- **Two gates need `pytest`, and one of them lies without it.** `mutation_check.py` scores a
+  mutant KILLED on a non-zero pytest exit, and a missing pytest module also exits non-zero, so
+  under a pytest-less interpreter it used to print *"41 mutations, 41 killed, 0 needing
+  attention"* and exit 0 having run nothing. It now refuses instead. The hook resolves an
+  interpreter that has pytest — or provisions one with `uv run --with pytest` — and says
+  loudly when it can do neither, rather than skipping in silence.
 
 ```bash
 git config core.hooksPath .githooks
 cp .leakterms.example .leakterms      # then add YOUR real client / brand / project names
+```
+
+To run the two pytest gates by hand without installing anything permanently:
+
+```bash
+uv run --python 3.11 --with pytest python -m pytest \
+    plugins/agent-traffic-control/hooks/resume-gate/tests -q
+uv run --python 3.11 --with pytest python \
+    plugins/agent-traffic-control/hooks/resume-gate/tests/mutation_check.py
 ```
 
 ### The two term files, and why one is committed and the other must not be
@@ -294,7 +339,9 @@ right both times — it was answering a narrower question than the one being ask
 `.leakdomains` exists to close that half. It is **committed on purpose**, so CI reads it too, and
 the gate **fails if the file is absent** — "the denylist wasn't there" must never read as "clean"
 a second time. It lives inside `leak_scan.sh` rather than as a new CI step, so it needs no
-matching edit in `.githooks/pre-push` and cannot drift out of the hand-maintained parity above.
+matching edit in `.githooks/pre-push` and cannot drift out of parity at all. That reasoning is
+why the parity check above lives inside `validate_plugins.py` too: a gate of its own would have
+been one more thing to keep in the hook, which is the drift it exists to catch.
 
 **It spans education, health, finance, legal, HR, retail and cross-sector privacy statutes, and
 you must not trim it to the sectors you happen to work in.** A denylist naming one sector *is*
