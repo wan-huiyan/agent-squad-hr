@@ -17,14 +17,13 @@ description: |
   causation from the *current file state* and assumes your PR made a change
   it never made). Root cause (both directions): the reviewer never compared
   to mainline. `git stash` only stashes UNCOMMITTED changes — it does NOT
-  reset to mainline; and reading the current file state tells you nothing
-  about whether *this PR* changed it. Fix: verify the pre-existing/introduced
-  boundary with `git diff origin/main...HEAD -- <file>` (did THIS pr touch
-  it?) + `git show origin/main:<file>` (what was the value before?) +
+  reset to mainline; and the current file state says nothing about whether
+  *this PR* changed it. Fix: verify the pre-existing/introduced boundary with
+  `git diff origin/main...HEAD -- <file>` + `git show origin/main:<file>` +
   running the flagged tests on a real `origin/main` checkout — not by
   `git stash`, and not by eyeballing the working tree.
 author: Claude Code
-version: 1.1.1
+version: 1.1.2
 date: 2026-05-14
 disable-model-invocation: true
 ---
