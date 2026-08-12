@@ -235,19 +235,96 @@ def _expand(s, varmap):
     return s.lstrip("/")
 
 
+# An executable that RUNS the path that follows it. A path token is only counted as
+# an invocation when its simple command starts with one of these, with `$VAR` and a
+# bare script path also allowed. Without this, `echo "skipping scripts/leak_scan.sh"`
+# reads as running the leak gate -- found by attacking this check rather than by
+# reasoning about it, and it is the same hole as counting a comment, which is
+# already stripped.
+INTERPRETERS = {"python", "python3", "bash", "sh", "zsh", "node", "uv", "ruby",
+                "perl", "exec", "command", "source", "."}
+# Shell keywords that can lead a simple command without being its executable.
+_LEADERS = {"if", "then", "else", "elif", "do", "done", "fi", "while", "until",
+            "!", "&&", "||", "time", "nohup", "sudo", "env"}
+
+
+def split_simple_commands(line):
+    """Split a shell line on ; && || | -- quote-aware.
+
+    Quote-aware because the budget assertion's `python3 -c "...; ..."` contains a
+    semicolon INSIDE its quoted script; a naive split would cut it in half and lose
+    the command.
+    """
+    out, cur, quote, i = [], [], None, 0
+    while i < len(line):
+        ch = line[i]
+        if quote:
+            cur.append(ch)
+            if ch == quote:
+                quote = None
+            i += 1
+            continue
+        if ch in ("'", '"'):
+            quote = ch
+            cur.append(ch)
+            i += 1
+            continue
+        two = line[i:i + 2]
+        if two in ("&&", "||"):
+            out.append("".join(cur))
+            cur = []
+            i += 2
+            continue
+        if ch in ";|":
+            out.append("".join(cur))
+            cur = []
+            i += 1
+            continue
+        cur.append(ch)
+        i += 1
+    out.append("".join(cur))
+    return [c.strip() for c in out if c.strip()]
+
+
+def _runs_something(toks, varmap):
+    """Does this simple command actually EXECUTE a path, or merely mention one?"""
+    j = 0
+    while j < len(toks) and toks[j].strip("'\"") in _LEADERS:
+        j += 1
+    while j < len(toks) and re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", toks[j]):
+        j += 1  # leading VAR=value assignments
+    if j >= len(toks):
+        return False
+    exe = toks[j].strip("'\"")
+    if exe.startswith("$"):
+        return True                     # e.g. $PYTEST_PY -- an interpreter in a var
+    base = os.path.basename(exe)
+    if base in INTERPRETERS:
+        return True
+    p = _expand(exe, varmap)
+    return p.endswith(".py") or p.endswith(".sh")
+
+
 def _keys_from_command(cmd, varmap):
     """Gate keys invoked by one command line, in order.
 
     A key is either a repo-relative path to a .py/.sh script, or a `-m <module>`
-    invocation plus its first path-like argument.
+    invocation plus its first path-like argument. Only simple commands that actually
+    execute something contribute keys -- see INTERPRETERS above.
 
-    KNOWN EDGE, stated rather than papered over: an inline `python -c "..."` has no
-    name to key on, so those are COUNTED rather than identified. CI's inline count
-    must be <= the hook's. Two different inline gates in CI against one in the hook
-    would be caught; swapping one inline gate for a different one would not.
+    TWO KNOWN EDGES, stated rather than papered over:
+      · an inline `python -c "..."` has no name to key on, so those are COUNTED
+        rather than identified. CI's inline count must be <= the hook's. Two
+        different inline gates in CI against one in the hook would be caught;
+        swapping one inline gate for a different one would not.
+      · shell semantics are not evaluated, so a gate wrapped in `if false; then ...`
+        still reads as present. Detecting that needs an interpreter, not a parser.
     """
     keys, inline = [], 0
-    toks = [t for t in cmd.split() if t]
+    all_toks = [t for t in cmd.split() if t]
+    if not _runs_something(all_toks, varmap):
+        return keys, inline
+    toks = all_toks
     i = 0
     while i < len(toks):
         t = toks[i].strip("'\"")
@@ -296,18 +373,16 @@ def ci_gate_keys(text):
                 ln = lines[i]
                 if ln.strip() and (len(ln) - len(ln.lstrip())) <= indent:
                     break
-                cmd = strip_shell_comment(ln)
-                if cmd.strip():
-                    k, c = _keys_from_command(cmd, {})
+                for sc in split_simple_commands(strip_shell_comment(ln)):
+                    k, c = _keys_from_command(sc, {})
                     keys.extend(k)
                     inline += c
                 i += 1
             continue
         m = _RUN_INLINE_RE.match(raw)
         if m and not m.group(2).startswith(("|", ">")):
-            cmd = strip_shell_comment(m.group(2))
-            if cmd.strip():
-                k, c = _keys_from_command(cmd, {})
+            for sc in split_simple_commands(strip_shell_comment(m.group(2))):
+                k, c = _keys_from_command(sc, {})
                 keys.extend(k)
                 inline += c
         i += 1
@@ -328,9 +403,10 @@ def hook_gate_keys(text):
             varmap[m.group(1)] = "" if ("$(" in val or "`" in val) else val
     keys, inline = [], 0
     for line in cmds:
-        k, c = _keys_from_command(line, varmap)
-        keys.extend(k)
-        inline += c
+        for sc in split_simple_commands(line):
+            k, c = _keys_from_command(sc, varmap)
+            keys.extend(k)
+            inline += c
     return len(cmds), keys, inline
 
 
@@ -384,6 +460,7 @@ _CONTROL_HOOK = """\
 #!/usr/bin/env bash
 # bash scripts/dropped.sh -- named in a COMMENT, which must not count as running it
 ROOT="$(git rev-parse --show-toplevel)"
+echo "not running scripts/dropped.sh today"
 python3 "$ROOT/scripts/kept.py" "$ROOT"
 """
 
@@ -394,9 +471,17 @@ def parity_self_test():
     The zero-parse guards below catch a parser that reads nothing. They do not catch
     a parser that reads something and mis-keys it -- a normalisation that maps every
     path to "" would satisfy them and report perfect parity forever. So the gate runs
-    a positive control on every invocation: two synthetic files, one omission, one
-    decoy in a comment. Costs microseconds; it is the only thing here that
-    demonstrates this check is capable of failing at all.
+    a positive control on every invocation. Costs microseconds; it is the only thing
+    here that demonstrates this check is capable of failing at all.
+
+    The control carries BOTH decoys that were found to fool earlier versions, because
+    a fixture that does not contain what a broken parser would wrongly report cannot
+    detect that parser:
+      · the dropped gate named in a COMMENT;
+      · the dropped gate named inside an `echo` STRING. That one was a real bypass,
+        found by attacking this check rather than by reasoning about it: a maintainer
+        disabling a gate and leaving `echo "skipping ..."` behind would have had a
+        clean parity report.
     """
     steps, ci_keys, _ = ci_gate_keys(_CONTROL_CI)
     _, hook_keys, _ = hook_gate_keys(_CONTROL_HOOK)
