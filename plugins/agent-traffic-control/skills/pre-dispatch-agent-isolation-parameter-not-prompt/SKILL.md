@@ -148,7 +148,7 @@ the damage exists; that is why this one is filed separately.
 - [`subagent-bash-cd-wrong-worktree`](https://github.com/wan-huiyan/agent-traffic-control/blob/main/plugins/agent-traffic-control/skills/subagent-bash-cd-wrong-worktree/SKILL.md)
   — the commit-on-a-sibling-branch case seen from the other end: the reported SHA is real and
   `git branch --contains <sha>` finds it on a branch that is not yours.
-- [`verifying-subagent-in-your-live-worktree-measures-your-uncommitted-work`](https://github.com/wan-huiyan/agent-traffic-control/blob/main/plugins/agent-traffic-control/skills/verifying-subagent-in-your-live-worktree-measures-your-uncommitted-work/SKILL.md)
+- [`isolate-subagent-verification-from-live-worktree`](https://github.com/wan-huiyan/agent-traffic-control/blob/main/plugins/agent-traffic-control/skills/isolate-subagent-verification-from-live-worktree/SKILL.md)
   — the same reconciliation failure with a different cause: an agent in a dirty tree reports
   the branch plus your uncommitted edits, as one number.
 

@@ -9,7 +9,15 @@ Checks (stdlib only, no external deps):
      and that name matches the marketplace entry.
   5. Every plugin exposes a skill: either plugins/<name>/SKILL.md, or a nested
      plugins/<name>/skills/<skill>/SKILL.md set (multi-skill plugin).
-  6. Every SKILL.md frontmatter `name:` equals its containing directory name.
+  6. Every SKILL.md frontmatter `name:` is a valid skill name -- at most 64 characters,
+     lowercase letters / digits / single hyphens, no leading, trailing or doubled hyphen
+     -- and equals its containing directory name.
+     WHERE THE 64 COMES FROM: the Agent Skills specification
+     (https://agentskills.io/specification), "Max 64 characters. Lowercase letters,
+     numbers, and hyphens only.", which the Skills API restates. Claude Code's own skill
+     docs do NOT state a cap, so this is a PORTABILITY gate, not a local style rule -- an
+     over-long name loads here and fails a spec validator elsewhere. Five skills shipped
+     at 65-72 characters, four of them in v1.7.0, and nothing here noticed until v1.25.0.
   7. If a VERSION file exists: it is non-empty; and for a single-plugin repo it must
      equal that plugin's plugin.json version (drift guard).
   8. Every marketplace entry's `version` equals that plugin's plugin.json version.
@@ -157,9 +165,21 @@ def main():
     return finish()
 
 
+NAME_MAX = 64
+NAME_RE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
+
+
 def check_skill(skill_md):
     n = frontmatter_name(skill_md)
     if n is not None:
+        # An over-long name is invisible to every other gate here: the skill is still
+        # on disk, still matches its directory, still has one README row, still routes.
+        # Nothing noticed for five of them between v1.7.0 and v1.24.0.
+        if len(n) > NAME_MAX:
+            err(f"{skill_md}: frontmatter name `{n}` exceeds {NAME_MAX} characters ({len(n)})")
+        if not NAME_RE.fullmatch(n):
+            err(f"{skill_md}: frontmatter name `{n}` must use lowercase letters, "
+                "digits, and single hyphens only")
         dirname = os.path.basename(os.path.dirname(skill_md))
         if n != dirname:
             err(f"{skill_md}: frontmatter name `{n}` != dir `{dirname}`")

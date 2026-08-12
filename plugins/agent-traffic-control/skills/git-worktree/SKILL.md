@@ -358,6 +358,6 @@ with Read when one of these matches what you are looking at.
 - [`worktree-index-corrupt-async-post-commit-hook`](../worktree-index-corrupt-async-post-commit-hook/SKILL.md) — `fatal: unable to read <sha>` in worktree B right after committing in worktree A
 - [`worktree-does-not-isolate-shared-installed-artefacts`](../worktree-does-not-isolate-shared-installed-artefacts/SKILL.md) — a worktree isolates the source tree and nothing else — venvs, caches and installed packages stay shared
 - [`worktree-historical-test-replay-missing-dirs`](../worktree-historical-test-replay-missing-dirs/SKILL.md) — `pytest exit 4` replaying tests in a worktree checked out at an old commit
-- [`pytest-editable-install-resolves-to-primary-checkout-not-worktree`](../pytest-editable-install-resolves-to-primary-checkout-not-worktree/SKILL.md) — an editable install makes `import <pkg>` resolve to the primary checkout, not your worktree
+- [`verify-pytest-imports-worktree-not-primary-checkout`](../verify-pytest-imports-worktree-not-primary-checkout/SKILL.md) — an editable install makes `import <pkg>` resolve to the primary checkout, not your worktree
 - [`flask-debug-cross-worktree-edit-stale`](../flask-debug-cross-worktree-edit-stale/SKILL.md) — the dev server keeps serving the old template after you edited it in another worktree
 - [`async-doc-hook-autodocs-worktree-locks-branch-checkout`](../async-doc-hook-autodocs-worktree-locks-branch-checkout/SKILL.md) — `'<branch>' is already used by worktree at .../autodocs-<name>` from a background docs hook

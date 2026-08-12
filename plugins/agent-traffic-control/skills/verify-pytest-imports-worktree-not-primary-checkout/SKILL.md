@@ -1,5 +1,5 @@
 ---
-name: pytest-editable-install-resolves-to-primary-checkout-not-worktree
+name: verify-pytest-imports-worktree-not-primary-checkout
 description: |
   When you run pytest (or any `python -c "import <pkg>"`) from a git WORKTREE
   but the venv has an editable install (`pip install -e .`) made from the

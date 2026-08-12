@@ -1,5 +1,5 @@
 ---
-name: parallel-session-superseded-validated-fix-verify-live-prod-state-first
+name: verify-live-prod-before-shipping-superseded-fix
 description: |
   A parallel Claude/work session shipped a DIFFERENT (often better) fix to the SAME live-prod
   artifact for the SAME issue while you were mid-build — so your fully-implemented, validated,

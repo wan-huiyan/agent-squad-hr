@@ -1,5 +1,5 @@
 ---
-name: workflow-large-markdown-deliverable-extract-from-output-json-not-retype
+name: extract-workflow-markdown-from-output-json
 description: |
   Use when a Workflow (or background Agent) synthesis step returns a LARGE markdown
   deliverable inside a structured-output (schema) field — e.g. a `next_prompt_markdown`,
@@ -79,6 +79,6 @@ dropped a large fraction (~40%) of the prompt and risked literal-`\n` leakage.
 - The output file lives under `/private/tmp/.../<session>/tasks/<task-id>.output` — ephemeral; extract
   before it's cleaned up, and copy it into `docs/` (e.g. `docs/reviews/` or `docs/analysis/`) if you
   want durable provenance.
-- See also: `workflow-pipeline-parallel-stage-returns-bare-array-dropped-by-collector`,
+- See also: `flatten-workflow-parallel-arrays-before-collecting`,
   `workflow-standalone-schema-agent-crash-and-args-string` (other Workflow-mechanics traps),
   `claude-code-transcript-token-dedup-by-message-id` (reading agent transcripts directly).

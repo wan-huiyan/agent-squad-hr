@@ -31,7 +31,7 @@ machine**:
 
 | keyed by | shared artefact |
 |---|---|
-| package name | venv / editable install (see `pytest-editable-install-resolves-to-primary-checkout-not-worktree`) |
+| package name | venv / editable install (see `verify-pytest-imports-worktree-not-primary-checkout`) |
 | bundle id | an installed app on a simulator/emulator/device |
 | project path *or* a hash of it | build caches (Xcode DerivedData, gradle, cargo target dirs) |
 | version string | a plugin/tool cache directory |
@@ -142,7 +142,7 @@ uninstall. Use your own tooling, especially when you are in a hurry.
 
 ## References
 
-- `pytest-editable-install-resolves-to-primary-checkout-not-worktree` — the same
+- `verify-pytest-imports-worktree-not-primary-checkout` — the same
   failure in Python; this skill is its generalisation.
 - `prove-test-failures-pre-existing-via-clean-worktree` — the right method for
   "mine or pre-existing?", and the one whose baseline this pattern can void.

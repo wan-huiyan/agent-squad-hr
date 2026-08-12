@@ -171,7 +171,7 @@
       "prompt": "Another session already shipped a better fix to the same production artifact",
       "should_trigger": false,
       "category": "negative",
-      "notes": "parallel-session-superseded-validated-fix-verify-live-prod-state-first"
+      "notes": "verify-live-prod-before-shipping-superseded-fix"
     },
     {
       "id": "neg-7",
