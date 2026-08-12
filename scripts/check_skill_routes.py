@@ -28,13 +28,28 @@ WHAT IT CHECKS
        (see v1.11.1); name those in backticks instead of linking them.
     3. README rows  -- every skill has exactly one index row, and no row points
        at a directory that does not exist.
+    4. README count -- every "N skills" claim ABOVE `## Version history` equals
+       the number of skill directories.
 
     Body text costs nothing in the skill listing, so 1 is free to satisfy.
+
+WHY 4 IS HERE AND NOT IN A GATE OF ITS OWN
+    This script ALREADY counts the skills on every run and ALREADY parses the
+    README's index rows. It knew the right number and never compared it to the
+    one the front page publishes -- so the README said 98 skills against a tree
+    of 99 from v1.21.0 until v1.25.0 corrected it by hand, across the opening
+    sentence, the install instruction and the buckets sentence. The changelog
+    disagreed with itself over the same window (v1.21.0 says 99, v1.22.0 says 98,
+    v1.23.0 says 99), which is the tell that no check was involved.
+
+    A new CI step would also have been one more thing to keep in
+    `.githooks/pre-push` -- the hand-maintained parity v1.27.0 exists to police.
 
 USAGE
     python3 scripts/check_skill_routes.py [REPO_ROOT] [--list]
 
-    Exit 0 = every skill reachable, every link resolves, every README row present.
+    Exit 0 = every skill reachable, every link resolves, every README row present,
+             every front-page count correct.
     Exit 1 = at least one failure.
 """
 
@@ -96,6 +111,78 @@ def inbound_from_live(skills: dict) -> dict:
             if tgt != src and pat[tgt].search(v["body"]):
                 inbound[tgt].append(src)
     return inbound
+
+
+# --------------------------------------------------------------------------- #
+# 4. README front-page skill count
+# --------------------------------------------------------------------------- #
+CHANGELOG_HEADING = re.compile(r"^##\s+Version history\s*$", re.M)
+
+# Tolerates markdown links BETWEEN the number and the noun. The front page's first
+# sentence reads "A coordination toolkit of 99 [Claude Code](https://…) skills", and
+# a bare `\d+\s+skills` regex does not match it -- the most-read line in the repo and
+# the exact claim this check exists for. Measured on the real README: the naive form
+# finds 2 of the 3 header claims and the one it drops is line 3.
+COUNT_CLAIM = re.compile(r"\b(\d+)\s+(?:\[[^\]]*\]\([^)]*\)\s+)*skills?\b")
+
+
+def count_claim_self_test() -> bool:
+    """Prove the pattern still sees BOTH forms before trusting its silence.
+
+    Zero matches in the header is reported as a failure, which covers a header that
+    stopped stating a count. It does NOT cover a pattern edit that quietly stops
+    matching the LINKED form while still matching the two bare ones -- that would
+    leave the front page's first sentence ungated while every message still read OK.
+    A self-test whose fixture cannot distinguish the broken version is not a test,
+    so both forms are asserted on every run.
+    """
+    linked = "A coordination toolkit of 42 [Claude Code](https://x.y/z) skills — plus"
+    bare = "one shot, gets all 42 skills"
+    return ([m.group(1) for m in COUNT_CLAIM.finditer(linked)] == ["42"]
+            and [m.group(1) for m in COUNT_CLAIM.finditer(bare)] == ["42"])
+
+
+def check_readme_count(root: str, n_skills: int) -> bool:
+    """Every "N skills" claim above the changelog must equal the real count.
+
+    Scoped to the header on purpose: changelog entries state what was true at the
+    time and must keep their historical figures. There are 45 such matches below the
+    heading, and a gate that fired on those is a gate that gets muted.
+    """
+    path = os.path.join(root, "README.md")
+    if not os.path.isfile(path):
+        print("\n  README COUNT — README.md not found, so the front-page count "
+              "cannot be checked")
+        return False
+    if not count_claim_self_test():
+        print("\n  README COUNT — the pattern SELF-TEST failed: it no longer matches "
+              "the\n  linked form `N [text](url) skills`. Its silence on the README "
+              "means nothing\n  until that is fixed.")
+        return False
+    with open(path, encoding="utf-8") as fh:
+        text = fh.read()
+    parts = CHANGELOG_HEADING.split(text, maxsplit=1)
+    if len(parts) < 2:
+        print("\n  README COUNT — no `## Version history` heading, so the header "
+              "cannot be told\n  apart from the changelog. Refusing to scan the whole "
+              "file: every historical\n  figure would read as a failure.")
+        return False
+    claims = [(i, m.group(1))
+              for i, line in enumerate(parts[0].split("\n"), start=1)
+              for m in COUNT_CLAIM.finditer(line)]
+    if not claims:
+        print("\n  README COUNT — no `N skills` claim found above the changelog. "
+              "Either the front\n  page stopped stating a count or this check stopped "
+              "finding it; both need a human.")
+        return False
+    wrong = [(i, v) for i, v in claims if int(v) != n_skills]
+    if wrong:
+        print(f"\n  README COUNT ({len(wrong)} of {len(claims)} claim(s) wrong)")
+        for i, v in wrong:
+            print(f"    · README.md:{i} claims {v} skills; the tree has {n_skills}")
+        return False
+    print(f"  readme count  OK — {len(claims)} front-page claim(s), all {n_skills}")
+    return True
 
 
 def main() -> int:
@@ -173,6 +260,10 @@ def main() -> int:
             print(f"    · {rows[n]} rows (want exactly 1): {n}")
     else:
         print(f"  readme rows   OK — {len(skills)} skills, exactly one index row each")
+
+    # 4. README front-page count
+    if not check_readme_count(root, len(skills)):
+        failed = True
 
     if a.list:
         print("\n  live-inbound counts (0 on a reference-only skill is a failure):")

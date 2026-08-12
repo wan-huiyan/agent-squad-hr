@@ -17,6 +17,8 @@ applies to the skill listing.
    addresses — plus the **tracked** industry-vocabulary denylist in `.leakdomains`. A hit
    fails the check, and so does a missing `.leakdomains`. See *The two term files* below.
 4. `scripts/check_skill_routes.py` — the **route gate**: can the model get to a skill at all?
+   It also asserts that every **"N skills" claim above `## Version history`** in the README
+   equals the number of skill directories.
 5. `scripts/check_skill_tiers.py` — the **tier gate**: does the listing still fit, by policy?
 6. `scripts/check_release_parity.py` — a version claimed in `VERSION` or the changelog with no
    GitHub Release. Accepted holes live in `.release-parity-accepted`.
@@ -45,9 +47,28 @@ python3 scripts/check_skill_routes.py .            # exit 0 = every skill reacha
 python3 scripts/check_skill_routes.py . --list     # per-skill live-inbound counts
 ```
 
-Three things fail it: an unreachable reference-only skill; a `../<name>/SKILL.md` link that
+Four things fail it: an unreachable reference-only skill; a `../<name>/SKILL.md` link that
 does not resolve (a skill from *another* plugin is not at that path — name it in backticks,
-see v1.11.1); and a skill with no README index row, or more than one.
+see v1.11.1); a skill with no README index row, or more than one; and a README front-page
+skill count that disagrees with the tree.
+
+**The count check is scoped to the header, above `## Version history`.** Changelog entries
+state what was true at the time and must keep their historical figures — there are 45 matches
+below that heading and a gate firing on those would be muted within a week. If the heading
+cannot be found the check *fails* rather than scanning the whole file.
+
+Two things it refuses to do quietly. **Zero claims found is a failure, not a pass** — either
+the front page stopped stating a count or the check stopped finding it, and both need a human.
+And it **self-tests the pattern on every run**, because the claim it most needs to catch is the
+opening sentence, where a markdown link sits between the number and the noun:
+
+```
+A coordination toolkit of 99 [Claude Code](https://claude.com/claude-code) skills
+```
+
+A bare `\d+\s+skills` regex does not match that. Measured: the naive form finds 2 of the 3
+header claims and the one it drops is line 3 — so a gate built on it would have reported OK
+through the whole window in which the front page was wrong.
 
 **Links from a disabled skill do not count.** The model only reads a disabled skill's body
 after it has already been sent there, so a chain that starts inside the dark half never starts.
