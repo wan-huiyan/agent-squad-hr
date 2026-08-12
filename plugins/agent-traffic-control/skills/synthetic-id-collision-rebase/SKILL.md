@@ -203,7 +203,7 @@ grep -n 'Item("cat7-7kr"' docs/generate_roadmap_backlog.py
 
 **Key insight:** git includes the first line of the *shared context after the conflict block* in both conflict sides. Any "take both sides" strategy without per-line argument-count validation will duplicate that shared line.
 
-**Prevention (pre-rebase):** If your new `Item(...)` and the incoming `Item(...)` land adjacent in the file, rename your ID in a separate commit before rebasing (changes the exact insertion point, so git's conflict boundary shifts away from the argument-list interior). The `pr-conflict-site-regen` skill's Step 2a/2e covers the renumber; the cleanest path is to abort early and pre-rename.
+**Prevention (pre-rebase):** If your new `Item(...)` and the incoming `Item(...)` land adjacent in the file, rename your ID in a separate commit before rebasing (changes the exact insertion point, so git's conflict boundary shifts away from the argument-list interior). The cleanest path is to abort early and pre-rename.
 
 ## Notes
 

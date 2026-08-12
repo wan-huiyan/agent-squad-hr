@@ -154,15 +154,18 @@ please be aware of #642, #662, and #663" on 2026-05-10.
   basis show negative or near-zero pre-conversion marginal lift. Named 4 paths.
 - `#663` — MERGED docs/probe-3b artifact.
 - (Discovered by reading #662 body) `#669` — MERGED methodology correction: under
-  the binary-filter framing, 2 of 3 A1 events ARE clean (content_page_view +
-  task_item_complete), not just content_page_view alone.
+  the binary-filter framing, 1 of 3 A1 events IS clean (task_item_complete), where
+  the earlier probe had called all 3 leakage-flavored. Separately, #662's path 1
+  widens from content_page_view alone to the 2-event set {content_page_view,
+  task_item_complete} — a REPLACEMENT basis, not two of the original three.
 
 **Map:**
 - The prompt's plan: merge PR #656 as-is (3-event basis at 27.3%/n=1,149/~91 today).
 - Post-#669 implication: A1's 3-event basis includes 2 leakage-flavored events
   (event_signup, todo_item_click). The prompt's plan would ship known-leakage to prod.
-- Options narrow to either: (a) accept the leakage with a caveat, (b) narrow basis
-  to the 2 clean events per #662 path 1, (c) hold the PR, (d) narrative-only edit.
+- Options narrow to either: (a) accept the leakage with a caveat, (b) narrow the
+  basis to the 2 clean events of #662 path 1, (c) hold the PR, (d) narrative-only
+  edit.
 
 **AskUserQuestion** with all 4 options + concrete trade-offs. User chose (b) "Edit
 basis to clean events."

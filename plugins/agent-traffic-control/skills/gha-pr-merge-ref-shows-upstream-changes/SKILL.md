@@ -16,9 +16,8 @@ description: |
   from your branch. Root cause: GitHub re-computes the merge ref every
   time the base moves, so CI on `pull_request` sees `main-at-CI-start +
   your-branch`, NOT just `your-branch`. Sister concept to
-  `gha-billing-failure-fast-fail-pattern` (different GHA gotcha) and
-  `pr-conflict-site-regen` Step 2b (when this surfaces during
-  tracker collision sweeps).
+  `gha-billing-failure-fast-fail-pattern` (different GHA gotcha). Recurs
+  during a dense parallel-PR window, when the base keeps moving under you.
 author: Claude Code
 version: 1.0.1
 date: 2026-05-11
@@ -194,9 +193,14 @@ Resolution: `git rebase origin/main` (resolved 2 real tracker conflicts),
 `git push --force-with-lease`. Next CI run: green.
 
 The same trap recurred 2 more times in the same session as PRs #706
-and #707 landed during subsequent rebases. Per `pr-conflict-site-regen`
-v1.4.0 Step 2b, this is expected behavior in dense windows — the lint
-is doing its job, just on a sliding target.
+and #707 landed during subsequent rebases. In a dense parallel-PR window
+that is expected behaviour — the lint is doing its job, just on a sliding
+target. (The *cadence* question — how often to rebase while the base keeps
+moving — was written up in a project-specific skill dropped in v1.2.0 and
+has no home here since. The `gh pr merge --auto` behaviour that travels
+with it does: see `gh-pr-merge-unstable-state-needs-auto-and-watch-branch-deletes`
+and `solo-repo-branch-protection-stable-gate-and-self-merge` Trap 2, which
+covers the zero-required-checks case that makes `--auto` merge instantly.)
 
 ## Notes
 
