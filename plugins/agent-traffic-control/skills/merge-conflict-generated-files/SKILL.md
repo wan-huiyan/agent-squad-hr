@@ -251,7 +251,7 @@ growth is an assumption, not a property of the number.
   branches claiming the same synthetic ID (tracker IDs, ADR numbers, migration filenames)
 - `pr-conflict-from-mid-flight-merges` — broader recipe for identifying and clearing all
   mid-flight conflicts across a stale PR
-- `overnight-multi-issue-implementation`
+- `overnight-multi-issue-implementation` (its own plugin in the `wan-huiyan-overnight-workflows` marketplace, not here)
   ([overnight-workflows](https://github.com/wan-huiyan/overnight-workflows)) — carries the
   sibling rule for where a stated number comes from in the first place ("the rule survives;
   the numbers do not — measure the baseline yourself, never carry a count from a document").

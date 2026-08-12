@@ -212,11 +212,12 @@ The subagent's ~10 zero-tool-use micro-cycles cost the subagent itself
 
 ## References
 
-- Sister skill: `schedule-poll-orchestrator-pattern` (cron-fired multi-track
+- Sister skill: `schedule-poll-orchestrator-pattern` — its own plugin in the
+  `wan-huiyan-overnight-workflows` marketplace, not here (cron-fired multi-track
   variant; complementary, not redundant)
 - Sister skill: `subagent-reports-complete-but-pr-unmerged` (related: gap
   between agent status and actual PR state)
-- Related skill: `dispatching-parallel-agents` (when to choose subagent
+- Related skill: `superpowers:dispatching-parallel-agents` (when to choose subagent
   dispatch in the first place)
 - gh CLI: [`gh pr checks --watch`](https://cli.github.com/manual/gh_pr_checks)
   blocks until CI conclusion in a single subprocess call

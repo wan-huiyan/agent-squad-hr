@@ -72,7 +72,7 @@ zero regression risk.
   targeted blast-radius suite), and that **full local suites can HANG on real-DB/network tests** — run
   the suite with `--ignore=<documented-staller>` or just the targeted node ids; don't let a stalling
   unrelated test block the proof.
-- Reviewer-side analog: `agent-review-panel`'s "Codebase State Check" (a review panel must not flag code
+- Reviewer-side analog: `roundtable:agent-review-panel`'s "Codebase State Check" (a review panel must not flag code
   as "missing" when it exists on main but not the reviewed branch). This skill is the author-side twin:
   don't attribute a *failure* to your change without checking the baseline.
 - **The baseline worktree is not automatically clean.** A worktree isolates the SOURCE TREE only;

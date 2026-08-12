@@ -1,0 +1,155 @@
+# Skill-citation baseline — backticked skill names cited here that are NOT a skill
+# directory in this repo, with what each one actually is.
+#
+# Read by check_skill_routes.py. One `name  # reason` per line. Any backticked
+# kebab-case name (3+ hyphen-words) cited in a SKILL.md, README.md or
+# CONTRIBUTING.md that is neither a skill directory here nor listed below is a hard
+# CI failure.
+#
+# WHY THIS FILE IS THE FIX AND NOT AN EXCUSE. Issue #39 measured 51 names cited as
+# if a reader could go and open them, across 77 sites in 41 files, mostly in
+# "Sister skill:" and "See also:" lines — which is precisely where a reader goes
+# when the current skill did not answer their question. A gate alone could not ship:
+# with 51 live offenders it would start red and be muted inside a week, and a muted
+# gate is worse than no gate because it looks like coverage. So the names are
+# recorded here ONCE, with what is actually known about each, and the gate then
+# fails only on a NEW one. That is the same design as `.release-parity-accepted`.
+#
+# The reader-facing half is that this file is now the map: a name in a skill body
+# that you cannot find is in here, with its status and where to get it if anywhere.
+#
+# HOW IT WAS ESTABLISHED (2026-08-12), two independent checks, both with a positive
+# control that correctly found the one known deleted skill:
+#   · `git log --all -- '*<name>*'` and a sweep of every path in every ref — none of
+#     these ever existed as a path in this repo's history, so none is recoverable
+#     with `git show <sha>^:<path>` and none can be retargeted against what a dropped
+#     skill actually said;
+#   · every public repo under the author's account, plus the public `superpowers`
+#     bundle — 9 names resolve there and are marked PUBLISHED with the repo.
+#
+# THE RULE FOR NEW WORK. If you cite a name that is not a skill directory here, add
+# it below with its status in the same commit. Do not add a name to make a red gate
+# green without checking what it is: a confident wrong note is worse than an admitted
+# gap, because the note is what the next person trusts instead of re-checking.
+
+# --- PUBLISHED ELSEWHERE — a reader can actually reach these ---
+# Verified by listing the repo's tree, not by recognising the name. Cite them
+# with their bundle prefix or a link so the reader knows where to go.
+agent-review-panel                                      # wan-huiyan/agent-review-panel (public)
+claude-plugin-repo-ci-release                           # wan-huiyan/claude-ecosystem-hygiene (public)
+dispatching-parallel-agents                             # wan-huiyan/superpowers (public)
+overnight-insight-discovery                             # wan-huiyan/overnight-workflows (public)
+overnight-multi-issue-implementation                    # wan-huiyan/overnight-workflows (public)
+overnight-review-panel-blocked-reviewer-reads-as-clean  # wan-huiyan/overnight-workflows (public)
+schedule-poll-orchestrator-pattern                      # wan-huiyan/overnight-workflows (public)
+subagent-driven-development                             # wan-huiyan/superpowers (public)
+test-effectiveness-auditor                              # wan-huiyan/test-effectiveness-auditor (public)
+
+# --- NOT A SKILL CITATION AT ALL — the backtick means something else here ---
+# Each was judged by reading the citing sentence, not by pattern. They need no
+# text change; they are listed because a name-shaped token cannot be told from a
+# citation by shape alone.
+add-iam-policy                   # a GCP IAM method name, not a skill
+agent-squad-hr                   # this repo's own former plugin name, kept in the v1.2.0 history line
+agent-traffic-control            # this plugin's own name, not a skill
+all-globs-to-any-file            # a GitHub labeler config key, not a skill
+any-glob-to-any-file             # a GitHub labeler config key, not a skill
+chatbox-with-data                # an example git worktree name inside a worked example
+claude-ecosystem-hygiene         # a plugin MARKETPLACE name, not a skill (verified in that repo's marketplace.json)
+co-authored-by                   # a git commit trailer, not a skill
+disable-model-invocation         # a SKILL.md frontmatter field name, not a skill
+grid-template-columns            # a CSS property, not a skill
+s13-firestore-jobstore           # a git branch name inside a worked example
+s13-gemini-retry-friendly-error  # a git branch name inside a worked example
+s227-auc-floor-recalibration     # a git branch name inside a worked example
+s262b-followup-handoff           # a git branch name inside a worked example
+scan-bugs-parallel               # a session label inside a worked example, not a pointer
+set-iam-policy                   # a GCP IAM method name, not a skill
+team-1-iap-deploy                # a git branch name inside a worked example
+the-causal-impact-repo           # a placeholder repo name inside a worked example
+the-dashboard-service            # a placeholder service name inside a worked example
+the-dashboard-service-00077-b6b  # a placeholder deploy revision id
+the-dashboard-service-00148-cql  # a placeholder deploy revision id
+the-project-repo                 # a placeholder repo name inside a worked example
+tool-use-id                      # a transcript JSON field name, not a skill
+wan-huiyan-overnight-workflows   # a plugin MARKETPLACE name, not a skill (verified in that repo's marketplace.json)
+
+# --- HISTORICAL — a name this repo deliberately keeps ---
+# A changelog records what shipped at the time, and the v1.25.0 entry carries the
+# old-to-new rename mapping on purpose. Removing these would make the history
+# wrong, which is a worse defect than a name a reader cannot open.
+frozen-cohort-rebucket-newer-model-contemporaneity-leak                   # an old name kept in the v1.25.0 old-to-new rename mapping
+parallel-session-superseded-validated-fix-verify-live-prod-state-first    # an old name kept in the v1.25.0 old-to-new rename mapping
+pr-conflict-site-regen                                                    # dropped in v1.2.0; kept in that history line and in the v1.26.1 entry
+pre-dispatch-schema-probe                                                 # renamed inherited-scope-doc-names-may-not-exist in v1.18.0; the rename is stated inline at each citation
+pytest-editable-install-resolves-to-primary-checkout-not-worktree         # an old name kept in the v1.25.0 old-to-new rename mapping
+verifying-subagent-in-your-live-worktree-measures-your-uncommitted-work   # an old name kept in the v1.25.0 old-to-new rename mapping
+workflow-large-markdown-deliverable-extract-from-output-json-not-retype   # an old name kept in the v1.25.0 old-to-new rename mapping
+workflow-pipeline-parallel-stage-returns-bare-array-dropped-by-collector  # an old name kept in the v1.25.0 old-to-new rename mapping
+
+# --- SELF-DISCLOSED — the citing text already tells the reader it does not exist ---
+# Left exactly as it is. This is the honest form, not a defect.
+verify-plan-constants-against-data  # the citing sentence itself states no such skill exists anywhere
+
+# --- UNPUBLISHED NOTES — real notes the author holds, not reachable from here ---
+# Not in this repo's history and not in any public repo checked on 2026-08-12, so
+# there is nothing to retarget them to and nothing for a reader to open. They stay
+# named because the name is the only handle there is, and a named absence beats a
+# silent one.
+#
+# ⚠️ STILL TO DO, stated here rather than left to be discovered: their ~70 citing
+# sentences still read as ordinary pointers — "Sister skill: `x`", "See also: `x`"
+# — with no inline signal that the reader cannot follow them. This file records
+# them; it does not yet warn at the point of use. The wording to copy already
+# exists at one site in merged-pr-not-deployed-gate-label-missing: "Not part of
+# this plugin and not published; refer to it by name."
+agent-review-panel-stale-cite-verification                           # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+anthropic-credit-balance-error-vs-app-bug                            # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+auto-mode-handoff-deploy-permission-still-denied                     # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+availability-window-gate-on-renderable-not-just-present              # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+baked-payload-stale-after-merge                                      # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+bq-query-default-max-rows-100-silent-truncation                      # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+byte-identical-sha-gate-as-refactor-safety-net                       # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+claude-cli-backend-deadlocks-nested-in-active-session                # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+claude-code-session-jsonl-orphan-advisor-tool-result                 # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+claude-code-session-jsonl-whitespace-text-block                      # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+claude-code-session-shipped-and-agent-labels-from-transcript         # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+claude-code-transcript-token-dedup-by-message-id                     # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+claude-code-workflow-subagent-tokens-nested-undercount               # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+claude-design-handoff-bundle                                         # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+cloud-run-results-bq-postsync                                        # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+concurrent-session-curating-shared-global-dir                        # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+dashboard-worktree-main-gap                                          # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+deploy-gate-success-report-doesnt-prove-the-gated-path               # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+dual-cloudrun-job-orchestration                                      # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+feature-rebuild-arms-unattended-scheduled-retrain-promote            # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+flask-debug-ttl-cache-stale-after-rebake                             # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+flask-route-decommission-blast-radius                                # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+flicker-fix-verify-oscillation-and-prefix-baseline                   # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+gha-auto-deploy-never-ran-skipped-mask                               # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+gha-billing-failure-fast-fail-pattern                                # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+git-add-all-sweeps-untracked-artifacts-into-commit                   # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+git-recover-lost-branch                                              # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+in-memory-job-registry-orphans-cloud-result-on-restart               # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+label-gated-deploy-pull-request-closed-needs-branches-filter         # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+lint-allowlist-substring-stale-after-rewrite                         # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+numbered-append-log-next-id-grep-max-not-tail                        # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+openai-compatible-chinese-llm-client-divergences                     # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+parallel-rewrite-with-claims-inventory-factcheck                     # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+parallel-subagent-ui-from-contract-table-design-anemic               # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+playwright-screenshot-hangs-on-infinite-animation                    # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+pre-merge-client-variant-regression-audit                            # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+preview-mcp-reads-base-repo-launch-json                              # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+procedure-doc-reads-pending-but-already-shipped                      # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+reconstruction-from-durable-store-must-replicate-completion-gate     # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+review-panel-pre-dispatch-claim-recheck                              # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+route-orphan-fetch-after-template-carveout                           # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+same-day-hotfix-write-delta-handoff-not-rewrite-shipped-next-prompt  # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+shipped-change-not-visible-deploy-vs-gate-vs-cache                   # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+stale-backlog-triage-adversarial-verify                              # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+template-inlined-css-is-one-surface-not-two                          # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+verify-recurring-writer-before-unattended-window                     # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+version-fix-check-read-source-not-materialized-table                 # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+vite-hmr-transient-console-errors-verify-on-fresh-reload             # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+voltagent-reviewer-no-write-tool                                     # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)
+worktree-plan-b-brief-runner                                         # unpublished note; not in this repo's history nor any public repo (checked 2026-08-12)

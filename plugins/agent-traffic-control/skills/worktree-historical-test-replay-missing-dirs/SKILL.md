@@ -151,7 +151,7 @@ produces an ambiguous "exit 4" that looks like a script bug.
 
 ## Example
 
-From `test-effectiveness-auditor` v1.0:
+From `test-effectiveness-auditor` v1.0 (a separately published plugin, not one of this repo's skills):
 
 ```bash
 # Initial naive command — fails on the project's older SHAs because

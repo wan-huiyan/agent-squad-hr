@@ -18,7 +18,8 @@ applies to the skill listing.
    fails the check, and so does a missing `.leakdomains`. See *The two term files* below.
 4. `scripts/check_skill_routes.py` — the **route gate**: can the model get to a skill at all?
    It also asserts that every **"N skills" claim above `## Version history`** in the README
-   equals the number of skill directories.
+   equals the number of skill directories, and that **no markdown file cites a backticked
+   skill name that resolves to nothing**.
 5. `scripts/check_skill_tiers.py` — the **tier gate**: does the listing still fit, by policy?
 6. `scripts/check_release_parity.py` — a version claimed in `VERSION` or the changelog with no
    GitHub Release. Accepted holes live in `.release-parity-accepted`.
@@ -69,6 +70,39 @@ A coordination toolkit of 99 [Claude Code](https://claude.com/claude-code) skill
 A bare `\d+\s+skills` regex does not match that. Measured: the naive form finds 2 of the 3
 header claims and the one it drops is line 3 — so a gate built on it would have reported OK
 through the whole window in which the front page was wrong.
+
+### Citing a skill that is not in this repo
+
+Check 1 asks whether a reference-only skill is reachable **from** a live skill. The citation
+check asks the opposite question — whether a name a skill points **at** exists at all — and
+nothing had ever asked it. Measured for #39: **51 names across 77 sites in 41 files**, most of
+them in "Sister skill:" and "See also:" lines, which is exactly where a reader goes when the
+current skill did not answer their question.
+
+The link check could not catch them either: every one is a **bare backticked name**, not a
+`[...](../name/SKILL.md)` link, so a link-shaped gate fires on none of them and could never see
+one in frontmatter.
+
+**If you cite a name that is not a skill directory here, add it to `.skill-citations-accepted`
+in the same commit**, one `name  # reason` per line. That file is the map: a name in a skill
+body that you cannot find is in there, with its status and where to get it if anywhere. Do not
+add a name just to turn the gate green — a confident wrong note is worse than an admitted gap,
+because the note is what the next person trusts instead of re-checking.
+
+Unlike `.hook-parity-accepted`, this one **fails closed on absence**: a missing, empty or
+comments-only file is a failure, not a stricter policy, because its entries are the deliberate
+historical citations the README must keep and losing them would produce a wall of false
+failures — the fastest way to get a check muted.
+
+Two mechanics worth knowing before editing the sweep:
+
+- **It is fence-aware, and the naive version is wrong in a way that looks right.** A plain
+  `` `([^`]+)` `` regex pairs backticks *across* ``` fence boundaries: an odd number of
+  backticks inside a fence flips the parity for every line after it. That version found the one
+  known dangling name in **2 of its 7** files and printed a clean-looking result for the rest.
+- **It walks for markdown rather than listing files.** An enumerated list was one file short on
+  the day it was written — the hook ships its own `README.md` and `DESIGN.md` inside the plugin,
+  read by the same audience and able to carry the same dead pointer.
 
 **Links from a disabled skill do not count.** The model only reads a disabled skill's body
 after it has already been sent there, so a chain that starts inside the dark half never starts.
