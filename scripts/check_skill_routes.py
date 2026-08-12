@@ -30,6 +30,8 @@ WHAT IT CHECKS
        at a directory that does not exist.
     4. README count -- every "N skills" claim ABOVE `## Version history` equals
        the number of skill directories.
+    5. citations    -- no markdown file cites a backticked skill-shaped name that
+       resolves to nothing, unless it is recorded in `.skill-citations-accepted`.
 
     Body text costs nothing in the skill listing, so 1 is free to satisfy.
 
@@ -45,11 +47,22 @@ WHY 4 IS HERE AND NOT IN A GATE OF ITS OWN
     A new CI step would also have been one more thing to keep in
     `.githooks/pre-push` -- the hand-maintained parity v1.27.0 exists to police.
 
+WHY 5 IS HERE
+    Check 1 asks whether a reference-only skill is reachable FROM a live skill.
+    Check 5 asks the opposite question -- whether a name a skill points AT exists
+    at all -- and nothing had ever asked it. Measured: 51 names across 77 sites in
+    41 files, mostly in "Sister skill:" and "See also:" lines, which is precisely
+    where a reader goes when the current skill did not answer their question.
+
+    Check 2 could not catch them either: every one is a bare backticked name, not
+    a `[...](../name/SKILL.md)` link, so a link-shaped gate fires on none of them
+    and could never see one in frontmatter.
+
 USAGE
     python3 scripts/check_skill_routes.py [REPO_ROOT] [--list]
 
     Exit 0 = every skill reachable, every link resolves, every README row present,
-             every front-page count correct.
+             every front-page count correct, every cited skill name resolves.
     Exit 1 = at least one failure.
 """
 
@@ -185,6 +198,205 @@ def check_readme_count(root: str, n_skills: int) -> bool:
     return True
 
 
+# --------------------------------------------------------------------------- #
+# 5. dangling skill citations
+# --------------------------------------------------------------------------- #
+CITATION_ACCEPT_REL = ".skill-citations-accepted"
+SKILL_SHAPED = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+){2,}$")
+PLUGIN_QUALIFIED = re.compile(r"^([a-z0-9-]+):([a-z0-9]+(?:-[a-z0-9]+){2,})$")
+FENCE = re.compile(r"^\s*(`{3,}|~{3,})")
+
+
+def backticked_names(text: str):
+    """Yield (lineno, token) for every `...` span, FENCE-AWARE.
+
+    THE TRAP, recorded because the first version of this sweep was wrong in a way
+    that looked right. A plain `` `([^`]+)` `` regex pairs backticks ACROSS ``` fence
+    boundaries: an odd number of backticks inside a fence flips the parity for every
+    line after it. That version found the one known dangling name in 2 of its 7
+    files -- a 71% undercount that reported clean-looking output.
+
+    So: fence state is tracked per line, and backticks pair only WITHIN a single
+    non-fenced line, so an unbalanced backtick stops at the end of its own line
+    instead of leaking into the next.
+    """
+    in_fence, marker = False, None
+    for i, line in enumerate(text.split("\n"), start=1):
+        m = FENCE.match(line)
+        if m:
+            ch = m.group(1)[0]
+            if not in_fence:
+                in_fence, marker = True, ch
+            elif ch == marker:
+                in_fence, marker = False, None
+            continue
+        if in_fence:
+            continue
+        pos, n = 0, len(line)
+        while pos < n:
+            if line[pos] != "`":
+                pos += 1
+                continue
+            run = 1
+            while pos + run < n and line[pos + run] == "`":
+                run += 1
+            delim = "`" * run
+            close = line.find(delim, pos + run)
+            if close == -1:
+                break
+            yield i, line[pos + run:close]
+            pos = close + run
+
+
+_FENCE_FIXTURE = """\
+Body text citing `alpha-beta-gamma` before any fence.
+
+```bash
+# `sample-code-inside-fence` is sample code, NOT a citation, and must not be reported
+echo "one ` here"
+```
+
+And after the fence, `delta-epsilon-zeta` must still be found.
+"""
+
+
+def citation_self_test() -> bool:
+    """Prove fence handling is alive, on a fixture built from the two regressions.
+
+    Three assertions, because the first version had only the first two and a
+    mutation run proved it worthless: disabling the fence SKIP entirely left it
+    passing, since the fixture held no complete backticked name inside the fence for
+    the broken version to wrongly report. A self-test whose fixture cannot tell the
+    broken version apart is the defect it exists to catch, one level up.
+
+      1/2. both names OUTSIDE the fence are found -- guards cross-line pairing;
+      3.   the name INSIDE the fence is NOT found -- guards the fence skip itself.
+    """
+    found = {t for _, t in backticked_names(_FENCE_FIXTURE)}
+    return ("alpha-beta-gamma" in found
+            and "delta-epsilon-zeta" in found
+            and "sample-code-inside-fence" not in found)
+
+
+def citations_accepted(root: str):
+    """{name: reason} for names that dangle from THIS repo but are legitimate.
+
+    FAILS CLOSED, and unlike `.hook-parity-accepted` its absence is a failure rather
+    than a stricter policy: these entries are the deliberate historical citations the
+    README must keep, so a missing file would turn them all into failures and produce
+    exactly the wall of noise that gets a check muted. Absence is a broken checkout.
+    An empty or comments-only file fails the same way, for the same reason -- 'the
+    baseline was not there' must never read as 'the tree is dirty'.
+    """
+    path = os.path.join(root, CITATION_ACCEPT_REL)
+    if not os.path.isfile(path):
+        print(f"\n  CITATIONS — {CITATION_ACCEPT_REL} not found. It records the "
+              f"deliberate\n  historical and external citations this repo keeps; "
+              f"without it every one of\n  them reads as a failure. Restore it.")
+        return None
+    try:
+        with open(path, encoding="utf-8") as fh:
+            content = fh.read()
+    except OSError as e:
+        print(f"\n  CITATIONS — cannot read {CITATION_ACCEPT_REL}: {e}")
+        return None
+    accepted = {}
+    for line in content.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        name, _, reason = line.partition("#")
+        name = name.strip()
+        if name:
+            accepted[name] = reason.strip() or "(no reason recorded)"
+    if not accepted:
+        print(f"\n  CITATIONS — {CITATION_ACCEPT_REL} loaded 0 names. An empty accept "
+              f"file and a\n  missing one fail the same way here, for the same reason.")
+        return None
+    return accepted
+
+
+def check_citations(root: str, skills: dict) -> bool:
+    """No markdown file may cite a backticked skill name that resolves to nothing."""
+    if not citation_self_test():
+        print("\n  CITATIONS — the sweep's SELF-TEST failed: fence handling is no "
+              "longer working,\n  so this check undercounts silently. A clean result "
+              "from it means nothing.")
+        return False
+    accepted = citations_accepted(root)
+    if accepted is None:
+        return False
+
+    known = set(skills)
+    hooks = os.path.join(root, "plugins/agent-traffic-control/hooks")
+    if os.path.isdir(hooks):
+        known |= {d for d in os.listdir(hooks)
+                  if os.path.isdir(os.path.join(hooks, d))}
+
+    # EVERY markdown file, discovered rather than enumerated. An enumerated list was
+    # already one file short on the day it was written -- the hook ships its own
+    # README.md and DESIGN.md inside the plugin, read by the same audience and able
+    # to carry the same dead pointer. A walk also covers the next doc someone adds.
+    # Dot-directories are pruned, which excludes .git and generated caches.
+    targets = []
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if not d.startswith(".")]
+        for fn in sorted(filenames):
+            if fn.endswith(".md"):
+                targets.append(os.path.join(dirpath, fn))
+    targets.sort()
+    if not targets:
+        print("\n  CITATIONS — the sweep found no markdown files to scan")
+        return False
+
+    hits, scanned = {}, 0
+    for p in targets:
+        try:
+            with open(p, encoding="utf-8") as fh:
+                text = fh.read()
+        except OSError as e:
+            print(f"\n  CITATIONS — cannot read {p}: {e}")
+            return False
+        scanned += 1
+        rel = os.path.relpath(p, root)
+        for lineno, tok in backticked_names(text):
+            tok = tok.strip()
+            name = tok if SKILL_SHAPED.match(tok) else None
+            if name is None:
+                pm = PLUGIN_QUALIFIED.match(tok)
+                name = pm.group(2) if pm else None
+            if not name or name in known or name in accepted:
+                continue
+            hits.setdefault(name, []).append((rel, lineno))
+
+    # A walk that suddenly reads far fewer files than there are skills is a broken
+    # walk, not a clean tree.
+    if scanned < len(skills):
+        print(f"\n  CITATIONS — scanned only {scanned} markdown files against "
+              f"{len(skills)} skills;\n  the sweep is not reading the tree")
+        return False
+
+    if hits:
+        n_sites = sum(len(v) for v in hits.values())
+        n_files = len({f for v in hits.values() for f, _ in v})
+        print(f"\n  DANGLING CITATIONS ({len(hits)} name(s), {n_sites} site(s), "
+              f"{n_files} file(s))")
+        for name in sorted(hits):
+            where = ", ".join(f"{f}:{l}" for f, l in hits[name][:4])
+            more = "" if len(hits[name]) <= 4 else f" (+{len(hits[name]) - 4} more)"
+            print(f"    · {name} — {where}{more}")
+        print("  A backticked skill name that resolves to nothing costs the reader a "
+              "search that\n  cannot succeed. Fix the text: retarget to a skill that "
+              "genuinely covers it, drop\n  the pointer, or say plainly that nothing "
+              "here covers it. If the name is\n  legitimately external or historical, "
+              f"add it to {CITATION_ACCEPT_REL} with the reason.")
+        return False
+
+    print(f"  citations     OK — {scanned} markdown files, every backticked skill "
+          f"name resolves ({len(accepted)} accepted)")
+    return True
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -263,6 +475,10 @@ def main() -> int:
 
     # 4. README front-page count
     if not check_readme_count(root, len(skills)):
+        failed = True
+
+    # 5. dangling skill citations
+    if not check_citations(root, skills):
         failed = True
 
     if a.list:

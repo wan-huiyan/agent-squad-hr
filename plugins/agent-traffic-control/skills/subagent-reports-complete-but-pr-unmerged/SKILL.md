@@ -20,7 +20,7 @@ description: |
   the missing step (poll CI, add label, squash-merge, delete-branch) before
   marking the parent task done. Brief sub-agents to be more disciplined
   but DON'T trust them; treat sub-agent "completed" as "handed off to
-  parent for finalization." Sister skills: `subagent-driven-development`
+  parent for finalization." Sister skills: `superpowers:subagent-driven-development`
   (workflow), `subagent-pre-existing-misattribution`,
   `subagent-bash-cd-wrong-worktree`.
 author: Claude Code
@@ -150,6 +150,6 @@ Without the verify-then-finish discipline, only #540 would have actually closed 
 ## References
 
 - Session log: `the-project-repo` 2026-05-08 (`scan-bugs-parallel`) — closed 8 issues across 6 PRs; 4/4 sub-agents stopped before final merge.
-- Sister skill: `subagent-driven-development` (workflow primer for sub-agent dispatch).
+- Sister skill: `superpowers:subagent-driven-development` (workflow primer for sub-agent dispatch).
 - Sister skill: `subagent-pre-existing-misattribution` (different gap class — wrong baseline classification, not premature completion).
 - Sister skill: `subagent-bash-cd-wrong-worktree` (different gap class — wrong cwd).

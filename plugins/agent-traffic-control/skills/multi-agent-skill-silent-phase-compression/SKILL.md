@@ -168,7 +168,7 @@ if missing:
     # Run the missing phase(s) before retrying.
 ```
 
-Mirror the existing Phase 15.3 retry pattern that v2.16.4 of `agent-review-panel`
+Mirror the existing Phase 15.3 retry pattern that v2.16.4 of `roundtable:agent-review-panel`
 introduced for HTML report generation.
 
 ### 4. Fail-loud deliverable headers

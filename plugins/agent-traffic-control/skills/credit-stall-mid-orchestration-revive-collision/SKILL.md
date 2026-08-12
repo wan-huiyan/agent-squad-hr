@@ -260,5 +260,5 @@ S156 4-track orchestration on the project repo (2026-05-08):
   and resolved)
 - Related skill: `using-git-worktrees` (the substrate that makes parallel tracks
   isolatable in the first place)
-- Related skill: `dispatching-parallel-agents` (when to choose parallel dispatch in
+- Related skill: `superpowers:dispatching-parallel-agents` (when to choose parallel dispatch in
   the first place — informs how many tracks to risk a stall on)

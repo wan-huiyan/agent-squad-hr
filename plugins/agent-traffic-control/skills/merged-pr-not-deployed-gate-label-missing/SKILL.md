@@ -90,7 +90,7 @@ If the row for your branch's merge shows `"conclusion":"skipped"` — confirmed.
 
 If there's no row at all — the workflow's `on:` filter didn't match (e.g. wrong event type, wrong base branch). Inspect the workflow YAML.
 
-If the row shows `failure` — that's a different problem; check `gh-auto-deploy-never-ran-skipped-mask` if this was the first time the gate fired, otherwise treat as a normal CI failure.
+If the row shows `failure` — that's a different problem; check `gha-auto-deploy-never-ran-skipped-mask` if this was the first time the gate fired (named below, and not published — so this is a pointer to a concept, not somewhere to go), otherwise treat as a normal CI failure.
 
 ### Step 2 — What is the gate?
 

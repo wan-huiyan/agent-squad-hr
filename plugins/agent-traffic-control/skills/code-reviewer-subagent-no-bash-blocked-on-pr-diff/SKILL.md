@@ -117,7 +117,8 @@ correct first dispatch would have avoided.
 
 ## See also
 
-- `overnight-review-panel-blocked-reviewer-reads-as-clean` — the **overnight specialization**
+- `overnight-review-panel-blocked-reviewer-reads-as-clean` (its own plugin in the
+  `wan-huiyan-overnight-workflows` marketplace, not here) — the **overnight specialization**
   of this skill (published in `wan-huiyan/overnight-workflows`): in an unattended run a BLOCKED
   reviewer reads as CLEAN with no human to notice, so the bug ships by morning. This skill is the
   general tool-gap mechanism; that one adds the autonomy consequence + morning-synthesis rule.
