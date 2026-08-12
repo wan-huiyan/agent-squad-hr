@@ -115,4 +115,4 @@ with Read when one of these matches what you are looking at.
 
 - [`session-handoff-detect-prior-orphan-pr`](../session-handoff-detect-prior-orphan-pr/SKILL.md) — a previous handoff run already left a branch, PR or worktree behind — find it before opening a duplicate
 - [`session-handoff-number-collision-with-unmerged-sibling`](../session-handoff-number-collision-with-unmerged-sibling/SKILL.md) — two sessions picked the same handoff number because each only sees what merged on its own branch
-- [`parallel-session-superseded-validated-fix-verify-live-prod-state-first`](../parallel-session-superseded-validated-fix-verify-live-prod-state-first/SKILL.md) — a parallel session already shipped a different fix to the same live artefact while you were building yours
+- [`verify-live-prod-before-shipping-superseded-fix`](../verify-live-prod-before-shipping-superseded-fix/SKILL.md) — a parallel session already shipped a different fix to the same live artefact while you were building yours

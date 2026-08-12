@@ -1,5 +1,5 @@
 ---
-name: workflow-pipeline-parallel-stage-returns-bare-array-dropped-by-collector
+name: flatten-workflow-parallel-arrays-before-collecting
 description: |
   Claude Code Workflow tool gotcha: a pipeline() stage that returns
   parallel([...]) resolves to a BARE ARRAY, but a sibling stage that returns

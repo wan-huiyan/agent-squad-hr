@@ -284,8 +284,8 @@ with Read when one of these matches what you are looking at.
 
 - [`workflow-parallel-fanout-omits-sequential-phases`](../workflow-parallel-fanout-omits-sequential-phases/SKILL.md) — a sequential debate/consensus process silently vanished into a parallel fan-out
 - [`workflow-deterministic-compute-as-script-not-stall-prone-agent`](../workflow-deterministic-compute-as-script-not-stall-prone-agent/SKILL.md) — heavy deterministic compute stalls mid-stream in an agent turn — move it into a script
-- [`workflow-large-markdown-deliverable-extract-from-output-json-not-retype`](../workflow-large-markdown-deliverable-extract-from-output-json-not-retype/SKILL.md) — a large markdown deliverable came back inside a structured-output field; extract it, do not retype it
-- [`workflow-pipeline-parallel-stage-returns-bare-array-dropped-by-collector`](../workflow-pipeline-parallel-stage-returns-bare-array-dropped-by-collector/SKILL.md) — a pipeline stage returned a bare array and the collector dropped it
+- [`extract-workflow-markdown-from-output-json`](../extract-workflow-markdown-from-output-json/SKILL.md) — a large markdown deliverable came back inside a structured-output field; extract it, do not retype it
+- [`flatten-workflow-parallel-arrays-before-collecting`](../flatten-workflow-parallel-arrays-before-collecting/SKILL.md) — a pipeline stage returned a bare array and the collector dropped it
 - [`workflow-schema-agent-retry-cap-oversized-payload`](../workflow-schema-agent-retry-cap-oversized-payload/SKILL.md) — a schema agent that did all its work returns null — "StructuredOutput retry cap" on an oversized payload
 - [`workflow-schema-agents-empty-loop-under-ratelimit`](../workflow-schema-agents-empty-loop-under-ratelimit/SKILL.md) — a workflow returns fewer results than it dispatched because agents empty-looped under a rate limit
 - [`workflow-standalone-schema-agent-crash-and-args-string`](../workflow-standalone-schema-agent-crash-and-args-string/SKILL.md) — two crashes that discard every completed agent's work in a dynamic workflow

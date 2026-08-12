@@ -1,5 +1,5 @@
 ---
-name: verifying-subagent-in-your-live-worktree-measures-your-uncommitted-work
+name: isolate-subagent-verification-from-live-worktree
 description: |
   A verification / gate-running subagent you dispatched into YOUR OWN worktree silently
   measures the branch PLUS your uncommitted edits, and reports the mixture as the branch's
