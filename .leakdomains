@@ -34,19 +34,24 @@
 # so the file keeps describing a class rather than a client.
 #
 # DELIBERATELY ABSENT, so nobody re-adds them and then silences the gate to compensate.
-# Each collides with this repo's own engineering vocabulary and would fire on real text:
-#   claimant   -- the session that CLAIMED an issue (gh-issue-claim-coordination)
-#   transcript -- a Claude Code session transcript; 155 hits
+# The first five collide with this repo's own engineering vocabulary and DO fire on real
+# text -- hit counts measured with this gate's own rule (case-insensitive, word-bounded,
+# same exclusions), because a count taken any other way is a number about a different
+# question:
+#   claimant   -- the session that CLAIMED an issue (gh-issue-claim-coordination); 1 hit
+#   transcript -- a Claude Code session transcript; 134 hits
 #   diagnosis  -- diagnosing a failure; 19 hits
 #   headcount  -- check_skill_tiers.py's own per-class caps; 5 hits
 #   churn      -- git object churn; 3 hits
-#   premium    -- omitted as too common in ordinary pricing prose to stay zero-hit
+# The sixth is a judgement call, not a measurement -- it is zero-hit today:
+#   premium    -- left out because it is ordinary pricing and scheduling prose, so it
+#                 would likely start firing on text that names no industry at all.
 # A term that cannot stay zero-hit does not belong here; put it in .leakterms instead.
 
 # --- education / admissions ---
 \bstudents?\b
-\benrol(l)?(ment|ed|ing)?\b
-\bmatriculat(e|ed|ing|ion)\b
+\benrol(l)?(ments?|ed|ing|s|ees?)?\b
+\bmatriculat(e|ed|ing|ions?)\b
 \b(under|post)graduates?\b
 \bcampus(es)?\b
 \bFERPA\b
@@ -58,6 +63,8 @@
 \bsemesters?\b
 \bfaculty\b
 \bscholarships?\b
+# Plural only, deliberately: the singular "admission" is ordinary prose here -- the
+# listing budget's own docs say "admission is ranked by usage" in four places.
 \badmissions\b
 
 # --- health ---
@@ -72,7 +79,8 @@
 
 # --- finance / insurance ---
 \bpolicyholders?\b
-\bunderwrit(e|er|ers|ing|ten)\b
+\bunderwrit(e|es|er|ers|ing|ten)\b
+\bunderwrote\b
 \bIBAN\b
 \bKYC\b
 \bbrokerage\b

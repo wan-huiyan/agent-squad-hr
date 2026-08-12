@@ -300,7 +300,7 @@ matching edit in `.githooks/pre-push` and cannot drift out of the hand-maintaine
 you must not trim it to the sectors you happen to work in.** A denylist naming one sector *is*
 the disclosure: committing that sector's nouns and nothing else to a public repo reassembles, in
 one searchable file, the set a scrub just removed — and points at the engagement more precisely
-than the prose did. A list spanning six points at none, and the next engagement will be in some
+than the prose did. A list spanning six sectors points at none of them, and the next engagement will be in some
 other sector anyway.
 
 **Both files together are the *necessary* half, not the sufficient one.** They are known-term
