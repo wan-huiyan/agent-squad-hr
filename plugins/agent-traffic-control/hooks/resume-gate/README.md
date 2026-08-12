@@ -105,6 +105,24 @@ retrying. **The gate is escapable on purpose.** An earlier design cleared itself
 written by the party being gated, which *looked* unevadable and was not. That is worse than an
 honest prompt. Anything that must be unevadable belongs in CI.
 
+## If a session has no transcript, the gate allows and says so
+
+A session started by another Claude Code process inherits `CLAUDE_CODE_CHILD_SESSION`, and an
+interactive session carrying that marker writes **no transcript file at all**. This gate reads the
+transcript, so there is nothing for it to read.
+
+It allows the call and prints a one-line `systemMessage` naming the cause and the remedy
+(`CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1` in `~/.claude/settings.json`). It does **not** block.
+Until 2026-08-12 it did: `FileNotFoundError` reached the fail-closed handler, and exit 2 blocked
+every `git push`, `gh pr merge`, `gh api` and gated publish call in every project on that machine
+for as long as the session lasted, with `gate failed (FileNotFoundError) - blocking to stay safe`
+naming the exception and nothing that would connect it to session persistence.
+
+Blocking there protected nothing, which is the whole argument: with no transcript there is no mark
+to read and no rows for the detector to scan, so the gate could not have fired in either direction.
+See *The one failure that is not an internal error* in `DESIGN.md`. Every other read failure still
+exits 2 — including a missing `transcript_path` key and a path that is a directory.
+
 ## Install
 
 ```bash

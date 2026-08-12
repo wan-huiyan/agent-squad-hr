@@ -109,6 +109,21 @@ MUTATIONS = [
      "", False),
     ("uncommitted_summary: return nothing", "resume_gate.py",
      "    import subprocess\n    lines = []", "    import subprocess\n    return []\n    lines = []", False),
+    # ---- the missing-transcript branch ----
+    # Anchored on `items = read_last_mark(entries)`, which appears only in
+    # run_pre_tool_use - run_session_start has a near-identical except clause
+    # and replace(old, new, 1) would otherwise hit that one instead.
+    ("no-transcript: block the call instead of allowing it", "resume_gate.py",
+     "        except FileNotFoundError:\n            return 0, json.dumps(_no_transcript_output()), \"\"\n"
+     "        items = read_last_mark(entries)",
+     "        except FileNotFoundError:\n            raise\n        items = read_last_mark(entries)", False),
+    ("no-transcript: allow but say nothing", "resume_gate.py",
+     "        except FileNotFoundError:\n            return 0, json.dumps(_no_transcript_output()), \"\"\n"
+     "        items = read_last_mark(entries)",
+     "        except FileNotFoundError:\n            return 0, \"\", \"\"\n        items = read_last_mark(entries)", False),
+    ("no-transcript: drop the remedy from the message", "resume_gate.py",
+     '    "no transcript; set CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1 to restore the guard."',
+     '    "no transcript."', False),
     # ---- installer ----
     ("install: put `if` at the matcher-group level", "install.py",
      '        {"matcher": BASH_MATCHER, "hooks": [_command(script_path, "pre-tool-use", condition)]}',

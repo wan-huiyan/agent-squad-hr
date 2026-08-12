@@ -113,11 +113,29 @@ def test_gate_arms_on_resume_one_and_disarms_on_resume_two(tmp_path):
 
     assert push() == (0, "", "")
 
-def test_session_start_exits_2_with_one_line_on_error():
-    code, out, err = rg.run_session_start({"source": "resume", "transcript_path": "/nope/missing.jsonl"})
+def test_session_start_exits_2_with_one_line_on_error(tmp_path):
+    """A MISSING transcript is deliberately no longer the error case - it has
+    its own allow-and-say-so branch - so this uses a path that exists and is a
+    DIRECTORY. open() raises IsADirectoryError, which is a genuine surprise
+    about the harness with no known cause, and must still fail closed.
+
+    Using a missing file here was the old proxy for "any error", and it is
+    what made the two behaviours impossible to change independently."""
+    code, out, err = rg.run_session_start({"source": "resume", "transcript_path": str(tmp_path)})
     assert code == 2
     assert len(err.strip().splitlines()) == 1
     assert "resume-gate" in err
+
+def test_session_start_allows_and_says_so_when_the_transcript_does_not_exist(tmp_path):
+    """A resume cannot really happen without a transcript, but both hooks must
+    answer a missing file the same way rather than one calling it a detector
+    failure. Allowed, and NOT silent."""
+    missing = tmp_path / "never-written.jsonl"
+    assert not missing.exists()
+    code, out, err = rg.run_session_start(
+        {"source": "resume", "transcript_path": str(missing), "cwd": "/tmp"})
+    assert (code, err) == (0, "")
+    assert json.loads(out) == {"systemMessage": rg.NO_TRANSCRIPT_MESSAGE}
 
 def test_uncommitted_work_is_reported_as_supplementary_context(tmp_path):
     """Spec: `git status --porcelain` + unpushed commits are the review-state proxy."""
@@ -295,9 +313,53 @@ def test_pre_tool_use_allows_a_clean_session():
     code, out, err = rg.run_pre_tool_use(_pre("clean"))
     assert (code, out.strip()) == (0, "")
 
-def test_pre_tool_use_exits_2_on_error():
-    code, out, err = rg.run_pre_tool_use({"transcript_path": "/nope/missing.jsonl", "tool_name": "Bash"})
+def test_pre_tool_use_exits_2_when_the_transcript_path_is_unreadable(tmp_path):
+    """Fail-closed on a real error. A directory, not a missing file: a missing
+    file is now the allow-and-say-so branch below, so reusing it here would
+    make this test and that one contradict each other."""
+    code, out, err = rg.run_pre_tool_use({"transcript_path": str(tmp_path), "tool_name": "Bash"})
     assert code == 2
+
+def test_pre_tool_use_exits_2_when_the_payload_has_no_transcript_path():
+    """The KeyError path. A payload shaped differently from what the harness
+    documents is a surprise with no known cause, so it still blocks - only a
+    path that names nothing is treated as "there is nothing to check"."""
+    code, out, err = rg.run_pre_tool_use({"tool_name": "Bash"})
+    assert code == 2
+    assert "resume-gate" in err
+
+def test_pre_tool_use_allows_and_says_so_when_the_transcript_does_not_exist(tmp_path):
+    """Regression for 2026-08-12.
+
+    An interactive session that inherits CLAUDE_CODE_CHILD_SESSION writes no
+    transcript at all. `load()` then raised FileNotFoundError, the outer
+    handler exited 2, and exit 2 BLOCKS - so git push, gh pr merge, gh api and
+    every gated publish tool failed in every project on the machine, with an
+    error naming the exception and nothing that would connect it to session
+    persistence.
+
+    Blocking protected nothing: with no transcript there is no mark to read
+    and no rows for detect() to scan, so the gate could not have fired either
+    way. It must allow.
+
+    But it must not go quiet about it - a check that silently did nothing is
+    the fail-open defect this tool exists to avoid. Pinning the exact payload
+    (rather than just `code == 0`) is what makes both halves fail separately:
+    restore the block and the code assertion fails; drop the message and the
+    payload assertion fails."""
+    missing = tmp_path / "never-written.jsonl"
+    assert not missing.exists()
+    code, out, err = rg.run_pre_tool_use({"transcript_path": str(missing), "tool_name": "Bash",
+                                          "tool_input": {"command": "git push origin HEAD"}})
+    assert (code, err) == (0, "")
+    assert json.loads(out) == {"systemMessage": rg.NO_TRANSCRIPT_MESSAGE}
+
+def test_the_no_transcript_message_names_the_cause_and_the_remedy():
+    """The whole point of the message is that the next person does not have to
+    rediscover the connection between a blocked push and session persistence.
+    A message reading only "no transcript" would satisfy the tests above."""
+    assert "CLAUDE_CODE_CHILD_SESSION" in rg.NO_TRANSCRIPT_MESSAGE
+    assert "CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1" in rg.NO_TRANSCRIPT_MESSAGE
 
 
 def test_main_unknown_mode_exits_2_with_stderr_message(monkeypatch, capsys):

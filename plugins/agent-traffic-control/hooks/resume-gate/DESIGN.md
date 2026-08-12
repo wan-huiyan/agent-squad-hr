@@ -407,6 +407,39 @@ a stack trace nobody can act on.
 Exit code 1 is **non-blocking** for both — the action proceeds with a `hook error` notice. Never use
 it for policy; the hooks documentation is explicit that a policy-enforcing hook uses `exit 2`.
 
+### The one failure that is not an internal error: no transcript file
+
+**Added 2026-08-12, after this posture blocked every push on a machine for an entire session.**
+
+A session that inherits `CLAUDE_CODE_CHILD_SESSION` — one started by another Claude Code process —
+writes **no transcript at all** when it is interactive. `load()` then raises `FileNotFoundError`,
+the handler above exits 2, and exit 2 blocks: `git push`, `gh pr merge`, `gh api` and every gated
+publish tool failed in every project on that machine, with
+`gate failed (FileNotFoundError) - blocking to stay safe` naming the exception and nothing that
+would connect it to session persistence.
+
+**Blocking there protects nothing, and that is the whole argument.** This gate fires on a mark; a
+mark is only ever written by the `SessionStart` hook; that hook only acts when `source == "resume"`;
+and a session whose transcript was never written cannot be resumed at all. The `detect()` fallback
+has no rows to scan either. So the gate could not have fired in either direction — refusing the
+push does not make unreviewed subagent work reviewable, it only stops the machine.
+
+So a missing transcript **allows the call and emits a `systemMessage` saying the gate did not run**,
+naming both the cause and the remedy (`CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1`). The second half is
+not decoration: "prefer blocking to a check that quietly did nothing" is still right about silence,
+and `except FileNotFoundError: return 0, "", ""` would reintroduce exactly the fail-open defect this
+tool exists to avoid while looking like the same fix. Both halves have their own mutation in
+`tests/mutation_check.py`.
+
+**Only a missing file takes that path.** A payload with no `transcript_path` key, a path that is a
+directory, a file that cannot be read — all still exit 2. Those are surprises about the harness with
+no known cause; this one has a cause and a remedy.
+
+> The two tests that pinned the old behaviour both used `/nope/missing.jsonl` as their stand-in for
+> "any error", which is why the two cases could not be changed independently. They now use a
+> directory (`IsADirectoryError`) and a payload with the key absent (`KeyError`), so the fail-closed
+> posture is still pinned by something that is genuinely an error.
+
 Both scripts are single-file and stdlib-only, so there is no dependency that can go missing.
 
 ## Testing
