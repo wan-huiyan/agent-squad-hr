@@ -2,12 +2,24 @@
 # Public-safe leak gate. Flags likely client/PII identifiers by GENERIC PATTERN so
 # nothing client-specific has to be committed here. Maintainer-specific names/brands
 # go in a gitignored `.leakterms` (one grep -E regex per line), read at runtime.
+#
+# TWO TERM FILES, AND THE DIFFERENCE IS THE WHOLE POINT:
+#   .leakterms    gitignored. YOUR client names, brands, project ids, username. Never
+#                 committed -- so a CI checkout does not have it, and this gate silently
+#                 degrades to the three generic patterns below. That is by design for
+#                 secret-ish names, and it is also how v1.24.0's 129 occurrences of
+#                 engagement residue passed a green gate before AND after removal.
+#   .leakdomains  TRACKED. Industry vocabulary, spanning many sectors so the file names
+#                 no single one. Committed precisely so CI reads it too. Missing file =
+#                 hard failure, because "the denylist wasn't there" must never read as
+#                 "clean" a second time.
+#
 # Usage: leak_scan.sh [repo_root]   ->   exit 0 = clean, 1 = candidate leak(s).
 set -u
 ROOT="${1:-.}"
 cd "$ROOT" || exit 2
 fail=0
-EXC=(--exclude-dir=.git --exclude-dir=.githooks --exclude=leak_scan.sh --exclude=CONTRIBUTING.md --exclude=.leakterms --exclude=.leakfigs)
+EXC=(--exclude-dir=.git --exclude-dir=.githooks --exclude=leak_scan.sh --exclude=CONTRIBUTING.md --exclude=.leakterms --exclude=.leakfigs --exclude=.leakdomains)
 
 scan() { # $1 regex  $2 label  [$3 grep -vE false-positive filter]
   local out
@@ -34,6 +46,21 @@ if [ -f .leakterms ]; then
     if [ -n "$out" ]; then printf '%s\n' "$out" | head -10; echo "  ^ custom term: $t"; echo; fail=1; fi
   done < .leakterms
 fi
+
+# --- tracked industry-vocabulary denylist (see .leakdomains for what it can't do) ---
+# Fail-closed on absence. `.leakterms` going missing is invisible; this one must not be.
+if [ ! -f .leakdomains ]; then
+  echo "LEAK GATE: .leakdomains is missing. It is a TRACKED file and its absence means the" >&2
+  echo "  industry-vocabulary half of this gate did not run. Restore it (git checkout" >&2
+  echo "  -- .leakdomains) rather than deleting the check that noticed." >&2
+  exit 1
+fi
+while IFS= read -r t; do
+  [ -z "$t" ] && continue
+  case "$t" in \#*) continue;; esac
+  out=$(grep -rnIiE "${EXC[@]}" -- "$t" . 2>/dev/null | sed '/^$/d')
+  if [ -n "$out" ]; then printf '%s\n' "$out" | head -10; echo "  ^ industry vocabulary: $t"; echo; fail=1; fi
+done < .leakdomains
 
 if [ "$fail" -ne 0 ]; then
   echo "LEAK GATE: candidate client/PII identifiers found (above). Sanitize, or exclude a false positive, before publishing." >&2

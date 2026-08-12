@@ -1,0 +1,104 @@
+# Industry vocabulary that must not appear in a worked example. TRACKED ON PURPOSE --
+# unlike `.leakterms`, which is gitignored and therefore invisible to CI, this file ships
+# so the gate that reads it actually runs on a fresh checkout. See CONTRIBUTING.md.
+#
+# THE RULE THIS ENFORCES: a worked example here is about a coordination failure, not about
+# the client it was learned at. It may name a git object, a CI system, a file format or a
+# tool. It may not name an industry.
+#
+# WHY THE LIST SPANS MANY SECTORS, AND WHY YOU MUST NOT TRIM IT TO "the ones we work in":
+# a denylist naming one sector IS the disclosure. Committing `student`, `campus`, `FERPA`
+# and nothing else to a public repo reassembles, in one searchable file, exactly the set a
+# scrub just removed -- and points at the engagement more precisely than the prose did.
+# A list spanning education, health, finance, legal, HR and retail points at none of them.
+# It also has a second job: the next engagement will be in some other sector, and the
+# guard should already be waiting for it.
+#
+# WHAT THIS CANNOT DO -- read this before trusting a green run:
+#   1. It is a known-term grep. It cannot catch an OPEN-VOCABULARY coined name -- a
+#      dashboard nav label, a git worktree name, a campaign token in a filename, a
+#      module or dataset path. That class produced most of what v1.24.0 removed, and no
+#      fixed pattern can enumerate a word it has never seen.
+#   2. It says nothing about the sector you are actually working in right now, unless
+#      that sector happens to be listed below.
+#   A first public publish still needs a human or LLM semantic read. This is the
+#   necessary half, not the sufficient one.
+#
+# FORMAT: one `grep -E` regex per line, matched case-insensitively against every text file
+# in the repo. `#` comments and blank lines are ignored. Word boundaries (\b) are on you --
+# without them `tuition` matches `intuition`.
+#
+# ADDING A TERM: it must be zero-hit on the tree at the moment you add it, or the gate
+# ships red and gets muted inside a week. Run `bash scripts/leak_scan.sh .` before pushing.
+# DO NOT add a term because it appeared in one engagement -- add the sector's vocabulary,
+# so the file keeps describing a class rather than a client.
+#
+# DELIBERATELY ABSENT, so nobody re-adds them and then silences the gate to compensate.
+# Each collides with this repo's own engineering vocabulary and would fire on real text:
+#   claimant   -- the session that CLAIMED an issue (gh-issue-claim-coordination)
+#   transcript -- a Claude Code session transcript; 155 hits
+#   diagnosis  -- diagnosing a failure; 19 hits
+#   headcount  -- check_skill_tiers.py's own per-class caps; 5 hits
+#   churn      -- git object churn; 3 hits
+#   premium    -- omitted as too common in ordinary pricing prose to stay zero-hit
+# A term that cannot stay zero-hit does not belong here; put it in .leakterms instead.
+
+# --- education / admissions ---
+\bstudents?\b
+\benrol(l)?(ment|ed|ing)?\b
+\bmatriculat(e|ed|ing|ion)\b
+\b(under|post)graduates?\b
+\bcampus(es)?\b
+\bFERPA\b
+\bFAFSA\b
+\bregistrar\b
+\btuition\b
+\balumni\b
+\bcoursework\b
+\bsemesters?\b
+\bfaculty\b
+\bscholarships?\b
+\badmissions\b
+
+# --- health ---
+\bpatients?\b
+\bHIPAA\b
+\bclinicians?\b
+\bprescriptions?\b
+\bphysicians?\b
+\bmedicaid\b
+\bmedicare\b
+\bcomorbid(ity|ities)?\b
+
+# --- finance / insurance ---
+\bpolicyholders?\b
+\bunderwrit(e|er|ers|ing|ten)\b
+\bIBAN\b
+\bKYC\b
+\bbrokerage\b
+\bmortgages?\b
+
+# --- legal ---
+\bplaintiffs?\b
+\bdefendants?\b
+\bdockets?\b
+\blitigation\b
+\bdepositions?\b
+\bparalegals?\b
+
+# --- hr / payroll ---
+\bpayroll\b
+\bonboarding\b
+
+# --- retail / consumer ---
+\bSKUs?\b
+\bloyalty\b
+\bcardholders?\b
+\bsubscribers?\b
+\bdonors?\b
+
+# --- privacy statutes, cross-sector ---
+\bGDPR\b
+\bCCPA\b
+\bPIPEDA\b
+\bGLBA\b
