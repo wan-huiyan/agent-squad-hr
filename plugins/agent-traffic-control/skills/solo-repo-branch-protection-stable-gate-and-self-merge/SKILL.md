@@ -118,7 +118,7 @@ must be made through a pull request. ... Required status check "test-gate" is ex
   pass `--repo`/`--base`/`--head` explicitly (see `gh-pr-create-orchestration-cwd-wrong-head`).
 - To fan out across many solo repos, script the PUT per repo after confirming each has a
   `test-gate`-style stable check. See also `claude-plugin-repo-ci-release`, a plugin in the
-`claude-ecosystem-hygiene` marketplace rather than this one.
+  `claude-ecosystem-hygiene` marketplace rather than this one.
 
 ## Reference-only siblings in this toolkit
 
