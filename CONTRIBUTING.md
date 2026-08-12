@@ -13,7 +13,8 @@ applies to the skill listing.
 2. `scripts/check_skill_descriptions.py` — the **skill-description cap gate**.
 3. `scripts/leak_scan.sh` — the **leak gate**. It enforces low-false-positive generic
    patterns: Salesforce custom fields (`__c` / `__r`), API keys / tokens, and real email
-   addresses. A hit fails the check.
+   addresses — plus the **tracked** industry-vocabulary denylist in `.leakdomains`. A hit
+   fails the check, and so does a missing `.leakdomains`. See *The two term files* below.
 4. `scripts/check_skill_routes.py` — the **route gate**: can the model get to a skill at all?
 5. `scripts/check_skill_tiers.py` — the **tier gate**: does the listing still fit, by policy?
 6. A two-line assertion that `--json` reports `within_budget: true`.
@@ -275,16 +276,48 @@ git config core.hooksPath .githooks
 cp .leakterms.example .leakterms      # then add YOUR real client / brand / project names
 ```
 
-`.leakterms` is gitignored — it holds the names only you know are sensitive (client brands,
-dataset / project ids, your username), one `grep -E` regex per line. **Never commit it.** The
-generic CI patterns plus your local `.leakterms` together catch the *enumerable* leaks; a first
-public publish still deserves a human / LLM semantic read for client-shaped names a fixed
-pattern can't enumerate.
+### The two term files, and why one is committed and the other must not be
+
+| | `.leakterms` | `.leakdomains` |
+|---|---|---|
+| tracked? | **no** — gitignored | **yes** — committed |
+| holds | *your* client brands, dataset / project ids, your username | industry vocabulary, spanning many sectors |
+| CI sees it? | **no** | **yes** |
+| missing file | silently skipped | **hard failure** |
+
+`.leakterms` is gitignored — it holds the names only you know are sensitive, one `grep -E` regex
+per line. **Never commit it.** The cost of that is real and was measured: because CI has no copy,
+the gate there degrades to the three generic patterns and prints `LEAK GATE: clean`. It printed
+exactly that before *and* after v1.24.0 removed 129 occurrences of engagement residue, and was
+right both times — it was answering a narrower question than the one being asked of it.
+
+`.leakdomains` exists to close that half. It is **committed on purpose**, so CI reads it too, and
+the gate **fails if the file is absent** — "the denylist wasn't there" must never read as "clean"
+a second time. It lives inside `leak_scan.sh` rather than as a new CI step, so it needs no
+matching edit in `.githooks/pre-push` and cannot drift out of the hand-maintained parity above.
+
+**It spans education, health, finance, legal, HR, retail and cross-sector privacy statutes, and
+you must not trim it to the sectors you happen to work in.** A denylist naming one sector *is*
+the disclosure: committing that sector's nouns and nothing else to a public repo reassembles, in
+one searchable file, the set a scrub just removed — and points at the engagement more precisely
+than the prose did. A list spanning six sectors points at none of them, and the next engagement will be in some
+other sector anyway.
+
+**Both files together are the *necessary* half, not the sufficient one.** They are known-term
+greps. They cannot catch an open-vocabulary coined name — a dashboard nav label, a git worktree
+name, a campaign token in a filename — and that class produced most of what v1.24.0 removed. A
+first public publish still deserves a human / LLM semantic read.
 
 ## If the leak gate fires
 
 Sanitize the flagged content (replace the identifier with a neutral placeholder), or — for a
 genuine false positive — narrow the pattern or add an exclusion in `scripts/leak_scan.sh`.
+
+If it fires on **industry vocabulary**, the fix is almost never to delete the term from
+`.leakdomains`. Rewrite the worked example so it is about the coordination failure rather than the
+sector it was learned in. A term that genuinely cannot stay zero-hit — because it collides with
+this repo's own engineering vocabulary — does not belong in `.leakdomains` at all; six such terms
+are listed with their reasons in the file itself.
 
 ## If the description gate fires
 
