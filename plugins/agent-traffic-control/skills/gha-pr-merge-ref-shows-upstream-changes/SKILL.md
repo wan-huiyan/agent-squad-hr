@@ -195,9 +195,12 @@ Resolution: `git rebase origin/main` (resolved 2 real tracker conflicts),
 The same trap recurred 2 more times in the same session as PRs #706
 and #707 landed during subsequent rebases. In a dense parallel-PR window
 that is expected behaviour — the lint is doing its job, just on a sliding
-target. (The cadence question, and the `gh pr merge --auto` footgun that
-travels with it, were written up in a project-specific skill dropped in
-v1.2.0; nothing in this toolkit has covered them since.)
+target. (The *cadence* question — how often to rebase while the base keeps
+moving — was written up in a project-specific skill dropped in v1.2.0 and
+has no home here since. The `gh pr merge --auto` behaviour that travels
+with it does: see `gh-pr-merge-unstable-state-needs-auto-and-watch-branch-deletes`
+and `solo-repo-branch-protection-stable-gate-and-self-merge` Trap 2, which
+covers the zero-required-checks case that makes `--auto` merge instantly.)
 
 ## Notes
 

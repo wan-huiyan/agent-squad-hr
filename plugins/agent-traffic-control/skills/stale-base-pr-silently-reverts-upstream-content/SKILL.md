@@ -288,9 +288,21 @@ pre-#751 main. Its body claimed "All numbers preserved." Merged at
 **Detection (~3 min post-#759-merge)** via user-prompted content audit:
 
 ```bash
-git show origin/main:templates/actions.html | grep -E '50%|6.0%|n=117|8× the rate|6,483-record'
-# Returned: nothing for the A2/A3 lines, only A1 line had the new context — that's the regression signal
+# Every needle ANCHORED to a post-fix value: a bare '50%' matches unrelated copy
+# ("Target: >50%") on both trees and cannot tell you anything.
+git show origin/main:templates/actions.html | grep -E '6\.0%|n=117|8× the rate|6,483-record'
+# Returned: NOTHING. All four post-fix values absent — A1's added context and the
+# A2/A3 refreshed numbers alike. That silence is the regression signal; on the
+# pre-#759 tree the same grep returns 3 lines.
 ```
+
+⚠️ **The unanchored version of this grep is the trap, not the tool.** The first
+draft included a bare `50%`, which matches `Target: &gt;50%` in unrelated copy on
+*both* trees — so it returns output whichever tree you point it at, and "returned
+nothing" can never be true. A needle that matches something you were not asking
+about converts a real regression into a clean-looking result. Anchor every needle
+to a value that exists **only** after the fix, then verify the grep against the
+known-good tree first and confirm it returns the count you expect.
 
 **Files affected**:
 - `templates/actions.html`: 8 reverted lines (regressed)
@@ -304,8 +316,8 @@ A3=117/6%/50%`, but template copy showed `A2=48%/5%, A3=4.9%/48.3%`.
 **Recovery**: 8 targeted Edit operations on `templates/actions.html` that
 preserved #759's plain-English voice (`"roughly 8× the rate"`,
 `"about the same as"`, conversational tone) while restoring the
-post-fix numbers. Shipped as PR #760, MERGED at 11:34:25Z (~10 min after
-detection). Tracker entry `cat7-7jf`.
+post-fix numbers. Shipped as PR #760, MERGED at 11:34:24Z (~7 min after
+detection, ~10 min after #759). Tracker entry `cat7-7jf`.
 
 **Lesson**: a PR body claiming "X preserved" is true against ITS BASE.
 With stale-base 3-way merges, "preserved" against the base ≠ "preserved"
