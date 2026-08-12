@@ -354,6 +354,49 @@ def _context(items, pending=()):
     return "\n".join(lines)
 
 
+NO_TRANSCRIPT_MESSAGE = (
+    "resume-gate did not run: this session has no transcript file, so there is "
+    "nothing to check. A session that inherits CLAUDE_CODE_CHILD_SESSION writes "
+    "no transcript; set CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1 to restore the guard."
+)
+
+
+def _no_transcript_output():
+    """Hook output for a payload whose transcript_path names no file.
+
+    ALLOWED, and NOT SILENT. Both halves are deliberate, and the first one is
+    the only place in this file where a failure to read does not exit 2.
+
+    Allowed, because a missing transcript is not a broken detector - it is a
+    session this gate was never able to guard in the first place. The gate
+    fires on a mark; a mark is only ever written by the SessionStart hook;
+    that hook only does anything when `source == "resume"`; and a session
+    whose transcript was never written to disk cannot be resumed at all. The
+    detect() fallback has no rows to scan either. So blocking here cannot
+    make unreviewed subagent work reviewable - it can only stop every push,
+    merge and publish on the machine, which is exactly what it did.
+
+    Observed 2026-08-12: an interactive session that inherits
+    CLAUDE_CODE_CHILD_SESSION writes no transcript at all, and every gated
+    call died with `gate failed (FileNotFoundError) - blocking to stay safe`.
+    The message named the exception and nothing that would let anyone connect
+    it to session persistence.
+
+    Not silent, because "prefer blocking to a check that quietly did nothing"
+    is still right about its second half. The systemMessage says the gate did
+    not run, so a machine with persistence off cannot end up quietly
+    unguarded - which is the fail-open defect this tool exists to avoid, and
+    the one a bare `except FileNotFoundError: return 0, "", ""` would
+    reintroduce while looking like the same fix.
+
+    ONLY a missing file takes this path. A payload with no `transcript_path`
+    key, a path that is a directory, a file that cannot be read - all still
+    reach the caller's handler and exit 2. Those are surprises about the
+    harness with no known cause; this one has both a cause and a remedy.
+    """
+    return {"systemMessage": NO_TRANSCRIPT_MESSAGE}
+
+
 def run_session_start(payload):
     """Return (exit_code, stdout, stderr).
 
@@ -382,7 +425,14 @@ def run_session_start(payload):
     try:
         if payload.get("source") != "resume":
             return 0, "", ""
-        entries = load(payload["transcript_path"])
+        try:
+            entries = load(payload["transcript_path"])
+        except FileNotFoundError:
+            # Not reachable in practice - a session with no transcript on disk
+            # cannot be resumed, so `source == "resume"` should never arrive
+            # here. Handled anyway so both hooks answer a missing file the
+            # same way, rather than one of them calling it a detector failure.
+            return 0, json.dumps(_no_transcript_output()), ""
         previous = read_last_mark(entries)
         items = detect(entries)
         if not items:
@@ -432,9 +482,19 @@ def run_pre_tool_use(payload):
     "fails closed" is a claim about exceptions only — the None path above is
     what covers a mark that is merely unreadable, and it is only safe because
     window_after_last_mark skips undecodable marks when choosing the window.
+
+    ONE exception, added 2026-08-12: a transcript_path naming a file that does
+    not exist allows the call and says so, rather than blocking. That is not a
+    softening of the posture above — see _no_transcript_output for why a
+    session with no transcript is one this gate could never have guarded, and
+    why blocking it stopped every push on the machine while protecting
+    nothing. Every other read failure still exits 2.
     """
     try:
-        entries = load(payload["transcript_path"])
+        try:
+            entries = load(payload["transcript_path"])
+        except FileNotFoundError:
+            return 0, json.dumps(_no_transcript_output()), ""
         items = read_last_mark(entries)
         if items is None:
             items = detect(entries)
