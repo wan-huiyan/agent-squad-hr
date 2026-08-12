@@ -247,8 +247,9 @@ S156 4-track orchestration on the project repo (2026-05-08):
 - If the orchestrator's own context is at risk of compaction, prefer "take over in
   main thread" (Step 4) over launching more subagents.
 - Worktree dirty state with `UU` (both-modified, unmerged) markers is a normal step
-  in `pr-conflict-site-regen` flow — don't mistake it for a stall, the agent
-  is mid-rebase.
+  in `merge-conflict-generated-files` flow (its Steps 3–4, resolving the generator
+  source then staging the regenerated outputs) — don't mistake it for a stall, the
+  agent is mid-rebase.
 
 ## References
 

@@ -196,9 +196,9 @@ prevent it:
 2. **Prefix branch names with session/date.** Generic names like
    `feat/refactor-foo` collide across sessions. `feat/<YYYYMMDD>-foo`,
    `feat/<session-id>-foo`, or worktree-scoped names eliminate the
-   collision class entirely. The repos that have this convention
-   (e.g., `pr-conflict-site-regen` Step 2a's `cat7-7XX` ID
-   pattern) don't see this bug.
+   collision class entirely. The repos that have this convention —
+   session- or date-prefixed synthetic IDs, applied consistently —
+   don't see this bug.
 
 If your worktree harness shows a session-start git status banner, **don't
 trust it**. The banner is captured at worktree creation and can be stale

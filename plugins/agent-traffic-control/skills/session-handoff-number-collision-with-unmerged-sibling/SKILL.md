@@ -12,8 +12,8 @@ description: |
   separate branch) but DO collide logically — both PRs claim "S167", a future
   reader can't tell which is which, and any cross-reference to "session_167_*"
   becomes ambiguous. Defends against the silent-logical-collision class
-  (sister to `pr-conflict-site-regen` v1.4.0 Step 2c which covers the
-  same shape for tracker IDs). Sister to `feedback_coordination_framing_for_
+  (sister to `synthetic-id-collision-rebase`, which covers the same shape
+  for tracker IDs when it surfaces as a visible rebase conflict). Sister to `feedback_coordination_framing_for_
   parallel_artifact_collisions` (proactive coordination) and `feedback_
   parallel_session_file_ownership` (proactive file-level rules) — both of
   those prevent the collision; this skill recovers from it post-hoc.
@@ -58,7 +58,7 @@ Activate this check during `session-handoff` Phase 1 Step 2 (before writing the 
 
 1. You've picked a session number N based on `ls docs/handoffs/`.
 2. There's a project-level MEMORY.md or sessions_archive.md that tracks recent sessions.
-3. The repo is in a "dense parallel-PR" state (multiple worktrees, multiple open handoff PRs in recent days, or a `pr-conflict-site-regen`-style skill in the project's skill set).
+3. The repo is in a "dense parallel-PR" state (multiple worktrees, multiple open handoff PRs in recent days, or a `pr-conflict-from-mid-flight-merges`-style skill in the project's skill set).
 
 **Strong signal that the collision is present:**
 - Grepping MEMORY.md for `S<N>\b` or `session_<N>_` returns a match that points at a different worktree than yours.
@@ -212,8 +212,8 @@ Total recovery cost: ~5 minutes of file/branch renames + cross-ref find-replace.
 ## Notes
 
 - The check belongs in `session-handoff` Phase 1 Step 2 ideally — if you have edit access to your local copy of that skill, add a one-line cross-check step there. This standalone skill exists as a complement for projects/users who can't or shouldn't fork session-handoff.
-- The MEMORY.md cross-check is **not** a hot-path operation in single-session projects — skip if your project has zero parallel-session history. Apply only when "dense parallel-PR" is the project mode (heuristic: 3+ worktrees actively under `.claude/worktrees/`, OR a project skill like `pr-conflict-site-regen` exists).
-- This pattern is the session-number equivalent of `pr-conflict-site-regen` v1.4.0 Step 2c (silent ID collision detection for tracker IDs). The recovery mechanics are isomorphic: rename + propagate.
+- The MEMORY.md cross-check is **not** a hot-path operation in single-session projects — skip if your project has zero parallel-session history. Apply only when "dense parallel-PR" is the project mode (heuristic: 3+ worktrees actively under `.claude/worktrees/`, OR a project skill like `pr-conflict-from-mid-flight-merges` exists).
+- This pattern is the session-number equivalent of silent ID collision detection for tracker IDs. The recovery mechanics are isomorphic: rename + propagate. Closest sibling here is `synthetic-id-collision-rebase` — but note the gap: its recipe starts from `<<<<<<<` markers appearing, whereas the silent form produces **no git conflict at all** and surfaces only under an explicit post-rebase-and-post-merge `grep | sort | uniq -c` audit. That silent half has no dedicated skill in this toolkit.
 - The `b`/`c` suffix convention is not universal — some projects use `_b`, `-2`, `_alt`, etc. Check the project's precedents in `MEMORY.md` "Recent sessions" before picking a convention.
 - The sibling's handoff may eventually merge while yours is in flight, OR vice versa — neither needs to know about the other beyond a cross-link in the bucket-footprint or sibling-parallel field of each handoff. Don't tag the older one as "superseded" — both are valid (per `feedback_coordination_framing_for_parallel_artifact_collisions.md`).
 

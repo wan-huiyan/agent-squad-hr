@@ -186,7 +186,7 @@ Build a table:
 
 | # | Line | Post-B-merge (regressed) | PR A's intended | Notes |
 |---|------|---|---|---|
-| 1 | #237 | "based on 448 records" | "+ n=448 + 6,483-control" | Lost reproduction context |
+| 1 | #237 | "based on 448 records" | "+ n=448 + 6,483-record" | Lost reproduction context |
 | 2 | #354 | `48% vs 5%` | `50% vs 6%` | Lost number refresh |
 | ... | ... | ... | ... | ... |
 
@@ -283,7 +283,7 @@ numbers in `templates/actions.html`, `app.py`, `intelligence_findings.js`,
 
 PR #759 ("simplify copy for stakeholder readability") was based on
 pre-#751 main. Its body claimed "All numbers preserved." Merged at
-12:24:15Z, 64 minutes after #751.
+11:24:15Z, **4 minutes** after #751.
 
 **Detection (~3 min post-#759-merge)** via user-prompted content audit:
 
@@ -371,15 +371,17 @@ rewrite in the prior PR is the tell.
   `structure + value`, git's default recursive strategy treats B's edit
   as the broader change and resolves to B. There's no flag to invert this
   reliably; it's a content-aware decision git can't make.
-- Cross-link to `pr-conflict-site-regen` v1.8.0+: that skill
-  covers tracker / site-regen file conflicts (mechanical, generator-driven).
+- Cross-link to `merge-conflict-generated-files`: that skill covers
+  tracker / site-regen file conflicts (mechanical, generator-driven).
   This skill is its content-level cousin (human-authored, semantic).
 
 ## References
 
-- `pr-conflict-site-regen/SKILL.md` — tracker/site-regen file
-  conflict playbook (Step 2a/2c/2d/2e for IDs; this skill is the parallel
-  for content)
+- `merge-conflict-generated-files/SKILL.md` — the regeneration playbook:
+  resolve the generator source, discard and rebuild the outputs. This skill
+  is the parallel for content.
+- `synthetic-id-collision-rebase/SKILL.md` — the ID track, where two
+  entries claim the same identifier during a rebase.
 - `parallel-pr-template-fork-duplicates-moved-section/SKILL.md` —
   duplication via mover/forker (different files, same block); contrast
   with this skill's overlap-and-revert (same file, different intent)

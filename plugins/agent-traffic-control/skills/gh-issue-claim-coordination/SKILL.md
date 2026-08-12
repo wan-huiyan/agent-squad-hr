@@ -154,7 +154,7 @@ gh issue edit "$ISSUE" --remove-label wip
 - **`feedback_track_partial_batch_filings.md`** — different problem (knowing what YOU filed when a sandbox cancels mid-batch). This skill prevents the upstream collision; that one cleans up after a different failure mode.
 - **`feedback_coordination_framing_for_parallel_artifact_collisions.md`** — what to do AFTER two parallel artifacts have already collided. This skill prevents the collision; that one frames the recovery.
 - **`feedback_pr_partial_close_phrasing.md`** — keeps GitHub's closing-keyword parser from auto-closing on partial PRs. Pairs with the partial-scope guardrail above.
-- **`pr-conflict-site-regen`** — resolves rebase conflicts when parallel PRs collide on generated site files. Downstream of a missed claim; if this skill runs, that one fires less often.
+- **`merge-conflict-generated-files`** — resolves rebase conflicts when parallel PRs collide on generated output files; its "tracker + site regen" worked example is this exact shape. Downstream of a missed claim; if this skill runs, that one fires less often.
 
 ## Reference-only siblings in this toolkit
 
