@@ -13,7 +13,8 @@ description: |
   reader can't tell which is which, and any cross-reference to "session_167_*"
   becomes ambiguous. Defends against the silent-logical-collision class
   (sister to `synthetic-id-collision-rebase`, which covers the same shape
-  for tracker IDs when it surfaces as a visible rebase conflict). Sister to `feedback_coordination_framing_for_
+  for tracker IDs when it surfaces as a visible rebase conflict). Sister
+  to `feedback_coordination_framing_for_
   parallel_artifact_collisions` (proactive coordination) and `feedback_
   parallel_session_file_ownership` (proactive file-level rules) — both of
   those prevent the collision; this skill recovers from it post-hoc.
