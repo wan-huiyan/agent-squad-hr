@@ -110,8 +110,8 @@ returning agent's product against it:
 
 ```
 CHANGED MID-RUN — check every product that lands after this line
-  14:20  retention periods corrected by review: 30d → 90d for the audit table
-  15:05  the naming rule for the ledger columns is snake_case, not camelCase
+  <time>  <rule> corrected by review: <old value> → <new value>, on <which table/file>
+  <time>  the naming rule for the ledger columns is snake_case, not camelCase
 ```
 
 Then, for each returning product, ask **what the agent must have believed** rather
