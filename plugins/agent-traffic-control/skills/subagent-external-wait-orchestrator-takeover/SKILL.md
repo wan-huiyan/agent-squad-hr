@@ -22,7 +22,7 @@ description: |
   (different layer: that one is for fully-scheduled multi-track workflows,
   this one is for single-subagent in-session orchestration).
 author: Claude Code
-version: 1.0.0
+version: 1.1.0
 date: 2026-05-08
 disable-model-invocation: true
 ---
@@ -74,6 +74,57 @@ The earlier in the wait you notice this, the more orchestrator budget you save
 by taking over.
 
 ## Solution
+
+### The instruction that causes this most often is a PROHIBITION the agent reads as a command
+
+The brief in the section above at least *asks* for the polling. The commoner and more
+expensive case is a line you wrote to stop an agent doing something, which it reads as
+an instruction to stand and watch:
+
+> "Arm auto-merge and **wait**."
+
+What that meant: *do not fire `gh pr update-branch`; let GitHub land it when the checks
+pass.* What it was read as: *poll until the pull request merges.*
+
+**Measured in one night: five agents did exactly that.** One returned `meow~` three
+times having spent **300,000 tokens**; another spent **355,000**; a third reported
+individual CI legs going green, one at a time, as though that were progress. **Their
+findings had been written into the pull request body the whole time** — the work was
+finished before the waiting started, and every token after that bought nothing.
+
+**Worse than the tokens: a polling agent emits notifications that look like progress.**
+A stalled agent is at least quiet. This one produces a steady stream of plausible
+status lines, so each notification costs the orchestrator a wake to discover that
+nothing happened — and the fleet looks busy while it is idle.
+
+**The fix is two separate instructions, because one sentence cannot carry both.** They
+are about different things and merging them is what created the ambiguity:
+
+```
+1. REPORT IMMEDIATELY after arming auto-merge. Your findings go in the PR body
+   before you arm. Do not wait for checks, do not wait for the merge, do not
+   report merge status — that is the orchestrator's job.
+
+2. NEVER fire `gh pr update-branch` while a run is in progress on that branch.
+```
+
+Line 1 is what to do; line 2 is what not to do. Write both, and never write a
+prohibition whose verb ("wait", "hold off", "leave it alone") could be read as an
+activity.
+
+**And check that the wait is even necessary.** In this case the deliverable — the
+findings — was already durable in the PR body. An agent waiting to report something it
+has already reported is the purest form of this bug.
+
+Two adjacent failures worth telling apart when you write the brief:
+
+- Scope the prohibition in line 2 **per branch**. Written repo-wide — "only when
+  nothing is running" — it stalls the agent silently instead, which is harder to
+  notice than polling because it produces nothing at all:
+  [`orchestrator-rule-too-strict-stalls-agent-silently`](../orchestrator-rule-too-strict-stalls-agent-silently/SKILL.md).
+- If the agent polls because nothing is landing at all, the queue may be the problem
+  rather than the brief:
+  [`merge-queue-thrash-stop-inflow-and-open-prs-as-drafts`](../merge-queue-thrash-stop-inflow-and-open-prs-as-drafts/SKILL.md).
 
 ### Preventive (write better briefs from the start)
 
