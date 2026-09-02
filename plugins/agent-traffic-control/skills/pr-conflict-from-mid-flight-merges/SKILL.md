@@ -230,3 +230,10 @@ with Read when one of these matches what you are looking at.
 - [`git-diff-2dot-vs-3dot-merge-safety`](../git-diff-2dot-vs-3dot-merge-safety/SKILL.md) — a false "this PR deletes files on main" alarm from using two-dot instead of three-dot diff
 - [`pr-from-stale-branch-silently-reverts-newer-main-files`](../pr-from-stale-branch-silently-reverts-newer-main-files/SKILL.md) — a PR from an old branch point silently reverts files that landed on main afterwards, with no conflict
 - [`worktree-stale-local-main-ref-inflates-pr-diff`](../worktree-stale-local-main-ref-inflates-pr-diff/SKILL.md) — `git diff main...<branch>` reports dozens of upstream files because the local `main` ref is stale
+
+Two more about the churn itself rather than the conflict it produces. Reach for these
+when the PRs are `BEHIND` rather than `DIRTY` — there is nothing to resolve and nothing
+lands anyway:
+
+- [`merge-queue-thrash-stop-inflow-and-open-prs-as-drafts`](../merge-queue-thrash-stop-inflow-and-open-prs-as-drafts/SKILL.md) — main moves faster than the slowest CI leg, so every branch goes stale before its own run finishes; stop the inflow, land one at a time, and open pull requests as drafts by default
+- [`auto-merge-rearms-while-agent-live-kill-then-disarm-verify`](../auto-merge-rearms-while-agent-live-kill-then-disarm-verify/SKILL.md) — holding one pull request out of that queue: a disarm does not hold while the PR's own agent is still running, and a draft does

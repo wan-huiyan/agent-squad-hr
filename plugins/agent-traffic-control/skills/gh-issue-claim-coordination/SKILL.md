@@ -98,6 +98,51 @@ When you find a stale claim, **ask the user before clearing it** — the assigne
 gh issue edit "$ISSUE" --remove-assignee <stale-assignee> --remove-label wip
 ```
 
+## The reverse claim: hands-off lists must cite ownership, never infer it
+
+The protocol above records who *is* working on something. The mirror image — telling
+your agents what **not** to touch — has no protocol, and it fails in the opposite
+direction: instead of two sessions colliding, **nobody works on it at all**.
+
+**What happened (real):** a pull request was put on every agent's hands-off list for
+**three days**, on the assumption that it belonged to another session. It did not. It
+was the user's own, opened the day before she left. The instruction not to touch it is
+the entire reason nobody did.
+
+That failure is silent in a way a collision is not. A collision produces two branches
+and an argument. An over-broad hands-off list produces nothing, and a PR sitting
+untouched looks exactly like a PR nobody has got to yet.
+
+**The rule: an exclusion needs evidence of ownership, from the same primitives a claim
+uses.** Ownership is recorded, so read it — do not infer it from a branch name, a
+timing coincidence, or a style that looks like another session's:
+
+```bash
+# Who actually owns this? Author, assignees, and whether anything claims it.
+gh pr view "$PR" --json author,assignees,createdAt,headRefName,isDraft \
+  --jq '{author: .author.login, assignees: [.assignees[].login], createdAt, headRefName, isDraft}'
+
+# And the issue it is attached to, if any — the wip label is the claim.
+gh issue view "$ISSUE" --json assignees,labels,updatedAt
+```
+
+If none of those names an owner, **the honest entry is "owner unknown", not "belongs to
+another session"** — and an unknown owner is a question for the user, not a reason to
+freeze the item indefinitely.
+
+**Three rules that make a hands-off list safe to publish:**
+
+- **Every entry carries its reason and its evidence.** `#123 — hold, assigned to
+  @other-session, wip label set 14:02` is checkable. `#123 — someone else's` is not, and
+  it is the form that survives for three days.
+- **Every entry carries an expiry.** A hands-off list is a claim like any other, so give
+  it the same sweep as above: an exclusion older than the stale-claim window gets
+  re-checked against `gh pr view`, not renewed by default.
+- **A hold you actually need enforced is a state, not a sentence.** If the point is that
+  a PR must not merge, the list is the wrong tool —
+  [`auto-merge-rearms-while-agent-live-kill-then-disarm-verify`](../auto-merge-rearms-while-agent-live-kill-then-disarm-verify/SKILL.md)
+  covers why a disarm does not hold while its agent is live, and why a draft does.
+
 ## Release on completion
 
 GitHub auto-handles the happy path: a merged PR with a closing keyword (`Closes #123` / `Fixes #123` / `Resolves #123`) closes the issue and the assignee becomes irrelevant. The `wip` label, however, is **not** auto-removed by PR merge — and a CLOSED issue still showing `wip` clutters `gh issue list --label wip` and confuses future stale-claim sweeps.

@@ -167,3 +167,10 @@ with Read when one of these matches what you are looking at.
 - [`subagent-reports-complete-but-pr-unmerged`](../subagent-reports-complete-but-pr-unmerged/SKILL.md) — a subagent reported the task complete and the PR is still open
 - [`multi-agent-skill-silent-phase-compression`](../multi-agent-skill-silent-phase-compression/SKILL.md) — mandatory phases of a multi-agent skill silently vanished under context pressure
 - [`multi-phase-skill-disk-reading-strategy`](../multi-phase-skill-disk-reading-strategy/SKILL.md) — late phases of a multi-phase skill fail silently because payloads went through the prompt, not disk
+
+Three more that belong to this same pre-dispatch window — what you can still decide
+about a brief before it is frozen, and what to do about the parts you got wrong:
+
+- [`workflow-agent-unreachable-mid-flight-check-output-not-brief`](../workflow-agent-unreachable-mid-flight-check-output-not-brief/SKILL.md) — whether you can correct an agent later is decided by the dispatch mechanism: a subagent has an address, a workflow phase does not
+- [`orchestrator-rule-too-strict-stalls-agent-silently`](../orchestrator-rule-too-strict-stalls-agent-silently/SKILL.md) — a guard scoped over the whole repo instead of one branch, so its precondition never holds and the agent waits correctly forever
+- [`agent-refusal-with-evidence-beats-literal-compliance`](../agent-refusal-with-evidence-beats-literal-compliance/SKILL.md) — authorise the agent to refuse the letter of an instruction while meeting its intent, and require the measurement with the refusal
