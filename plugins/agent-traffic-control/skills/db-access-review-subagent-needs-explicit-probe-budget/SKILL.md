@@ -6,8 +6,8 @@ description: |
   it a tool call and time budget, plus the probes NOT to re-run. Also when it gives `API Error:
   The socket connection was closed unexpectedly`, or has run 30 minutes. Not its sources.
 author: Claude Code
-version: 1.0.0
-date: 2026-05-29
+version: 1.0.1
+date: 2026-09-02
 ---
 # A review subagent with live-DB access needs an explicit probe budget
 
@@ -92,3 +92,4 @@ with Read when one of these matches what you are looking at.
 - [`opus-ratelimit-fanout-retry-on-sonnet-throttled-waves`](../opus-ratelimit-fanout-retry-on-sonnet-throttled-waves/SKILL.md) — a large fan-out mass-fails with HTTP 429 / "temporarily limiting requests"
 - [`parallel-subagent-fanout-rate-limit-recover-from-disk`](../parallel-subagent-fanout-rate-limit-recover-from-disk/SKILL.md) — recovering a rate-limited fan-out from the files the surviving agents already wrote
 - [`credit-stall-mid-orchestration-revive-collision`](../credit-stall-mid-orchestration-revive-collision/SKILL.md) — a billing/credit stall froze in-flight subagents and they collide when it resolves
+- [`fan-out-cost-control`](../fan-out-cost-control/SKILL.md) — a fan-out's token burn is invisible from the agent count: per-shard `advisor()` calls multiply by fan-out width, a resumed agent's cost tracks turn count not thinking depth, and write-once-at-end agents lose everything to a kill or a usage limit
