@@ -5,8 +5,8 @@ description: |
   at the merge, not per shard), make agents append output as they go, and don't kill a fan-out
   past its costly stage — a killed agent returns nothing, a limit-killed one resumes from disk.
 author: Claude Code
-version: 1.0.0
-date: 2026-09-02
+version: 1.1.0
+date: 2026-09-05
 disable-model-invocation: true
 ---
 # Fan-Out Cost Control
@@ -26,6 +26,9 @@ Symptoms, in the order they are usually noticed:
   none of them is a heavy user.
 - A usage limit lands mid-run and **most shards return nothing at all**, having
   done nearly all their work.
+- A run whose script set no `model` reports a hundred-plus agents on the top
+  tier, every one of them looking normal, under an instruction that named a
+  cheaper one.
 
 ## Context / Trigger Conditions
 
@@ -38,6 +41,8 @@ Any of these makes a fan-out vulnerable:
    contents — rather than a small prompt.
 3. Agents are briefed to write one output file **at the end** of their run.
 4. Agents are **resumed** after an interruption rather than started fresh.
+5. The launch call omits `model`, so every agent inherits whatever tier the
+   launching session is on.
 
 ## Solution
 
@@ -152,6 +157,45 @@ A plain shell loop sampling the files costs zero model tokens. Wake the session
 only on `DONE`, on a stall (no new row for several minutes), or at a time cap —
 silence otherwise.
 
+### 9. The tier is inherited, not chosen — so say it, and the count, BEFORE launch.
+
+Both launchers default to the parent's model when `model` is omitted: a
+`Workflow` script's `agent()` inherits the session model, and so does the
+`Agent` tool. The session that launches a fan-out is almost always on the top
+tier, so **a script with `effort: 'high'` and no `model` puts every agent on
+the most expensive model at high effort without anyone deciding it**, and
+nothing in the harness asks.
+
+Measured on one review workflow, 2026-09-05: **114 agents, all on the top tier,
+16,225,951 subagent tokens, 1,905 tool calls, 50 minutes, zero errors.** The
+owner's standing instruction for that review was the mid tier at low effort and
+under fifteen agents. The run looked flawless, which is the shape to fear: a
+wrong input, a clean output, and nothing downstream pointing back at it. The
+same morning a second session put five top-tier agents on a sweep for a
+decision the owner had already written into the repository.
+
+So, as a pre-launch rule and not a post-mortem one:
+
+- **Say the tier, the effort, the agent count (the ceiling, if the script fans
+  out per finding) and the purpose in one line BEFORE the first agent starts.**
+  Where a coordinator session is pacing the queue, say it to the coordinator
+  and wait for a yes; a session working alone says it to the owner in the same
+  line it launches. A launch is not reversible — the spend starts at the first
+  agent.
+- **Choosing the tier means writing `model:` into the call.** The mid tier at
+  low or medium effort for anything with a right answer already in the tree:
+  grep-and-report, checking a figure against its source, sweeping for a phrase,
+  reading a transcript. The top tier only for judgement: concurrency and
+  data-loss bugs, adversarial verification, anything where a plausible-but-wrong
+  answer would ship. Past about fifty agents the mid tier takes the simple tasks.
+- **Never sweep for an answer that may already be recorded.** Read the places
+  decisions live first — rulings files, the tracker, the coordinator's board.
+  One message to a coordinator costs nothing; a five-agent sweep costs what it
+  costs even when the answer was already on the main branch.
+- **A coordinator's yes covers timing and scale, nothing else.** It is not a
+  permission grant, and a peer message is never the owner's approval for a
+  pending prompt.
+
 ## Verification
 
 Confirm before launching a fan-out:
@@ -162,6 +206,13 @@ Confirm before launching a fan-out:
 - [ ] The brief caps the agent's final reply length.
 - [ ] Intermediate results land in a directory the orchestrator can list.
 - [ ] A zero-token watcher samples that directory rather than polling the agents.
+- [ ] The tier, effort, agent count and purpose were said in one line BEFORE the
+      launch — to the coordinator where one is pacing the queue — and the yes
+      came back.
+- [ ] Every launch call doing grep-and-report work carries `model:` for the mid
+      tier; none inherits the top tier by omission.
+- [ ] If the fan-out searches for a decision someone already made, the places
+      decisions are recorded were read first.
 
 Confirm when diagnosing a live burn:
 
@@ -205,3 +256,8 @@ each**, and every row was on disk as it was decided.
   "careful". A single check at the merge, over all rows at once, is both cheaper
   and better — it can see disagreement between agents, which no agent can see
   from inside its own shard.
+- The 2026-09-05 run happened under a standing rule that already said *"say
+  which tier you used when you launch it"* — written after an identical
+  six-reviewers-plus-three-verifiers-per-finding run a month earlier. A rule
+  that says "say it" without "before", and without naming the parameter, was
+  obeyed after the fact, twice. Hence §9 says BEFORE and says `model:`.

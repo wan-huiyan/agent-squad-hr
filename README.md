@@ -225,6 +225,20 @@ Failure modes of the `Workflow` tool and multi-agent orchestration — schema/St
 
 ## Version history
 
+- **v1.32.0** (2026-09-05) — **EXTENDED: `fan-out-cost-control`** gains a ninth mechanism, the
+  one an agent count hides best: **the model tier is inherited, not chosen.** Both launchers
+  default to the parent session's model when `model` is omitted, so a script with
+  `effort: 'high'` and no `model` puts every agent on the top tier at high effort without
+  anyone deciding it. Measured on one review workflow the same day: **114 agents, all on the
+  top tier, 16,225,951 subagent tokens, 1,905 tool calls, 50 minutes, zero errors** — under a
+  standing instruction for the mid tier at low effort and under fifteen agents, and under a
+  rule that already said "say which tier you used when you launch it". The rule was obeyed
+  after the fact. New pre-launch checklist: say the tier, effort, agent count and purpose in
+  one line BEFORE the first agent starts (to the coordinator session where one is pacing the
+  queue, and wait for the yes); choose the tier by writing `model:` into the call; never
+  sweep for a decision that may already be recorded — a second session put five top-tier
+  agents on one the same morning; a coordinator's yes covers timing and scale, never
+  permissions. Skill version 1.0.0 → 1.1.0. Total: 105 skills + 1 hook.
 - **v1.31.0** (2026-09-02) — **New skill: `fan-out-cost-control`.** Rebased onto v1.30.0's five-skill overnight-fleet-run release below, which landed first and already claimed 1.30.0 and 104 skills; this entry's numbers are re-derived against that, not carried over from the version this skill was originally drafted at. Written up from a real
   13-agent audit fan-out the same day, each agent holding 28 issue bodies. A session usage
   limit landed mid-run; **3 of 13 agents had results on disk**, the other ten had done nearly
